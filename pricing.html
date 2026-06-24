@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing - Whitestone Dynamic</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2>WHITESTONE</h2>
+                <span>DYNAMIC</span>
+                <div class="sidebar-divider"></div>
+                <p>Poultry Management</p>
+            </div>
+            <ul class="nav-menu">
+        <li><a href="dashboard.html"><span class="icon">📊</span> <span>Dashboard</span></a></li>
+        <li><a href="employees.html"><span class="icon">👥</span> <span>Employees</span></a></li>
+        <li><a href="stock.html"><span class="icon">📦</span> <span>Stock</span></a></li>
+        <li><a href="feed.html"><span class="icon">🌾</span> <span>Feed Management</span></a></li>
+        <li><a href="coops.html"><span class="icon">🏠</span> <span>Coops</span></a></li>
+        <li><a href="eggs.html"><span class="icon">🥚</span> <span>Egg Production</span></a></li>
+        <li><a href="sales.html"><span class="icon">💰</span> <span>Sales</span></a></li>
+        <li><a href="chickens.html"><span class="icon">🐔</span> <span>Chickens</span></a></li>
+        <li><a href="customers.html"><span class="icon">👤</span> <span>Customers</span></a></li>
+        <li><a href="batches.html"><span class="icon">📋</span> <span>Batches</span></a></li>
+        <li><a href="pricing.html"><span class="icon">🏷️</span> <span>Pricing</span></a></li>
+        <li><a href="security.html"><span class="icon">🔒</span> <span>Security</span></a></li>
+        <li><a href="equipment.html"><span class="icon">🔧</span> <span>Equipment</span></a></li>
+        <li><a href="#" id="logoutBtn"><span class="icon">🚪</span> <span>Logout</span></a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="top-bar-left">
+                    <h1>Pricing Management</h1>
+                    <p class="welcome-text">Monitor and manage product pricing</p>
+                </div>
+                <div class="top-bar-right">
+                    <span class="date-display" id="currentDate"></span>
+                    <div class="user-avatar">JA</div>
+                </div>
+            </header>
+
+            <!-- Pricing Stats -->
+            <div class="pricing-stats-grid">
+                <div class="pricing-stat-card">
+                    <div class="pricing-stat-icon">🥚</div>
+                    <div class="pricing-stat-info">
+                        <h3>Eggs (Tray)</h3>
+                        <p id="eggTrayPriceDisplay">R0.00</p>
+                        <span class="price-change" id="eggTrayChange">— No data</span>
+                    </div>
+                </div>
+                <div class="pricing-stat-card">
+                    <div class="pricing-stat-icon">🥚</div>
+                    <div class="pricing-stat-info">
+                        <h3>Eggs (Each)</h3>
+                        <p id="eggPiecePriceDisplay">R0.00</p>
+                        <span class="price-change" id="eggPieceChange">— No data</span>
+                    </div>
+                </div>
+                <div class="pricing-stat-card">
+                    <div class="pricing-stat-icon">🐔</div>
+                    <div class="pricing-stat-info">
+                        <h3>Dressed Chicken</h3>
+                        <p id="dressedPriceDisplay">R0.00</p>
+                        <span class="price-change" id="dressedChange">— No data</span>
+                    </div>
+                </div>
+                <div class="pricing-stat-card">
+                    <div class="pricing-stat-icon">🐔</div>
+                    <div class="pricing-stat-info">
+                        <h3>Undressed Chicken</h3>
+                        <p id="undressedPriceDisplay">R0.00</p>
+                        <span class="price-change" id="undressedChange">— No data</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pricing Tabs -->
+            <div class="pricing-tabs">
+                <button class="tab-btn active" data-tab="current">Current Prices</button>
+                <button class="tab-btn" data-tab="history">Price History</button>
+                <button class="tab-btn" data-tab="graphs">📊 Graphs & Trends</button>
+            </div>
+
+            <!-- Current Prices Tab -->
+            <div class="content-section tab-content active" id="current-tab">
+                <div class="section-header">
+                    <h2>Update Current Prices</h2>
+                    <span class="update-info">Last updated: <span id="lastPriceUpdate">Never</span></span>
+                </div>
+
+                <div class="pricing-form-grid">
+                    <!-- Egg Pricing -->
+                    <div class="pricing-form-card">
+                        <div class="pricing-form-header">
+                            <span class="pricing-form-icon">🥚</span>
+                            <h3>Egg Prices</h3>
+                        </div>
+                        <form id="eggPricingForm">
+                            <div class="form-group">
+                                <label for="eggTrayPriceInput">Price per Tray (60 eggs)</label>
+                                <div class="input-with-icon">
+                                    <span class="currency-icon">R</span>
+                                    <input type="number" id="eggTrayPriceInput" step="0.01" placeholder="0.00" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="eggPiecePriceInput">Price per Egg</label>
+                                <div class="input-with-icon">
+                                    <span class="currency-icon">R</span>
+                                    <input type="number" id="eggPiecePriceInput" step="0.01" placeholder="0.00"
+                                        required>
+                                </div>
+                            </div>
+                            <button type="submit" class="primary-btn full-width">Update Egg Prices</button>
+                        </form>
+                    </div>
+
+                    <!-- Chicken Pricing -->
+                    <div class="pricing-form-card">
+                        <div class="pricing-form-header">
+                            <span class="pricing-form-icon">🐔</span>
+                            <h3>Chicken Prices</h3>
+                        </div>
+                        <form id="chickenPricingForm">
+                            <div class="form-group">
+                                <label for="dressedChickenPriceInput">Dressed Chicken</label>
+                                <div class="input-with-icon">
+                                    <span class="currency-icon">R</span>
+                                    <input type="number" id="dressedChickenPriceInput" step="0.01" placeholder="0.00"
+                                        required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="undressedChickenPriceInput">Undressed Chicken</label>
+                                <div class="input-with-icon">
+                                    <span class="currency-icon">R</span>
+                                    <input type="number" id="undressedChickenPriceInput" step="0.01" placeholder="0.00"
+                                        required>
+                                </div>
+                            </div>
+                            <button type="submit" class="primary-btn full-width">Update Chicken Prices</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Price History Tab -->
+            <div class="content-section tab-content" id="history-tab">
+                <div class="section-header">
+                    <h2>Price Change History</h2>
+                    <span class="history-count">Total updates: <span id="totalUpdates">0</span></span>
+                </div>
+                <div id="priceHistoryContainer">
+                    <div class="empty-state">
+                        <span class="empty-icon">📊</span>
+                        <p>No price updates recorded yet</p>
+                        <span class="empty-sub">Update prices to start tracking history</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Graphs Tab -->
+            <div class="content-section tab-content" id="graphs-tab">
+                <div class="section-header">
+                    <h2>Pricing Trends & Analysis</h2>
+                    <div class="chart-controls">
+                        <select id="chartPeriod">
+                            <option value="7">Last 7 days</option>
+                            <option value="14">Last 14 days</option>
+                            <option value="30" selected>Last 30 days</option>
+                            <option value="90">Last 90 days</option>
+                        </select>
+                        <button id="refreshChartBtn" class="primary-btn"
+                            style="padding: 6px 16px; font-size: 12px;">Refresh</button>
+                    </div>
+                </div>
+
+                <div class="chart-grid">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>🥚 Egg Prices Trend</h3>
+                            <span class="chart-legend">
+                                <span class="legend-dot" style="background: #C9A84C;"></span> Tray
+                                <span class="legend-dot" style="background: #0A1628;"></span> Per Egg
+                            </span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="eggPriceChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>🐔 Chicken Prices Trend</h3>
+                            <span class="chart-legend">
+                                <span class="legend-dot" style="background: #C9A84C;"></span> Dressed
+                                <span class="legend-dot" style="background: #0A1628;"></span> Undressed
+                            </span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="chickenPriceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-insights">
+                    <div class="insight-card">
+                        <span class="insight-icon">📈</span>
+                        <div class="insight-content">
+                            <h4>Price Stability</h4>
+                            <p id="priceStability">Loading...</p>
+                        </div>
+                    </div>
+                    <div class="insight-card">
+                        <span class="insight-icon">💰</span>
+                        <div class="insight-content">
+                            <h4>Highest Price</h4>
+                            <p id="highestPrice">Loading...</p>
+                        </div>
+                    </div>
+                    <div class="insight-card">
+                        <span class="insight-icon">📉</span>
+                        <div class="insight-content">
+                            <h4>Price Changes</h4>
+                            <p id="priceChanges">Loading...</p>
+                        </div>
+                    </div>
+                    <div class="insight-card">
+                        <span class="insight-icon">📊</span>
+                        <div class="insight-content">
+                            <h4>Average Price</h4>
+                            <p id="averagePrice">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/app.js"></script>
+    <script src="js/chart-loader.js"></script>
+    <script src="js/pricing.js"></script>
+</body>
+
+</html>

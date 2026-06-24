@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customers - Whitestone Dynamic</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2>WHITESTONE</h2>
+                <span>DYNAMIC</span>
+                <div class="sidebar-divider"></div>
+                <p>Poultry Management</p>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="dashboard.html"><span class="icon">📊</span> <span>Dashboard</span></a></li>
+                <li><a href="employees.html"><span class="icon">👥</span> <span>Employees</span></a></li>
+                <li><a href="stock.html"><span class="icon">📦</span> <span>Stock</span></a></li>
+                <li><a href="feed.html"><span class="icon">🌾</span> <span>Feed Management</span></a></li>
+                <li><a href="coops.html"><span class="icon">🏠</span> <span>Coops</span></a></li>
+                <li><a href="eggs.html"><span class="icon">🥚</span> <span>Egg Production</span></a></li>
+                <li><a href="sales.html"><span class="icon">💰</span> <span>Sales</span></a></li>
+                <li><a href="chickens.html"><span class="icon">🐔</span> <span>Chickens</span></a></li>
+                <li><a href="customers.html" class="active"><span class="icon">👤</span> <span>Customers</span></a></li>
+                <li><a href="batches.html"><span class="icon">📋</span> <span>Batches</span></a></li>
+                <li><a href="pricing.html"><span class="icon">🏷️</span> <span>Pricing</span></a></li>
+                <li><a href="security.html"><span class="icon">🔒</span> <span>Security</span></a></li>
+                <li><a href="equipment.html"><span class="icon">🔧</span> <span>Equipment</span></a></li>
+                <li><a href="#" id="logoutBtn"><span class="icon">🚪</span> <span>Logout</span></a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="top-bar-left">
+                    <h1>👤 Customer Management</h1>
+                    <p class="welcome-text">Manage your valued customers and track purchase history</p>
+                </div>
+                <div class="top-bar-right">
+                    <span class="date-display" id="currentDate"></span>
+                    <div class="user-avatar">JA</div>
+                </div>
+            </header>
+
+            <!-- Customer Stats -->
+            <div class="customer-stats-grid">
+                <div class="customer-stat-card" style="background: linear-gradient(135deg, #0A1628, #1A2A4A);">
+                    <div class="customer-stat-icon">👤</div>
+                    <div class="customer-stat-info">
+                        <span class="customer-stat-label">Total Customers</span>
+                        <p class="customer-stat-value" id="totalCustomers">0</p>
+                    </div>
+                </div>
+                <div class="customer-stat-card" style="background: linear-gradient(135deg, #C9A84C, #A8892E);">
+                    <div class="customer-stat-icon">💰</div>
+                    <div class="customer-stat-info">
+                        <span class="customer-stat-label">Total Revenue</span>
+                        <p class="customer-stat-value" id="customerRevenue">R0.00</p>
+                    </div>
+                </div>
+                <div class="customer-stat-card" style="background: linear-gradient(135deg, #28A745, #1E7E34);">
+                    <div class="customer-stat-icon">⭐</div>
+                    <div class="customer-stat-info">
+                        <span class="customer-stat-label">Wholesale</span>
+                        <p class="customer-stat-value" id="wholesaleCount">0</p>
+                    </div>
+                </div>
+                <div class="customer-stat-card" style="background: linear-gradient(135deg, #17A2B8, #117A8B);">
+                    <div class="customer-stat-icon">🔄</div>
+                    <div class="customer-stat-info">
+                        <span class="customer-stat-label">Regular</span>
+                        <p class="customer-stat-value" id="regularCount">0</p>
+                    </div>
+                </div>
+                <div class="customer-stat-card" style="background: linear-gradient(135deg, #6F42C1, #553098);">
+                    <div class="customer-stat-icon">👑</div>
+                    <div class="customer-stat-info">
+                        <span class="customer-stat-label">VIP</span>
+                        <p class="customer-stat-value" id="vipCount">0</p>
+                    </div>
+                </div>
+                <div class="customer-stat-card" style="background: linear-gradient(135deg, #FD7E14, #E06B0B);">
+                    <div class="customer-stat-icon">📊</div>
+                    <div class="customer-stat-info">
+                        <span class="customer-stat-label">Avg. Purchase</span>
+                        <p class="customer-stat-value" id="avgPurchase">R0.00</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Table -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2>📋 Customer Directory</h2>
+                    <button id="addCustomerBtn" class="primary-btn">+ Add Customer</button>
+                </div>
+
+                <!-- Search and Filter -->
+                <div class="customer-search">
+                    <input type="text" id="customerSearch" placeholder="🔍 Search customers by name, phone, or email..."
+                        class="search-input">
+                    <select id="customerTypeFilter" class="filter-select">
+                        <option value="all">All Types</option>
+                        <option value="regular">Regular</option>
+                        <option value="wholesale">Wholesale</option>
+                        <option value="vip">VIP</option>
+                    </select>
+                </div>
+
+                <div class="table-container">
+                    <table id="customerTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Customer</th>
+                                <th>Contact</th>
+                                <th>Type</th>
+                                <th>Total Spent</th>
+                                <th>Last Purchase</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customerTableBody">
+                            <!-- Customers will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Customer Modal -->
+                <div id="customerModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <h2 id="customerModalTitle">Add Customer</h2>
+                        <form id="customerForm">
+                            <input type="hidden" id="editCustomerId">
+                            <div class="form-group">
+                                <label for="custName">Full Name *</label>
+                                <input type="text" id="custName" placeholder="Enter customer name" required>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group half">
+                                    <label for="custPhone">Phone Number</label>
+                                    <input type="text" id="custPhone" placeholder="071 234 5678">
+                                </div>
+                                <div class="form-group half">
+                                    <label for="custEmail">Email Address</label>
+                                    <input type="email" id="custEmail" placeholder="customer@email.com">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="custAddress">Physical Address</label>
+                                <input type="text" id="custAddress" placeholder="Street, City, Province">
+                            </div>
+                            <div class="form-group">
+                                <label for="custType">Customer Type</label>
+                                <select id="custType">
+                                    <option value="regular">🔄 Regular</option>
+                                    <option value="wholesale">⭐ Wholesale</option>
+                                    <option value="vip">👑 VIP</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="primary-btn full-width">Save Customer</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="js/app.js"></script>
+    <script src="js/customers.js"></script>
+</body>
+
+</html>

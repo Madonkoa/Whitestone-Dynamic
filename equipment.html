@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipment - Whitestone Dynamic</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2>WHITESTONE</h2>
+                <span>DYNAMIC</span>
+                <div class="sidebar-divider"></div>
+                <p>Poultry Management</p>
+            </div>
+            <ul class="nav-menu">
+    <li><a href="dashboard.html"><span class="icon">📊</span> <span>Dashboard</span></a></li>
+    <li><a href="employees.html"><span class="icon">👥</span> <span>Employees</span></a></li>
+    <li><a href="stock.html"><span class="icon">📦</span> <span>Stock</span></a></li>
+    <li><a href="feed.html"><span class="icon">🌾</span> <span>Feed Management</span></a></li>
+    <li><a href="coops.html"><span class="icon">🏠</span> <span>Coops</span></a></li>
+    <li><a href="eggs.html"><span class="icon">🥚</span> <span>Egg Production</span></a></li>
+    <li><a href="sales.html"><span class="icon">💰</span> <span>Sales</span></a></li>
+    <li><a href="chickens.html"><span class="icon">🐔</span> <span>Chickens</span></a></li>
+    <li><a href="customers.html"><span class="icon">👤</span> <span>Customers</span></a></li>
+    <li><a href="batches.html"><span class="icon">📋</span> <span>Batches</span></a></li>
+    <li><a href="pricing.html"><span class="icon">🏷️</span> <span>Pricing</span></a></li>
+    <li><a href="security.html"><span class="icon">🔒</span> <span>Security</span></a></li>
+    <li><a href="equipment.html"><span class="icon">🔧</span> <span>Equipment</span></a></li>
+    <li><a href="#" id="logoutBtn"><span class="icon">🚪</span> <span>Logout</span></a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="top-bar-left">
+                    <h1>Equipment Management</h1>
+                    <p class="welcome-text">Manage farm equipment and tools</p>
+                </div>
+                <div class="top-bar-right">
+                    <span class="date-display" id="currentDate"></span>
+                    <div class="user-avatar">JA</div>
+                </div>
+            </header>
+
+            <div class="content-section">
+                <div class="section-header">
+                    <h2>Equipment Inventory</h2>
+                    <button id="addEquipmentBtn" class="primary-btn">+ Add Equipment</button>
+                </div>
+
+                <div class="equipment-grid" id="equipmentGrid"></div>
+
+                <div id="equipmentModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <h2 id="equipmentModalTitle">Add/Update Equipment</h2>
+                        <form id="equipmentForm">
+                            <input type="hidden" id="editEquipmentId">
+                            <div class="form-group">
+                                <label for="equipmentName">Equipment Name</label>
+                                <input type="text" id="equipmentName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="equipmentCondition">Condition</label>
+                                <select id="equipmentCondition" required>
+                                    <option value="Excellent">Excellent</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Fair">Fair</option>
+                                    <option value="Poor">Poor</option>
+                                    <option value="Broken">Broken</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group half">
+                                    <label for="equipmentPurchase">Purchase Date</label>
+                                    <input type="date" id="equipmentPurchase">
+                                </div>
+                                <div class="form-group half">
+                                    <label for="equipmentMaintenance">Last Maintenance</label>
+                                    <input type="date" id="equipmentMaintenance">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="equipmentNotes">Notes</label>
+                                <textarea id="equipmentNotes" rows="3"></textarea>
+                            </div>
+                            <button type="submit" class="primary-btn" style="width: 100%;">Save Equipment</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="js/app.js"></script>
+    <script src="js/equipment.js"></script>
+</body>
+</html>

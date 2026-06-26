@@ -17,7 +17,7 @@
                 <div class="sidebar-divider"></div>
                 <p>Poultry Management</p>
             </div>
-            <ul class="nav-menu">
+            <ul class="nav-menu" id="mainNav">
                 <li><a href="dashboard.html"><span class="icon">📊</span> <span>Dashboard</span></a></li>
                 <li><a href="employees.html"><span class="icon">👥</span> <span>Employees</span></a></li>
                 <li><a href="stock.html"><span class="icon">📦</span> <span>Stock</span></a></li>
@@ -48,7 +48,6 @@
                 </div>
             </header>
 
-            <!-- Feed Stats -->
             <div class="feed-stats-grid">
                 <div class="feed-stat-card">
                     <div class="feed-stat-icon">📦</div>
@@ -80,14 +79,12 @@
                 </div>
             </div>
 
-            <!-- Feed Tabs -->
             <div class="feed-tabs">
                 <button class="tab-btn active" data-tab="consumption">📝 Record Consumption</button>
                 <button class="tab-btn" data-tab="stock">📦 Record Stock</button>
                 <button class="tab-btn" data-tab="history">📋 History</button>
             </div>
 
-            <!-- Consumption Tab -->
             <div class="content-section tab-content active" id="consumption-tab">
                 <div class="section-header">
                     <h2>📝 Record Daily Feed Consumption</h2>
@@ -137,7 +134,6 @@
                 </form>
             </div>
 
-            <!-- Stock Tab -->
             <div class="content-section tab-content" id="stock-tab">
                 <div class="section-header">
                     <h2>📦 Record Feed Stock Delivery</h2>
@@ -197,7 +193,6 @@
                 </form>
             </div>
 
-            <!-- History Tab -->
             <div class="content-section tab-content" id="history-tab">
                 <div class="section-header">
                     <h2>📋 Feed History</h2>
@@ -214,6 +209,7 @@
         </main>
     </div>
     <script src="js/app.js"></script>
+    <script src="js/nav.js"></script>
     <script src="js/feed.js"></script>
 </body>
 

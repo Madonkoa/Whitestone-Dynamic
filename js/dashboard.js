@@ -1,9 +1,51 @@
-// dashboard.js - Dashboard functionality
+// dashboard.js - Dashboard with role-based content
 
 document.addEventListener('DOMContentLoaded', function () {
     loadDashboardStats();
     loadRecentActivity();
+    setupRoleBasedDashboard();
 });
+
+function setupRoleBasedDashboard() {
+    var user = getCurrentUser();
+    if (!user) return;
+
+    var role = user.role || 'farmer';
+    var isOwner = role === 'owner';
+    var isManager = role === 'manager' || role === 'owner';
+    var isSales = role === 'sales' || role === 'owner' || role === 'manager';
+    var isFarmer = role === 'farmer' || role === 'foreman' || role === 'owner' || role === 'manager';
+
+    // Show/hide Quick Actions based on role
+    var actionButtons = document.querySelectorAll('.action-btn');
+    actionButtons.forEach(function (btn) {
+        var text = btn.textContent.toLowerCase();
+        var shouldShow = true;
+
+        // Sales buttons - only for sales, manager, owner
+        if (text.includes('sell') && !isSales) {
+            shouldShow = false;
+        }
+
+        // Farm operations - only for farmer, foreman, manager, owner
+        if ((text.includes('record') || text.includes('check')) && !isFarmer) {
+            shouldShow = false;
+        }
+
+        // Staff management - only for manager, owner
+        if (text.includes('manage staff') && !isManager) {
+            shouldShow = false;
+        }
+
+        btn.style.display = shouldShow ? '' : 'none';
+    });
+
+    // Show/hide batch info based on role
+    var batchSection = document.querySelector('.batch-info');
+    if (batchSection && !isFarmer) {
+        batchSection.style.display = 'none';
+    }
+}
 
 function loadDashboardStats() {
     // Employees

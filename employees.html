@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employees - Whitestone Dynamic</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
     <div class="dashboard-container">
         <nav class="sidebar">
@@ -15,29 +17,29 @@
                 <div class="sidebar-divider"></div>
                 <p>Poultry Management</p>
             </div>
-            <ul class="nav-menu">
-            <li><a href="dashboard.html"><span class="icon">📊</span> <span>Dashboard</span></a></li>
-            <li><a href="employees.html"><span class="icon">👥</span> <span>Employees</span></a></li>
-            <li><a href="stock.html"><span class="icon">📦</span> <span>Stock</span></a></li>
-            <li><a href="feed.html"><span class="icon">🌾</span> <span>Feed Management</span></a></li>
-            <li><a href="coops.html"><span class="icon">🏠</span> <span>Coops</span></a></li>
-            <li><a href="eggs.html"><span class="icon">🥚</span> <span>Egg Production</span></a></li>
-            <li><a href="sales.html"><span class="icon">💰</span> <span>Sales</span></a></li>
-            <li><a href="chickens.html"><span class="icon">🐔</span> <span>Chickens</span></a></li>
-            <li><a href="customers.html"><span class="icon">👤</span> <span>Customers</span></a></li>
-            <li><a href="batches.html"><span class="icon">📋</span> <span>Batches</span></a></li>
-            <li><a href="pricing.html"><span class="icon">🏷️</span> <span>Pricing</span></a></li>
-            <li><a href="security.html"><span class="icon">🔒</span> <span>Security</span></a></li>
-            <li><a href="equipment.html"><span class="icon">🔧</span> <span>Equipment</span></a></li>
-            <li><a href="#" id="logoutBtn"><span class="icon">🚪</span> <span>Logout</span></a></li>
+            <ul class="nav-menu" id="mainNav">
+                <li><a href="dashboard.html"><span class="icon">📊</span> <span>Dashboard</span></a></li>
+                <li><a href="employees.html" class="active"><span class="icon">👥</span> <span>Employees</span></a></li>
+                <li><a href="stock.html"><span class="icon">📦</span> <span>Stock</span></a></li>
+                <li><a href="feed.html"><span class="icon">🌾</span> <span>Feed Management</span></a></li>
+                <li><a href="coops.html"><span class="icon">🏠</span> <span>Coops</span></a></li>
+                <li><a href="eggs.html"><span class="icon">🥚</span> <span>Egg Production</span></a></li>
+                <li><a href="sales.html"><span class="icon">💰</span> <span>Sales</span></a></li>
+                <li><a href="chickens.html"><span class="icon">🐔</span> <span>Chickens</span></a></li>
+                <li><a href="customers.html"><span class="icon">👤</span> <span>Customers</span></a></li>
+                <li><a href="batches.html"><span class="icon">📋</span> <span>Batches</span></a></li>
+                <li><a href="pricing.html"><span class="icon">🏷️</span> <span>Pricing</span></a></li>
+                <li><a href="security.html"><span class="icon">🔒</span> <span>Security</span></a></li>
+                <li><a href="equipment.html"><span class="icon">🔧</span> <span>Equipment</span></a></li>
+                <li><a href="#" id="logoutBtn"><span class="icon">🚪</span> <span>Logout</span></a></li>
             </ul>
         </nav>
 
         <main class="main-content">
             <header class="top-bar">
                 <div class="top-bar-left">
-                    <h1>Employee Management</h1>
-                    <p class="welcome-text">Manage your team</p>
+                    <h1>👥 Employee Management</h1>
+                    <p class="welcome-text">Manage your team and their access rights</p>
                 </div>
                 <div class="top-bar-right">
                     <span class="date-display" id="currentDate"></span>
@@ -59,7 +61,7 @@
                                 <th>Username</th>
                                 <th>Name</th>
                                 <th>Surname</th>
-                                <th>Position</th>
+                                <th>Role</th>
                                 <th>Access Rights</th>
                                 <th>Status</th>
                                 <th>Actions</th>
@@ -76,20 +78,20 @@
                         <form id="employeeForm">
                             <input type="hidden" id="editEmployeeId">
                             <div class="form-group">
-                                <label for="empUsername">Username</label>
+                                <label for="empUsername">Username *</label>
                                 <input type="text" id="empUsername" required>
                             </div>
                             <div class="form-group">
                                 <label for="empPassword">Password</label>
-                                <input type="password" id="empPassword">
+                                <input type="password" id="empPassword" placeholder="Leave blank to keep current">
                             </div>
                             <div class="form-row">
                                 <div class="form-group half">
-                                    <label for="empName">Name</label>
+                                    <label for="empName">Name *</label>
                                     <input type="text" id="empName" required>
                                 </div>
                                 <div class="form-group half">
-                                    <label for="empSurname">Surname</label>
+                                    <label for="empSurname">Surname *</label>
                                     <input type="text" id="empSurname" required>
                                 </div>
                             </div>
@@ -103,20 +105,26 @@
                             </div>
                             <div class="form-row">
                                 <div class="form-group half">
-                                    <label for="empPosition">Position</label>
-                                    <select id="empPosition">
-                                        <option value="farmer">Farmer</option>
-                                        <option value="admin">Admin</option>
-                                        <option value="manager">Manager</option>
-                                        <option value="owner">Owner</option>
+                                    <label for="empRole">Role *</label>
+                                    <select id="empRole" required>
+                                        <option value="owner">👑 Owner</option>
+                                        <option value="manager">📋 Manager</option>
+                                        <option value="foreman">🔧 Production Foreman</option>
+                                        <option value="farmer">🌾 Farmer</option>
+                                        <option value="sales">💰 Sales Representative</option>
+                                        <option value="accountant">📊 Accountant</option>
                                     </select>
                                 </div>
                                 <div class="form-group half">
-                                    <label for="empAccess">Access Rights</label>
-                                    <input type="text" id="empAccess" placeholder="admin,manager,farmer">
+                                    <label for="empPosition">Position Title</label>
+                                    <input type="text" id="empPosition" placeholder="e.g., Farm Manager">
                                 </div>
                             </div>
-                            <button type="submit" class="primary-btn" style="width: 100%;">Save Employee</button>
+                            <div class="form-group">
+                                <label for="empAccess">Access Rights (comma separated)</label>
+                                <input type="text" id="empAccess" placeholder="admin,manager,farmer">
+                            </div>
+                            <button type="submit" class="primary-btn full-width">Save Employee</button>
                         </form>
                     </div>
                 </div>
@@ -124,6 +132,8 @@
         </main>
     </div>
     <script src="js/app.js"></script>
+    <script src="js/nav.js"></script>
     <script src="js/employees.js"></script>
 </body>
+
 </html>

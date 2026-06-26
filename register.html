@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Whitestone Dynamic</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
     <div class="auth-container">
         <div class="auth-box register-box">
@@ -13,25 +15,29 @@
                 <h2>WHITESTONE</h2>
                 <span>DYNAMIC</span>
             </div>
-            <h3>Register New Employee</h3>
+            <h3>Create New Account</h3>
             <form id="registerForm">
                 <div class="form-row">
                     <div class="form-group half">
-                        <label for="regName">First Name</label>
+                        <label for="regName">First Name *</label>
                         <input type="text" id="regName" placeholder="First name" required>
                     </div>
                     <div class="form-group half">
-                        <label for="regSurname">Surname</label>
+                        <label for="regSurname">Surname *</label>
                         <input type="text" id="regSurname" placeholder="Surname" required>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="regUsername">Username</label>
+                    <label for="regUsername">Username *</label>
                     <input type="text" id="regUsername" placeholder="Choose username" required>
                 </div>
                 <div class="form-group">
-                    <label for="regPassword">Password</label>
-                    <input type="password" id="regPassword" placeholder="Choose password" required>
+                    <label for="regPassword">Password *</label>
+                    <input type="password" id="regPassword" placeholder="Min 6 characters" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label for="regConfirmPassword">Confirm Password *</label>
+                    <input type="password" id="regConfirmPassword" placeholder="Confirm password" required>
                 </div>
                 <div class="form-group">
                     <label for="regDob">Date of Birth</label>
@@ -56,6 +62,17 @@
                         <input type="text" id="regAccess" placeholder="admin,manager,farmer" value="farmer">
                     </div>
                 </div>
+                <div class="form-group">
+                    <label for="regRole">Role *</label>
+                    <select id="regRole" required>
+                        <option value="owner">👑 Owner</option>
+                        <option value="manager">📋 Manager</option>
+                        <option value="foreman">🔧 Production Foreman</option>
+                        <option value="farmer">🌾 Farmer</option>
+                        <option value="sales">💰 Sales Representative</option>
+                        <option value="accountant">📊 Accountant</option>
+                    </select>
+                </div>
                 <button type="submit" class="auth-btn">Register</button>
             </form>
             <p class="auth-link">Already have an account? <a href="login.html">Login here</a></p>
@@ -64,4 +81,5 @@
     <script src="js/app.js"></script>
     <script src="js/auth.js"></script>
 </body>
+
 </html>

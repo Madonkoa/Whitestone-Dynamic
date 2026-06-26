@@ -10,7 +10,6 @@
 
 <body>
     <div class="dashboard-container">
-        <!-- Sidebar -->
         <nav class="sidebar">
             <div class="sidebar-header">
                 <h2>WHITESTONE</h2>
@@ -18,8 +17,8 @@
                 <div class="sidebar-divider"></div>
                 <p>Poultry Management</p>
             </div>
-            <ul class="nav-menu">
-                <li><a href="dashboard.html"><span class="icon">📊</span> <span>Dashboard</span></a></li>
+            <ul class="nav-menu" id="mainNav">
+                <li><a href="dashboard.html" class="active"><span class="icon">📊</span> <span>Dashboard</span></a></li>
                 <li><a href="employees.html"><span class="icon">👥</span> <span>Employees</span></a></li>
                 <li><a href="stock.html"><span class="icon">📦</span> <span>Stock</span></a></li>
                 <li><a href="feed.html"><span class="icon">🌾</span> <span>Feed Management</span></a></li>
@@ -114,20 +113,7 @@
             <div class="dashboard-grid">
                 <section class="recent-activity">
                     <h2>📈 Recent Activity</h2>
-                    <div id="activityLog">
-                        <div class="activity-item">
-                            <span class="activity-time">Today</span>
-                            <p>🥚 Egg production recorded: 1,250 eggs</p>
-                        </div>
-                        <div class="activity-item">
-                            <span class="activity-time">Yesterday</span>
-                            <p>💰 Sale completed: 30 trays to Prince Owusu</p>
-                        </div>
-                        <div class="activity-item">
-                            <span class="activity-time">2 days ago</span>
-                            <p>🌾 Feed stock updated: 250kg Layer Feed</p>
-                        </div>
-                    </div>
+                    <div id="activityLog"></div>
                 </section>
 
                 <section class="batch-info">
@@ -163,6 +149,7 @@
         </main>
     </div>
     <script src="js/app.js"></script>
+    <script src="js/nav.js"></script>
     <script src="js/dashboard.js"></script>
 </body>
 

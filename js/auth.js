@@ -1,8 +1,4 @@
-// auth.js - Complete authentication with access control
-
-// ============================================
-// AUTH STATE MANAGEMENT
-// ============================================
+// auth.js - Complete authentication
 
 const Auth = {
     getCurrentUser: function () {
@@ -80,9 +76,10 @@ const Auth = {
     }
 };
 
-// ============================================
-// CLEAN TOAST - NO GREEN, NO BORDER
-// ============================================
+function verifyPassword(password, hash) {
+    if (!hash || hash === '') return true;
+    return hashPassword(password) === hash;
+}
 
 function showAuthToast(message) {
     document.querySelectorAll('.auth-toast').forEach(function (t) { t.remove(); });

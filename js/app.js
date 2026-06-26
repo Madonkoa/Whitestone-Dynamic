@@ -73,7 +73,7 @@ const DB = {
 };
 
 // ============================================
-// PERMISSIONS DEFINITIONS
+// ROLE PERMISSIONS - SINGLE SOURCE OF TRUTH
 // ============================================
 
 const PERMISSIONS = {
@@ -104,9 +104,21 @@ const PERMISSIONS = {
     EQUIPMENT_CRUD: 'equipment_crud'
 };
 
-// ============================================
-// ROLE PERMISSIONS
-// ============================================
+const PAGE_PERMISSIONS = {
+    'dashboard.html': PERMISSIONS.DASHBOARD,
+    'employees.html': PERMISSIONS.EMPLOYEES_VIEW,
+    'stock.html': PERMISSIONS.STOCK_VIEW,
+    'feed.html': PERMISSIONS.FEED_VIEW,
+    'coops.html': PERMISSIONS.COOPS_VIEW,
+    'eggs.html': PERMISSIONS.EGGS_VIEW,
+    'sales.html': PERMISSIONS.SALES_VIEW,
+    'chickens.html': PERMISSIONS.CHICKENS_VIEW,
+    'customers.html': PERMISSIONS.CUSTOMERS_VIEW,
+    'batches.html': PERMISSIONS.BATCHES_VIEW,
+    'pricing.html': PERMISSIONS.PRICING_VIEW,
+    'security.html': PERMISSIONS.SECURITY_VIEW,
+    'equipment.html': PERMISSIONS.EQUIPMENT_VIEW
+};
 
 const ROLE_PERMISSIONS = {
     owner: [
@@ -175,70 +187,38 @@ const ROLE_PERMISSIONS = {
 };
 
 // ============================================
-// ACCESS CONTROL FUNCTIONS
+// ACCESS CONTROL - UNIFIED SYSTEM
 // ============================================
 
-function hasPermission(permission) {
-    var user = getCurrentUser();
+function isOwner(user) {
     if (!user) return false;
+    return user.position === 'Owner' || user.role === 'owner' || user.username === 'admin';
+}
 
-    // OWNER HAS ALL PERMISSIONS - Check position, role, AND username
-    if (user.position === 'Owner' || user.role === 'owner' || user.username === 'admin') {
-        return true;
-    }
+function hasPermission(user, permission) {
+    if (!user) return false;
+    if (isOwner(user)) return true;
 
-    // MANAGER has most permissions (but not employee CRUD)
-    if (user.position === 'Manager' || user.role === 'manager') {
-        if (permission === PERMISSIONS.EMPLOYEES_VIEW) return true;
-        if (permission === PERMISSIONS.EMPLOYEES_CRUD) return false;
-        if (permission === PERMISSIONS.PRICING_CRUD) return false;
-        return true;
-    }
-
-    var userPermissions = ROLE_PERMISSIONS[user.role] || [];
-    return userPermissions.includes(permission);
+    var rolePermissions = ROLE_PERMISSIONS[user.role] || [];
+    return rolePermissions.includes(permission);
 }
 
 function canViewPage(page) {
     var user = getCurrentUser();
     if (!user) return false;
+    if (isOwner(user)) return true;
 
-    // OWNER CAN VIEW EVERYTHING
-    if (user.position === 'Owner' || user.role === 'owner' || user.username === 'admin') {
-        return true;
-    }
-
-    var pageMap = {
-        'dashboard.html': PERMISSIONS.DASHBOARD,
-        'employees.html': PERMISSIONS.EMPLOYEES_VIEW,
-        'stock.html': PERMISSIONS.STOCK_VIEW,
-        'feed.html': PERMISSIONS.FEED_VIEW,
-        'coops.html': PERMISSIONS.COOPS_VIEW,
-        'eggs.html': PERMISSIONS.EGGS_VIEW,
-        'sales.html': PERMISSIONS.SALES_VIEW,
-        'chickens.html': PERMISSIONS.CHICKENS_VIEW,
-        'customers.html': PERMISSIONS.CUSTOMERS_VIEW,
-        'batches.html': PERMISSIONS.BATCHES_VIEW,
-        'pricing.html': PERMISSIONS.PRICING_VIEW,
-        'security.html': PERMISSIONS.SECURITY_VIEW,
-        'equipment.html': PERMISSIONS.EQUIPMENT_VIEW
-    };
-
-    var required = pageMap[page];
+    var required = PAGE_PERMISSIONS[page];
     if (!required) return false;
-    return hasPermission(required);
+    return hasPermission(user, required);
 }
 
 function canEdit(page) {
     var user = getCurrentUser();
     if (!user) return false;
+    if (isOwner(user)) return true;
 
-    // OWNER CAN EDIT EVERYTHING
-    if (user.position === 'Owner' || user.role === 'owner' || user.username === 'admin') {
-        return true;
-    }
-
-    var pageMap = {
+    var crudMap = {
         'employees.html': PERMISSIONS.EMPLOYEES_CRUD,
         'stock.html': PERMISSIONS.STOCK_CRUD,
         'feed.html': PERMISSIONS.FEED_CRUD,
@@ -253,9 +233,9 @@ function canEdit(page) {
         'equipment.html': PERMISSIONS.EQUIPMENT_CRUD
     };
 
-    var required = pageMap[page];
+    var required = crudMap[page];
     if (!required) return false;
-    return hasPermission(required);
+    return hasPermission(user, required);
 }
 
 // ============================================
@@ -264,8 +244,10 @@ function canEdit(page) {
 
 window.DB = DB;
 window.PERMISSIONS = PERMISSIONS;
+window.PAGE_PERMISSIONS = PAGE_PERMISSIONS;
 window.ROLE_PERMISSIONS = ROLE_PERMISSIONS;
 window.hashPassword = hashPassword;
+window.isOwner = isOwner;
 window.hasPermission = hasPermission;
 window.canViewPage = canViewPage;
 window.canEdit = canEdit;
@@ -280,6 +262,71 @@ window.formatCurrency = formatCurrency;
 window.getStatusClass = getStatusClass;
 
 // ============================================
+// AUTHENTICATION FUNCTIONS
+// ============================================
+
+function getCurrentUser() {
+    var userData = sessionStorage.getItem('currentUser');
+    return userData ? JSON.parse(userData) : null;
+}
+
+function setCurrentUser(user) {
+    sessionStorage.setItem('currentUser', JSON.stringify(user));
+    sessionStorage.setItem('lastActivity', Date.now().toString());
+}
+
+function clearCurrentUser() {
+    sessionStorage.removeItem('currentUser');
+    sessionStorage.removeItem('lastActivity');
+    sessionStorage.removeItem('rememberMe');
+}
+
+function isAuthenticated() {
+    return getCurrentUser() !== null;
+}
+
+function hasAccess(requiredRights) {
+    var user = getCurrentUser();
+    if (!user) return false;
+    if (isOwner(user)) return true;
+
+    var userRights = user.accessRights ? user.accessRights.split(',') : [];
+    var required = requiredRights.split(',');
+    return required.some(function (right) { return userRights.includes(right.trim()); });
+}
+
+function logout() {
+    clearCurrentUser();
+    window.location.href = 'login.html';
+}
+
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+
+function formatDate(dateString) {
+    if (!dateString) return 'N/A';
+    var date = new Date(dateString);
+    return date.toLocaleDateString('en-ZA');
+}
+
+function formatCurrency(amount) {
+    return 'R' + parseFloat(amount).toFixed(2);
+}
+
+function getStatusClass(status) {
+    var map = {
+        'Good': 'status-good',
+        'Fair': 'status-fair',
+        'Poor': 'status-poor',
+        'Critical': 'status-poor',
+        'Excellent': 'status-good',
+        'Broken': 'status-poor'
+    };
+    return map[status] || 'status-fair';
+}
+
+// ============================================
 // DATABASE INITIALIZATION
 // ============================================
 
@@ -287,9 +334,7 @@ function initDatabase() {
     console.log('🔄 Initializing database...');
     var now = new Date();
 
-    // ============================================
-    // EMPLOYEES - WITH ROLES AND ACCESS RIGHTS
-    // ============================================
+    // EMPLOYEES
     if (!DB.get('employees')) {
         DB.set('employees', [
             {
@@ -394,9 +439,7 @@ function initDatabase() {
         console.log('✅ Employees created with roles');
     }
 
-    // ============================================
     // CUSTOMERS
-    // ============================================
     if (!DB.get('customers')) {
         DB.set('customers', [
             { id: 1, name: 'Prince Owusu', phone: '0712345678', email: 'prince@email.com', address: '123 City Centre', type: 'wholesale', totalPurchases: 187450, lastPurchase: new Date(now - 86400000 * 2).toISOString(), createdAt: new Date(now - 86400000 * 700).toISOString() },
@@ -411,9 +454,7 @@ function initDatabase() {
         console.log('✅ Customers created');
     }
 
-    // ============================================
     // STOCK
-    // ============================================
     if (!DB.get('stock')) {
         DB.set('stock', [
             { id: 1, itemType: 'broiler', quantity: 320, unit: 'bird', price: 85.00, lastUpdated: new Date().toISOString() },
@@ -423,9 +464,7 @@ function initDatabase() {
         console.log('✅ Stock created');
     }
 
-    // ============================================
     // FEED
-    // ============================================
     if (!DB.get('feed')) {
         DB.set('feed', [
             { id: 1, feedType: 'Layer Feed Premium', quantityKg: 1850, lastUpdated: new Date().toISOString() },
@@ -436,9 +475,7 @@ function initDatabase() {
         console.log('✅ Feed created');
     }
 
-    // ============================================
     // COOPS
-    // ============================================
     if (!DB.get('coops')) {
         var coops = [];
         var stockData = { 1: { A: 45, B: 38, C: 42 }, 2: { A: 35, B: 40, C: 30 }, 3: { A: 25, B: 20, C: 18 } };
@@ -465,9 +502,7 @@ function initDatabase() {
         console.log('✅ Coops created');
     }
 
-    // ============================================
     // BATCHES
-    // ============================================
     if (!DB.get('batches')) {
         var batches = [];
         var batchTypes = ['Broiler', 'Layer', 'Broiler', 'Layer', 'Broiler'];
@@ -494,9 +529,7 @@ function initDatabase() {
         console.log('✅ Batches created');
     }
 
-    // ============================================
     // EGGS PRODUCTION
-    // ============================================
     if (!DB.get('eggs')) {
         var eggs = [];
         var batchNumbers = ['B-2024-0001', 'B-2024-0002', 'B-2024-0003', 'B-2025-0001', 'B-2025-0002', 'B-2025-0003', 'B-2026-0001', 'B-2026-0002'];
@@ -527,9 +560,7 @@ function initDatabase() {
         console.log('✅ Eggs production created (365 days)');
     }
 
-    // ============================================
     // EGG SALES
-    // ============================================
     if (!DB.get('sales')) {
         var sales = [];
         var customerNames = ['Prince Owusu', 'Mary Molefe', 'Peter Mokoena', 'Thabo Nkosi', 'Grace Dlamini', 'James Mokoena', 'Lindiwe Zulu', 'Sipho Ndlovu'];
@@ -562,9 +593,7 @@ function initDatabase() {
         console.log('✅ Egg sales created (300)');
     }
 
-    // ============================================
     // CHICKEN SALES
-    // ============================================
     if (!DB.get('chickenSales')) {
         var chickenSales = [];
         var chickenBuyers = ['Mrs Phiri', 'Mr Ndlovu', 'Mrs Dlamini', 'Mr Khumalo', 'Mrs Mokoena', 'Mr Zulu', 'Mrs Nkosi', 'Mr Dube'];
@@ -594,9 +623,7 @@ function initDatabase() {
         console.log('✅ Chicken sales created (150)');
     }
 
-    // ============================================
     // CHICKENS
-    // ============================================
     if (!DB.get('chickens')) {
         var chickens = [];
         for (var i = 1; i <= 25; i++) {
@@ -625,9 +652,7 @@ function initDatabase() {
         console.log('✅ Chickens created');
     }
 
-    // ============================================
     // EQUIPMENT
-    // ============================================
     if (!DB.get('equipment')) {
         DB.set('equipment', [
             { id: 1, name: 'Chicken Mesh - Perimeter', condition: 'Good', purchaseDate: '2024-01-15', lastMaintenance: '2025-12-01', notes: '200m perimeter fencing - replaced 2024' },
@@ -644,9 +669,7 @@ function initDatabase() {
         console.log('✅ Equipment created');
     }
 
-    // ============================================
     // SECURITY
-    // ============================================
     if (!DB.get('security')) {
         var security = [];
         var incidentTypes = ['Predator Attack', 'Theft', 'Trespassing', 'Equipment Damage', 'Vandalism', 'Other'];
@@ -674,9 +697,7 @@ function initDatabase() {
         console.log('✅ Security created');
     }
 
-    // ============================================
     // FEED CONSUMPTION
-    // ============================================
     if (!DB.get('feedConsumption')) {
         var feedConsumption = [];
         var feedTypes = ['Layer Feed Premium', 'Layer Feed Standard', 'Broiler Starter', 'Broiler Finisher'];
@@ -700,9 +721,7 @@ function initDatabase() {
         console.log('✅ Feed consumption created (365 days)');
     }
 
-    // ============================================
     // FEED STOCK RECORDS
-    // ============================================
     if (!DB.get('feedStockRecords')) {
         var feedStockRecords = [];
         var feedTypes2 = ['Layer Feed Premium', 'Layer Feed Standard', 'Broiler Starter', 'Broiler Finisher'];
@@ -727,9 +746,7 @@ function initDatabase() {
         console.log('✅ Feed stock records created');
     }
 
-    // ============================================
     // PRICING
-    // ============================================
     var pricingHistory = [];
     var eggTray = 115, eggPiece = 1.90, dressedChicken = 85, undressedChicken = 60;
     for (var i = 365; i >= 0; i--) {
@@ -788,76 +805,14 @@ function initDatabase() {
 }
 
 // ============================================
-// AUTHENTICATION FUNCTIONS
-// ============================================
-
-function getCurrentUser() {
-    var userData = sessionStorage.getItem('currentUser');
-    return userData ? JSON.parse(userData) : null;
-}
-
-function setCurrentUser(user) {
-    sessionStorage.setItem('currentUser', JSON.stringify(user));
-    sessionStorage.setItem('lastActivity', Date.now().toString());
-}
-
-function clearCurrentUser() {
-    sessionStorage.removeItem('currentUser');
-    sessionStorage.removeItem('lastActivity');
-    sessionStorage.removeItem('rememberMe');
-}
-
-function isAuthenticated() {
-    return getCurrentUser() !== null;
-}
-
-function hasAccess(requiredRights) {
-    var user = getCurrentUser();
-    if (!user) return false;
-    var userRights = user.accessRights ? user.accessRights.split(',') : [];
-    var required = requiredRights.split(',');
-    return required.some(function (right) { return userRights.includes(right.trim()); });
-}
-
-function logout() {
-    clearCurrentUser();
-    window.location.href = 'login.html';
-}
-
-// ============================================
-// HELPER FUNCTIONS
-// ============================================
-
-function formatDate(dateString) {
-    if (!dateString) return 'N/A';
-    var date = new Date(dateString);
-    return date.toLocaleDateString('en-ZA');
-}
-
-function formatCurrency(amount) {
-    return 'R' + parseFloat(amount).toFixed(2);
-}
-
-function getStatusClass(status) {
-    var map = {
-        'Good': 'status-good',
-        'Fair': 'status-fair',
-        'Poor': 'status-poor',
-        'Critical': 'status-poor',
-        'Excellent': 'status-good',
-        'Broken': 'status-poor'
-    };
-    return map[status] || 'status-fair';
-}
-
-// ============================================
-// DOCUMENT READY
+// DOCUMENT READY - PAGE ACCESS CHECK
 // ============================================
 
 document.addEventListener('DOMContentLoaded', function () {
     console.log('🚀 App initializing...');
     initDatabase();
 
+    // Update user display
     var userDisplay = document.getElementById('userDisplay');
     var userRoleDisplay = document.getElementById('userRoleDisplay');
     if (userDisplay) {
@@ -870,6 +825,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Logout button
     var logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', function (e) {
@@ -878,6 +834,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Current date
     var currentDate = document.getElementById('currentDate');
     if (currentDate) {
         var now = new Date();
@@ -889,25 +846,70 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // PAGE ACCESS CONTROL - CHECK PERMISSION
     var protectedPages = ['dashboard.html', 'employees.html', 'stock.html', 'feed.html', 'coops.html', 'eggs.html', 'sales.html', 'security.html', 'equipment.html', 'chickens.html', 'pricing.html', 'customers.html', 'batches.html'];
     var currentPage = window.location.pathname.split('/').pop();
 
     if (protectedPages.includes(currentPage)) {
         if (!isAuthenticated()) {
             window.location.href = 'login.html';
-        } else if (!canViewPage(currentPage)) {
-            window.location.href = 'dashboard.html';
+            return;
+        }
+
+        // Check if user has permission to view this page
+        if (!canViewPage(currentPage)) {
+            // Show access denied message instead of redirecting
+            var mainContent = document.querySelector('.main-content');
+            if (mainContent) {
+                mainContent.innerHTML = `
+                    <div class="access-denied">
+                        <div class="access-denied-icon">🔒</div>
+                        <h2>Access Denied</h2>
+                        <p>You do not have permission to view this page.</p>
+                        <p class="access-denied-sub">Please contact your administrator if you believe this is an error.</p>
+                        <a href="dashboard.html" class="primary-btn">Return to Dashboard</a>
+                    </div>
+                `;
+            }
         }
     }
 
     console.log('✅ App initialized!');
 });
 
+// Add styles for access denied
 var style = document.createElement('style');
 style.textContent = `
     @keyframes slideIn {
         from { transform: translateX(100%); opacity: 0; }
         to { transform: translateX(0); opacity: 1; }
+    }
+    
+    .access-denied {
+        text-align: center;
+        padding: 80px 20px;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    .access-denied-icon {
+        font-size: 64px;
+        display: block;
+        margin-bottom: 20px;
+        opacity: 0.6;
+    }
+    .access-denied h2 {
+        font-size: 28px;
+        color: var(--text-primary);
+        margin-bottom: 12px;
+    }
+    .access-denied p {
+        color: var(--text-muted);
+        font-size: 16px;
+        margin-bottom: 8px;
+    }
+    .access-denied-sub {
+        font-size: 14px !important;
+        margin-bottom: 24px !important;
     }
 `;
 document.head.appendChild(style);

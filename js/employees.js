@@ -1,56 +1,43 @@
-// employees.js - Employee management with force owner access
+// employees.js - Employee management with access control
 
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('👤 Employee page loaded');
-
-    // Get current user
     var user = getCurrentUser();
-    console.log('👤 Current user:', user);
+    console.log('👤 Employee page - Current user:', user);
 
-    // FORCE: If user is Owner, show everything regardless
-    var isOwner = false;
-    if (user) {
-        if (user.position === 'Owner' || user.role === 'owner' || user.username === 'admin') {
-            isOwner = true;
-            console.log('👑 Owner detected - full access to employees');
-        }
-    }
-
-    if (isOwner) {
-        // Show the add button
-        var addBtn = document.getElementById('addEmployeeBtn');
-        if (addBtn) addBtn.style.display = 'block';
-
-        // Load employees
-        loadEmployees();
-        setupEmployeeForm();
-        return;
-    }
-
-    // For non-owners, check permissions normally
+    // Check if user can view employees
     if (!canViewPage('employees.html')) {
-        var contentSection = document.querySelector('.content-section');
-        if (contentSection) {
-            contentSection.innerHTML =
-                '<div class="empty-state">' +
-                '<span class="empty-icon">🔒</span>' +
-                '<p>Access Denied</p>' +
-                '<span class="empty-sub">You do not have permission to view employees</span>' +
-                '</div>';
+        var container = document.querySelector('.content-section');
+        if (container) {
+            container.innerHTML = `
+                <div class="access-denied" style="text-align: center; padding: 60px 20px;">
+                    <div style="font-size: 64px; margin-bottom: 16px;">🔒</div>
+                    <h2 style="font-size: 24px; margin-bottom: 8px;">Access Denied</h2>
+                    <p style="color: var(--text-muted);">You do not have permission to view employees.</p>
+                    <a href="dashboard.html" class="primary-btn" style="margin-top: 16px; display: inline-block;">Return to Dashboard</a>
+                </div>
+            `;
         }
         return;
     }
 
-    loadEmployees();
-    setupEmployeeForm();
+    var isOwner = user && (user.position === 'Owner' || user.role === 'owner' || user.username === 'admin');
+    var canEditEmployees = canEdit('employees.html');
+    var showActions = isOwner || canEditEmployees;
+
+    loadEmployees(showActions);
+    setupEmployeeForm(showActions);
 });
 
-function setupEmployeeForm() {
+function setupEmployeeForm(showActions) {
     var addBtn = document.getElementById('addEmployeeBtn');
     if (addBtn) {
-        addBtn.addEventListener('click', function () {
-            openEmployeeModal();
-        });
+        if (!showActions) {
+            addBtn.style.display = 'none';
+        } else {
+            addBtn.addEventListener('click', function () {
+                openEmployeeModal();
+            });
+        }
     }
 
     var closeBtn = document.querySelector('#employeeModal .close');
@@ -74,7 +61,7 @@ function setupEmployeeForm() {
     }
 }
 
-function loadEmployees() {
+function loadEmployees(showActions) {
     console.log('📊 Loading employees...');
     var employees = DB.getAll('employees');
     console.log('📊 Employees found:', employees.length);
@@ -86,10 +73,6 @@ function loadEmployees() {
     }
 
     tbody.innerHTML = '';
-
-    var user = getCurrentUser();
-    var isOwner = user && (user.position === 'Owner' || user.role === 'owner' || user.username === 'admin');
-    var showActions = isOwner || canEdit('employees.html');
 
     if (employees.length === 0) {
         tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: #888;">No employees found</td></tr>';
@@ -228,7 +211,7 @@ function saveEmployee() {
     }
 
     closeModal();
-    loadEmployees();
+    loadEmployees(true);
 }
 
 function editEmployee(id) {
@@ -240,7 +223,7 @@ function editEmployee(id) {
 function deleteEmployee(id) {
     if (confirm('⚠️ Are you sure you want to delete this employee?')) {
         DB.delete('employees', id);
-        loadEmployees();
+        loadEmployees(true);
         alert('✅ Employee deleted successfully!');
     }
 }

@@ -11,10 +11,10 @@ function setupRoleBasedDashboard() {
     if (!user) return;
 
     var role = user.role || 'farmer';
-    var isOwner = role === 'owner';
-    var isManager = role === 'manager' || role === 'owner';
-    var isSales = role === 'sales' || role === 'owner' || role === 'manager';
-    var isFarmer = role === 'farmer' || role === 'foreman' || role === 'owner' || role === 'manager';
+    var isOwner = user.position === 'Owner' || user.role === 'owner' || user.username === 'admin';
+    var isManager = role === 'manager' || isOwner;
+    var isSales = role === 'sales' || isOwner || isManager;
+    var isFarmer = role === 'farmer' || role === 'foreman' || isOwner || isManager;
 
     // Show/hide Quick Actions based on role
     var actionButtons = document.querySelectorAll('.action-btn');

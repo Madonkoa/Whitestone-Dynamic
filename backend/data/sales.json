@@ -1,0 +1,6 @@
+﻿[
+  { "id": "1", "type": "egg", "customer": "Mary Molefe", "quantity": 347, "amount": 1595.00, "date": "2026-06-24", "description": "large eggs", "status": "completed" },
+  { "id": "2", "type": "egg", "customer": "Peter Mokoena", "quantity": 375, "amount": 1260.00, "date": "2026-06-23", "description": "small eggs", "status": "completed" },
+  { "id": "3", "type": "egg", "customer": "Thabo Nkosi", "quantity": 388, "amount": 1980.00, "date": "2026-06-22", "description": "xl eggs", "status": "completed" },
+  { "id": "4", "type": "chicken", "customer": "Sipho Zulu", "quantity": 45, "amount": 4500.00, "date": "2026-06-20", "description": "broilers", "status": "completed" }
+]

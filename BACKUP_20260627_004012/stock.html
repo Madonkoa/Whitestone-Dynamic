@@ -1,0 +1,875 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Whitestone Dynamic - Stock Management</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f1f5f9; display: flex; min-height: 100vh; }
+        
+        /* SIDEBAR */
+        .sidebar { width: 240px; min-width: 240px; background: #0f172a; color: #e2e8f0; padding: 20px 0; height: 100vh; position: sticky; top: 0; overflow-y: auto; }
+        .sidebar .brand { padding: 0 20px 25px 20px; }
+        .sidebar .brand .name { font-size: 22px; font-weight: 700; color: #fff; letter-spacing: 1px; }
+        .sidebar .brand .name span { color: #3b82f6; }
+        .sidebar .brand .sub { font-size: 11px; color: #64748b; letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
+        .sidebar .nav-item { display: block; padding: 8px 20px; color: #94a3b8; text-decoration: none; font-size: 13px; border-left: 3px solid transparent; cursor: pointer; transition: 0.15s; }
+        .sidebar .nav-item:hover { background: #1e293b; color: #fff; }
+        .sidebar .nav-item.active { background: #1e293b; color: #fff; border-left-color: #3b82f6; }
+        
+        /* MAIN */
+        .main { flex: 1; padding: 25px 30px; background: #f1f5f9; min-width: 0; }
+        .main-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; }
+        .main-header h1 { font-size: 26px; color: #0f172a; }
+        .main-header p { color: #64748b; font-size: 14px; margin-top: 2px; }
+        .header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn { padding: 8px 16px; border-radius: 6px; border: none; font-weight: 600; font-size: 13px; cursor: pointer; background: #fff; color: #1e293b; border: 1px solid #e2e8f0; transition: 0.2s; }
+        .btn-primary { background: #2563eb; color: #fff; border-color: #2563eb; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-outline:hover { background: #e2e8f0; }
+        .btn-success { background: #22c55e; color: #fff; border-color: #22c55e; }
+        .btn-success:hover { background: #16a34a; }
+        .btn-danger { background: #ef4444; color: #fff; border-color: #ef4444; }
+        .btn-danger:hover { background: #dc2626; }
+        
+        /* STATS */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+        .stat-card { background: #fff; padding: 16px 18px; border-radius: 10px; border: 1px solid #e2e8f0; }
+        .stat-card .label { font-size: 12px; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; }
+        .stat-card .value { font-size: 26px; font-weight: 700; color: #0f172a; margin-top: 4px; }
+        .stat-card .sub { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+        
+        /* CHART */
+        .chart-box { background: #fff; padding: 20px; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
+        .chart-box h3 { font-size: 15px; color: #0f172a; margin-bottom: 15px; }
+        .chart-placeholder { width: 100%; height: 200px; background: linear-gradient(180deg, #eff6ff 0%, #f8fafc 100%); border-radius: 8px; border: 1px dashed #cbd5e1; display: flex; flex-direction: column; justify-content: flex-end; padding: 10px; position: relative; }
+        .chart-bars { display: flex; align-items: flex-end; justify-content: space-around; height: 100%; padding: 0 5px; }
+        .chart-bar { width: 30px; background: #3b82f6; border-radius: 4px 4px 0 0; min-height: 10px; transition: 0.3s; }
+        .chart-bar:hover { opacity: 0.8; }
+        .chart-labels { display: flex; justify-content: space-around; margin-top: 8px; font-size: 10px; color: #94a3b8; }
+        .chart-y-axis { position: absolute; left: 5px; top: 5px; bottom: 5px; display: flex; flex-direction: column; justify-content: space-between; font-size: 10px; color: #94a3b8; }
+        
+        /* TABLE */
+        .table-container { background: #fff; border-radius: 10px; border: 1px solid #e2e8f0; overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: #f8fafc; }
+        th { padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; color: #475569; border-bottom: 1px solid #e2e8f0; text-transform: uppercase; letter-spacing: 0.3px; }
+        td { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
+        tr:last-child td { border-bottom: none; }
+        .actions-cell { display: flex; gap: 6px; }
+        .action-btn { padding: 4px 10px; border-radius: 4px; border: none; font-size: 12px; cursor: pointer; background: #f1f5f9; color: #1e293b; }
+        .action-btn.edit { background: #dbeafe; color: #2563eb; }
+        .action-btn.delete { background: #fee2e2; color: #ef4444; }
+        
+        /* PAGES */
+        .page { display: none; }
+        .page.active { display: block; }
+        
+        /* LOADING */
+        .loading { text-align: center; padding: 20px; color: #64748b; }
+        .error { background: #fee2e2; color: #dc2626; padding: 12px; border-radius: 6px; margin-bottom: 15px; display: none; }
+        
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; min-width: unset; height: auto; position: relative; padding: 15px; }
+            .sidebar .nav-item { display: inline-block; padding: 6px 12px; border-left: none; }
+            .sidebar .nav-item.active { border-left: none; border-bottom: 2px solid #3b82f6; }
+            .main { padding: 15px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+            .main-header h1 { font-size: 20px; }
+            .header-actions { width: 100%; }
+            .header-actions .btn { flex: 1; justify-content: center; font-size: 12px; padding: 6px 12px; }
+            .chart-placeholder { height: 150px; }
+        }
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .table-container { overflow-x: auto; }
+        }
+    </style>
+</head>
+<body>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="name">WHITE<span>STONE</span></div>
+            <div class="sub">DYNAMIC</div>
+        </div>
+        <a class="nav-item active" data-page="stock" onclick="showPage('stock')">📦 Stock</a>
+        <a class="nav-item" data-page="feed" onclick="showPage('feed')">🌾 Feed Management</a>
+        <a class="nav-item" data-page="coops" onclick="showPage('coops')">🏠 Coops</a>
+        <a class="nav-item" data-page="eggs" onclick="showPage('eggs')">🥚 Egg Production</a>
+        <a class="nav-item" data-page="sales" onclick="showPage('sales')">💰 Sales</a>
+        <a class="nav-item" data-page="chickens" onclick="showPage('chickens')">🐔 Chickens</a>
+        <a class="nav-item" data-page="customers" onclick="showPage('customers')">👥 Customers</a>
+        <a class="nav-item" data-page="batches" onclick="showPage('batches')">📋 Batches</a>
+        <a class="nav-item" data-page="pricing" onclick="showPage('pricing')">💲 Pricing</a>
+        <a class="nav-item" data-page="security" onclick="showPage('security')">🔒 Security</a>
+        <a class="nav-item" data-page="equipment" onclick="showPage('equipment')">🔧 Equipment</a>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+        <!-- STOCK PAGE -->
+        <div id="page-stock" class="page active">
+            <div class="main-header">
+                <div>
+                    <h1>📦 Stock Management</h1>
+                    <p>Monitor poultry and egg inventory in real-time</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-success" onclick="addStock()">➕ Add Stock</button>
+                    <button class="btn btn-primary" onclick="currentInventory()">📋 Current Stock Inventory</button>
+                    <button class="btn btn-outline" onclick="showActions()">⚡ Actions</button>
+                    <button class="btn btn-outline" onclick="refreshData()">🔄 Refresh</button>
+                </div>
+            </div>
+
+            <div id="errorMsg" class="error"></div>
+
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <div class="label">🐔 TOTAL BROILERS</div>
+                    <div class="value" id="totalBroilers">0</div>
+                    <div class="sub">Ready for sale</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">🐔 TOTAL LAYERS</div>
+                    <div class="value" id="totalLayers">0</div>
+                    <div class="sub">Active layers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">🥚 TOTAL EGGS</div>
+                    <div class="value" id="totalEggs">0</div>
+                    <div class="sub">In stock</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">💰 TOTAL VALUE</div>
+                    <div class="value" id="totalValue">R 0.00</div>
+                    <div class="sub">Estimated</div>
+                </div>
+            </div>
+
+            <div class="chart-box">
+                <h3>📊 Stock Trends (Last 30 Days)</h3>
+                <div class="chart-placeholder" id="chartContainer">
+                    <div class="chart-y-axis">
+                        <span>300</span>
+                        <span>250</span>
+                        <span>200</span>
+                        <span>150</span>
+                        <span>100</span>
+                        <span>50</span>
+                        <span>0</span>
+                    </div>
+                    <div class="chart-bars" id="chartBars" style="margin-left:30px;">
+                        <div class="chart-bar" style="height:60px;"></div>
+                        <div class="chart-bar" style="height:80px;"></div>
+                        <div class="chart-bar" style="height:120px;"></div>
+                        <div class="chart-bar" style="height:100px;"></div>
+                        <div class="chart-bar" style="height:160px;"></div>
+                        <div class="chart-bar" style="height:140px;"></div>
+                        <div class="chart-bar" style="height:180px;"></div>
+                        <div class="chart-bar" style="height:200px;"></div>
+                        <div class="chart-bar" style="height:170px;"></div>
+                        <div class="chart-bar" style="height:220px;"></div>
+                        <div class="chart-bar" style="height:240px;"></div>
+                        <div class="chart-bar" style="height:200px;"></div>
+                        <div class="chart-bar" style="height:260px;"></div>
+                        <div class="chart-bar" style="height:280px;"></div>
+                    </div>
+                    <div class="chart-labels" style="margin-left:30px;">
+                        <span>2026-05-26</span>
+                        <span>2026-05-29</span>
+                        <span>2026-06-01</span>
+                        <span>2026-06-04</span>
+                        <span>2026-06-07</span>
+                        <span>2026-06-10</span>
+                        <span>2026-06-13</span>
+                        <span>2026-06-16</span>
+                        <span>2026-06-19</span>
+                        <span>2026-06-22</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ITEM</th>
+                            <th>QUANTITY</th>
+                            <th>UNIT</th>
+                            <th>PRICE (R)</th>
+                            <th>TOTAL VALUE</th>
+                            <th>LAST UPDATED</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stockTableBody">
+                        <tr><td colspan="7" class="loading">Loading stock data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- FEED MANAGEMENT PAGE -->
+        <div id="page-feed" class="page">
+            <div class="main-header">
+                <div>
+                    <h1>🌾 Feed Management</h1>
+                    <p>Monitor feed inventory and consumption</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-success" onclick="alert('Add Feed')">➕ Add Feed</button>
+                    <button class="btn btn-outline" onclick="alert('Refresh Feed')">🔄 Refresh</button>
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="label">📦 Total Feed Stock</div>
+                    <div class="value">650 kg</div>
+                    <div class="sub">2 items</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">⏳ Days Remaining</div>
+                    <div class="value">12</div>
+                    <div class="sub">Days of feed left</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">📊 Feed Consumption</div>
+                    <div class="value">340 kg</div>
+                    <div class="sub">This month</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">💰 Feed Value</div>
+                    <div class="value">R 4,200</div>
+                    <div class="sub">Current stock value</div>
+                </div>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>FEED TYPE</th><th>QUANTITY</th><th>UNIT</th><th>PRICE (R)</th><th>TOTAL VALUE</th><th>LAST UPDATED</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Broiler Feed</strong></td><td>450</td><td>kg</td><td>R 4.50</td><td>R 2,025.00</td><td>2026-06-27</td></tr>
+                        <tr><td><strong>Layer Feed</strong></td><td>200</td><td>kg</td><td>R 5.20</td><td>R 1,040.00</td><td>2026-06-27</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- COOPS PAGE -->
+        <div id="page-coops" class="page">
+            <div class="main-header">
+                <div>
+                    <h1>🏠 Coops Management</h1>
+                    <p>Manage poultry housing and capacity</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-success" onclick="alert('Add Coop')">➕ Add Coop</button>
+                    <button class="btn btn-outline" onclick="alert('Refresh Coops')">🔄 Refresh</button>
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="label">🏠 Total Coops</div>
+                    <div class="value">8</div>
+                    <div class="sub">Active coops</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">🐔 Total Capacity</div>
+                    <div class="value">3,200</div>
+                    <div class="sub">Birds capacity</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">📊 Current Occupancy</div>
+                    <div class="value">2,850</div>
+                    <div class="sub">89% full</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">🏠 Available Space</div>
+                    <div class="value">350</div>
+                    <div class="sub">Birds space</div>
+                </div>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>COOP NAME</th><th>TYPE</th><th>CAPACITY</th><th>CURRENT</th><th>OCCUPANCY</th><th>STATUS</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Coop A</strong></td><td>Broiler</td><td>400</td><td>380</td><td>95%</td><td>🟢 Active</td></tr>
+                        <tr><td><strong>Coop B</strong></td><td>Layer</td><td>300</td><td>240</td><td>80%</td><td>🟢 Active</td></tr>
+                        <tr><td><strong>Coop C</strong></td><td>Broiler</td><td>400</td><td>320</td><td>80%</td><td>🟢 Active</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- EGG PRODUCTION PAGE -->
+        <div id="page-eggs" class="page">
+            <div class="main-header">
+                <div>
+                    <h1>🥚 Egg Production</h1>
+                    <p>Monitor egg production and quality</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-success" onclick="alert('Record Production')">📝 Record Production</button>
+                    <button class="btn btn-outline" onclick="alert('Refresh Eggs')">🔄 Refresh</button>
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="label">🥚 Total Eggs</div>
+                    <div class="value">540</div>
+                    <div class="sub">In stock</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">📊 Daily Production</div>
+                    <div class="value">180</div>
+                    <div class="sub">Eggs per day</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">📈 Production Rate</div>
+                    <div class="value">75%</div>
+                    <div class="sub">Of total capacity</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">💰 Egg Value</div>
+                    <div class="value">R 1,350</div>
+                    <div class="sub">Current stock value</div>
+                </div>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>DATE</th><th>LAYERS</th><th>EGGS PRODUCED</th><th>RATE</th><th>GRADE</th><th>STATUS</th></tr></thead>
+                    <tbody>
+                        <tr><td>2026-06-27</td><td>240</td><td>180</td><td>75%</td><td>A Grade</td><td>✅ Good</td></tr>
+                        <tr><td>2026-06-26</td><td>240</td><td>175</td><td>73%</td><td>A Grade</td><td>✅ Good</td></tr>
+                        <tr><td>2026-06-25</td><td>240</td><td>170</td><td>71%</td><td>B Grade</td><td>⚠️ Check</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SALES PAGE -->
+        <div id="page-sales" class="page">
+            <div class="main-header">
+                <div>
+                    <h1>💰 Sales Management</h1>
+                    <p>Track poultry and egg sales</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-success" onclick="alert('New Sale')">➕ New Sale</button>
+                    <button class="btn btn-outline" onclick="alert('Refresh Sales')">🔄 Refresh</button>
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="label">💰 Total Sales</div>
+                    <div class="value">R 45,200</div>
+                    <div class="sub">This month</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">📊 Orders</div>
+                    <div class="value">28</div>
+                    <div class="sub">This month</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">🐔 Chickens Sold</div>
+                    <div class="value">180</div>
+                    <div class="sub">This month</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">🥚 Eggs Sold</div>
+                    <div class="value">2,400</div>
+                    <div class="sub">This month</div>
+                </div>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>DATE</th><th>CUSTOMER</th><th>PRODUCT</th><th>QUANTITY</th><th>TOTAL (R)</th><th>STATUS</th></tr></thead>
+                    <tbody>
+                        <tr><td>2026-06-27</td><td>Farm Fresh Store</td><td>Eggs</td><td>120</td><td>R 360.00</td><td>✅ Completed</td></tr>
+                        <tr><td>2026-06-26</td><td>Joe's Poultry</td><td>Broilers</td><td>50</td><td>R 2,500.00</td><td>✅ Completed</td></tr>
+                        <tr><td>2026-06-25</td><td>Market Foods</td><td>Eggs</td><td>100</td><td>R 300.00</td><td>🔄 Processing</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- CHICKENS PAGE -->
+        <div id="page-chickens" class="page">
+            <div class="main-header">
+                <div>
+                    <h1>🐔 Chickens Management</h1>
+                    <p>Manage flock health and records</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-success" onclick="alert('Add Batch')">➕ Add Batch</button>
+                    <button class="btn btn-outline" onclick="alert('Refresh Chickens')">🔄 Refresh</button>
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="label">🐔 Total Broilers</div>
+                    <div class="value">320</div>
+                    <div class="sub">Current flock</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">🐔 Total Layers</div>
+                    <div class="value">240</div>
+                    <div class="sub">Current flock</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">📊 Mortality Rate</div>
+                    <div class="value">2.5%</div>
+                    <div class="sub">This month</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">⚖️ Avg Weight</div>
+                    <div class="value">2.8 kg</div>
+                    <div class="sub">Broilers</div>
+                </div>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>BATCH</th><th>TYPE</th><th>COUNT</th><th>AGE</th><th>WEIGHT</th><th>HEALTH</th><th>STATUS</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>B-2026-01</strong></td><td>Broiler</td><td>320</td><td>6 weeks</td><td>2.8 kg</td><td>✅ Healthy</td><td>🟢 Active</td></tr>
+                        <tr><td><strong>B-2026-02</strong></td><td>Layer</td><td>240</td><td>18 weeks</td><td>1.8 kg</td><td>✅ Healthy</td><td>🟢 Active</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- CUSTOMERS PAGE -->
+        <div id="page-customers" class="page">
+            <div class="main-header">
+                <div>
+                    <h1>👥 Customer Management</h1>
+                    <p>Manage customer relationships</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-success" onclick="alert('Add Customer')">➕ Add Customer</button>
+                    <button class="btn btn-outline" onclick="alert('Refresh Customers')">🔄 Refresh</button>
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="label">👥 Total Customers</div>
+                    <div class="value">45</div>
+                    <div class="sub">Active customers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">🔄 Repeat Customers</div>
+                    <div class="value">28</div>
+                    <div class="sub">62% repeat rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">💰 Total Revenue</div>
+                    <div class="value">R 92,000</div>
+                    <div class="sub">All time</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">📊 Avg Order</div>
+                    <div class="value">R 2,044</div>
+                    <div class="sub">Per customer</div>
+                </div>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>NAME</th><th>TYPE</th><th>CONTACT</th><th>ORDERS</th><th>TOTAL SPENT</th><th>STATUS</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Farm Fresh Store</strong></td><td>Retail</td><td>+27 82 123 4567</td><td>12</td><td>R 12,500</td><td>🟢 Active</td></tr>
+                        <tr><td><strong>Joe's Poultry</strong></td><td>Wholesale</td><td>+27 83 987 6543</td><td>8</td><td>R 8,200</td><td>🟢 Active</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- BATCHES PAGE -->
+        <div id="page-batches" class="page">
+            <div class="main-header">
+                <div>
+                    <h1>📋 Batch Management</h1>
+                    <p>Track production batches</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-success" onclick="alert('Create Batch')">📝 Create Batch</button>
+                    <button class="btn btn-outline" onclick="alert('Refresh Batches')">🔄 Refresh</button>
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="label">📋 Active Batches</div>
+                    <div class="value">3</div>
+                    <div class="sub">Currently active</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">✅ Completed Batches</div>
+                    <div class="value">12</div>
+                    <div class="sub">This year</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">📊 Success Rate</div>
+                    <div class="value">92%</div>
+                    <div class="sub">Average</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">🔄 Avg Cycle</div>
+                    <div class="value">8 weeks</div>
+                    <div class="sub">Per batch</div>
+                </div>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>BATCH ID</th><th>TYPE</th><th>START DATE</th><th>END DATE</th><th>COUNT</th><th>STATUS</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>#B-2026-001</strong></td><td>Broiler</td><td>2026-05-15</td><td>2026-06-27</td><td>320</td><td>🟢 Active</td></tr>
+                        <tr><td><strong>#B-2026-002</strong></td><td>Layer</td><td>2026-02-20</td><td>2026-06-27</td><td>240</td><td>🟢 Active</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- PRICING PAGE -->
+        <div id="page-pricing" class="page">
+            <div class="main-header">
+                <div>
+                    <h1>💲 Pricing Management</h1>
+                    <p>Manage product pricing</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-success" onclick="alert('Update Pricing')">✏️ Update Pricing</button>
+                    <button class="btn btn-outline" onclick="alert('Refresh Pricing')">🔄 Refresh</button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>PRODUCT</th><th>CURRENT PRICE (R)</th><th>LAST UPDATED</th><th>ACTION</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Broiler Feed</strong></td><td>R 4.50 / kg</td><td>2026-06-27</td><td><button class="action-btn edit" onclick="alert('Edit Broiler Feed Price')">✏️</button></td></tr>
+                        <tr><td><strong>Layer Feed</strong></td><td>R 5.20 / kg</td><td>2026-06-27</td><td><button class="action-btn edit" onclick="alert('Edit Layer Feed Price')">✏️</button></td></tr>
+                        <tr><td><strong>Fresh Eggs</strong></td><td>R 2.50 / egg</td><td>2026-06-27</td><td><button class="action-btn edit" onclick="alert('Edit Eggs Price')">✏️</button></td></tr>
+                        <tr><td><strong>Broiler Chicken</strong></td><td>R 55.00 / kg</td><td>2026-06-27</td><td><button class="action-btn edit" onclick="alert('Edit Broiler Price')">✏️</button></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SECURITY PAGE -->
+        <div id="page-security" class="page">
+            <div class="main-header">
+                <div>
+                    <h1>🔒 Security Management</h1>
+                    <p>Manage system security and access</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-success" onclick="alert('Add User')">👤 Add User</button>
+                    <button class="btn btn-outline" onclick="alert('Refresh Security')">🔄 Refresh</button>
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="label">👤 Total Users</div>
+                    <div class="value">8</div>
+                    <div class="sub">Active users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">🛡️ Roles</div>
+                    <div class="value">3</div>
+                    <div class="sub">Admin, Manager, Staff</div>
+                </div>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>USERNAME</th><th>ROLE</th><th>LAST LOGIN</th><th>STATUS</th><th>ACTIONS</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>admin</strong></td><td>Administrator</td><td>2026-06-27 09:30</td><td>🟢 Online</td><td><button class="action-btn edit" onclick="alert('Edit Admin')">✏️</button></td></tr>
+                        <tr><td><strong>manager</strong></td><td>Manager</td><td>2026-06-27 08:15</td><td>🟢 Online</td><td><button class="action-btn edit" onclick="alert('Edit Manager')">✏️</button></td></tr>
+                        <tr><td><strong>staff1</strong></td><td>Staff</td><td>2026-06-26 17:00</td><td>🟡 Away</td><td><button class="action-btn edit" onclick="alert('Edit Staff')">✏️</button></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- EQUIPMENT PAGE -->
+        <div id="page-equipment" class="page">
+            <div class="main-header">
+                <div>
+                    <h1>🔧 Equipment Management</h1>
+                    <p>Manage farm equipment and maintenance</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-success" onclick="alert('Add Equipment')">➕ Add Equipment</button>
+                    <button class="btn btn-outline" onclick="alert('Refresh Equipment')">🔄 Refresh</button>
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="label">🔧 Total Equipment</div>
+                    <div class="value">12</div>
+                    <div class="sub">Items</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">✅ Working</div>
+                    <div class="value">10</div>
+                    <div class="sub">83% operational</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">⚠️ Needs Maintenance</div>
+                    <div class="value">2</div>
+                    <div class="sub">Due for service</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">💰 Equipment Value</div>
+                    <div class="value">R 45,000</div>
+                    <div class="sub">Total value</div>
+                </div>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>EQUIPMENT</th><th>TYPE</th><th>STATUS</th><th>LAST MAINTENANCE</th><th>NEXT MAINTENANCE</th><th>ACTIONS</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Feeding System</strong></td><td>Automated</td><td>🟢 Working</td><td>2026-06-15</td><td>2026-07-15</td><td><button class="action-btn edit" onclick="alert('Edit Equipment')">✏️</button></td></tr>
+                        <tr><td><strong>Water System</strong></td><td>Automated</td><td>🟢 Working</td><td>2026-06-20</td><td>2026-07-20</td><td><button class="action-btn edit" onclick="alert('Edit Equipment')">✏️</button></td></tr>
+                        <tr><td><strong>Egg Collection</strong></td><td>Manual</td><td>🟡 Needs Check</td><td>2026-06-01</td><td>2026-07-01</td><td><button class="action-btn edit" onclick="alert('Edit Equipment')">✏️</button></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // API Base URL
+        const API_BASE = window.location.origin + '/api';
+        let stockData = [];
+        let statsData = {};
+
+        // Navigation
+        function showPage(pageName) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show selected page
+            const page = document.getElementById('page-' + pageName);
+            if (page) {
+                page.classList.add('active');
+            }
+            
+            // Update sidebar
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.page === pageName) {
+                    item.classList.add('active');
+                }
+            });
+        }
+
+        // Load stock data
+        async function loadData() {
+            try {
+                const response = await fetch(API_BASE + '/stock');
+                if (!response.ok) throw new Error('API returned ' + response.status);
+                const data = await response.json();
+                stockData = data.items || [];
+                statsData = data.stats || {};
+                updateUI();
+                document.getElementById('errorMsg').style.display = 'none';
+            } catch (error) {
+                console.warn('API unavailable, using sample data:', error);
+                document.getElementById('errorMsg').textContent = '⚠️ Backend API not available - showing sample data';
+                document.getElementById('errorMsg').style.display = 'block';
+                loadSampleData();
+            }
+        }
+
+        // Sample data
+        function loadSampleData() {
+            stockData = [
+                { id: 1, item: 'Broiler Feed', quantity: 450, unit: 'kg', price: 4.50, total: 2025.00, updated: '2026-06-27' },
+                { id: 2, item: 'Layer Feed', quantity: 320, unit: 'kg', price: 5.20, total: 1664.00, updated: '2026-06-27' },
+                { id: 3, item: 'Fresh Eggs', quantity: 540, unit: 'eggs', price: 2.50, total: 1350.00, updated: '2026-06-27' },
+                { id: 4, item: 'Broiler Chicks', quantity: 320, unit: 'chicks', price: 45.00, total: 14400.00, updated: '2026-06-26' },
+                { id: 5, item: 'Layer Pullets', quantity: 240, unit: 'pullets', price: 85.00, total: 20400.00, updated: '2026-06-26' },
+                { id: 6, item: 'Vaccines', quantity: 25, unit: 'vials', price: 120.00, total: 3000.00, updated: '2026-06-25' },
+                { id: 7, item: 'Egg Cartons', quantity: 200, unit: 'cartons', price: 8.00, total: 1600.00, updated: '2026-06-25' }
+            ];
+            statsData = {
+                totalBroilers: 320,
+                totalLayers: 240,
+                totalEggs: 540,
+                totalValue: 92000.00
+            };
+            updateUI();
+        }
+
+        // Update UI
+        function updateUI() {
+            document.getElementById('totalBroilers').textContent = statsData.totalBroilers || 0;
+            document.getElementById('totalLayers').textContent = statsData.totalLayers || 0;
+            document.getElementById('totalEggs').textContent = statsData.totalEggs || 0;
+            document.getElementById('totalValue').textContent = 'R ' + (statsData.totalValue || 0).toFixed(2);
+            
+            const tbody = document.getElementById('stockTableBody');
+            if (stockData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:#94a3b8;">No stock items found</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = stockData.map(item => `
+                <tr>
+                    <td><strong>${item.item || item.name || 'Unknown'}</strong></td>
+                    <td>${item.quantity || item.qty || 0}</td>
+                    <td>${item.unit || 'units'}</td>
+                    <td>R ${(item.price || 0).toFixed(2)}</td>
+                    <td>R ${(item.total || item.value || 0).toFixed(2)}</td>
+                    <td>${item.updated || item.lastUpdated || '2026-06-27'}</td>
+                    <td>
+                        <div class="actions-cell">
+                            <button class="action-btn edit" onclick="editStock(${item.id})">✏️</button>
+                            <button class="action-btn delete" onclick="deleteStock(${item.id})">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Stock functions
+        function addStock() {
+            const item = prompt('Enter item name:');
+            if (!item) return;
+            const qty = prompt('Enter quantity:') || '0';
+            const unit = prompt('Enter unit (kg/eggs/chicks/vials/cartons):') || 'units';
+            const price = prompt('Enter price per unit (R):') || '0';
+            
+            const newItem = {
+                id: Date.now(),
+                item: item,
+                quantity: parseFloat(qty),
+                unit: unit,
+                price: parseFloat(price),
+                total: parseFloat(qty) * parseFloat(price),
+                updated: new Date().toISOString().split('T')[0]
+            };
+            
+            fetch(API_BASE + '/stock', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newItem)
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('API error');
+                return res.json();
+            })
+            .then(() => {
+                alert('✅ Stock added successfully!');
+                loadData();
+            })
+            .catch(() => {
+                stockData.push(newItem);
+                updateUI();
+                alert('✅ Stock added successfully!');
+            });
+        }
+
+        function editStock(id) {
+            const item = stockData.find(i => i.id === id);
+            if (!item) return;
+            
+            const newItem = prompt('Enter new item name:', item.item || item.name);
+            if (newItem === null) return;
+            const newQty = prompt('Enter new quantity:', item.quantity || item.qty);
+            if (newQty === null) return;
+            const newPrice = prompt('Enter new price (R):', item.price);
+            if (newPrice === null) return;
+            
+            const updatedItem = {
+                ...item,
+                item: newItem,
+                quantity: parseFloat(newQty),
+                price: parseFloat(newPrice),
+                total: parseFloat(newQty) * parseFloat(newPrice),
+                updated: new Date().toISOString().split('T')[0]
+            };
+            
+            fetch(API_BASE + '/stock/' + id, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedItem)
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('API error');
+                return res.json();
+            })
+            .then(() => {
+                alert('✅ Stock updated successfully!');
+                loadData();
+            })
+            .catch(() => {
+                const index = stockData.findIndex(i => i.id === id);
+                if (index !== -1) {
+                    stockData[index] = updatedItem;
+                    updateUI();
+                    alert('✅ Stock updated successfully!');
+                }
+            });
+        }
+
+        function deleteStock(id) {
+            const item = stockData.find(i => i.id === id);
+            if (!item) return;
+            if (!confirm('🗑️ Delete "' + (item.item || item.name) + '" from inventory?')) return;
+            
+            fetch(API_BASE + '/stock/' + id, {
+                method: 'DELETE'
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('API error');
+                return res.json();
+            })
+            .then(() => {
+                alert('✅ Stock item deleted successfully!');
+                loadData();
+            })
+            .catch(() => {
+                stockData = stockData.filter(i => i.id !== id);
+                updateUI();
+                alert('✅ Stock item deleted successfully!');
+            });
+        }
+
+        function currentInventory() {
+            const total = stockData.reduce((sum, i) => sum + (i.total || i.value || 0), 0);
+            alert('📋 Current Stock Inventory\n\n' +
+                  'Total Items: ' + stockData.length + '\n' +
+                  'Total Value: R ' + total.toFixed(2) + '\n\n' +
+                  'View full inventory in the table below.');
+        }
+
+        function showActions() {
+            alert('⚡ Actions Available:\n\n' +
+                  '1. Add Stock - Add new inventory items\n' +
+                  '2. Edit Stock - Modify existing items\n' +
+                  '3. Delete Stock - Remove items from inventory\n' +
+                  '4. Refresh - Reload data from server');
+        }
+
+        function refreshData() {
+            document.getElementById('stockTableBody').innerHTML = '<tr><td colspan="7" class="loading">Refreshing data...</td></tr>';
+            loadData();
+        }
+
+        // Load on start
+        window.onload = function() {
+            loadData();
+            setInterval(loadData, 30000);
+        };
+    </script>
+</body>
+</html>

@@ -1,325 +1,831 @@
-// sales.js - Complete sales management for eggs and chickens
+// ============================================================
+// SALES.JS - COMPLETE API-INTEGRATED VERSION
+// ============================================================
+
+// ============================================================
+// CONFIGURATION
+// ============================================================
+
+// DETECT API BASE URL AUTOMATICALLY
+const API_BASE = (() => {
+    // If you're running on a specific port, set it here
+    // Example: 'http://localhost:3000/api'
+    // Or use relative path: '/api'
+    return '/api';
+})();
+
+const API_ENDPOINTS = {
+    sales: `${API_BASE}/sales`,
+    stats: `${API_BASE}/sales/stats`,
+    sale: (id) => `${API_BASE}/sales/${id}`
+};
+
+// ============================================================
+// STATE
+// ============================================================
+
+let allSales = [];
+let isLoading = false;
+let currentFilter = 'all';
+let currentPage = 1;
+const ITEMS_PER_PAGE = 10;
+
+// ============================================================
+// INITIALIZATION
+// ============================================================
 
 document.addEventListener('DOMContentLoaded', function () {
-    loadSalesStats();
-    loadAllSalesHistory();
+    console.log('🚀 Sales page initializing...');
 
-    document.getElementById('saleDate').value = new Date().toISOString().split('T')[0];
-    document.getElementById('chickenSaleDate').value = new Date().toISOString().split('T')[0];
+    // Set current date in header
+    const now = new Date();
+    const dateDisplay = document.getElementById('currentDate');
+    if (dateDisplay) {
+        dateDisplay.textContent = now.toLocaleDateString('en-ZA', {
+            weekday: 'short',
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+        });
+    }
 
-    loadPricingIntoForms();
+    // Set default dates on forms
+    const today = now.toISOString().split('T')[0];
+    const saleDate = document.getElementById('saleDate');
+    const chickenSaleDate = document.getElementById('chickenSaleDate');
+    if (saleDate) saleDate.value = today;
+    if (chickenSaleDate) chickenSaleDate.value = today;
 
-    document.getElementById('eggSalesForm').addEventListener('submit', function (e) {
-        e.preventDefault();
-        recordEggSale();
+    // Load sales from API
+    fetchSales();
+
+    // Set up event listeners
+    setupFormListeners();
+    setupTabListeners();
+    setupNavListener();
+
+    console.log('✅ Sales page initialized');
+});
+
+// ============================================================
+// API CALLS
+// ============================================================
+
+/**
+ * FETCH ALL SALES FROM API
+ */
+async function fetchSales() {
+    showLoading(true);
+    console.log('📡 Fetching sales from API...');
+
+    try {
+        const response = await fetch(API_ENDPOINTS.sales, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        // Handle different API response formats
+        if (Array.isArray(data)) {
+            allSales = data;
+        } else if (data.data && Array.isArray(data.data)) {
+            allSales = data.data;
+        } else if (data.sales && Array.isArray(data.sales)) {
+            allSales = data.sales;
+        } else {
+            throw new Error('Unexpected API response format');
+        }
+
+        console.log(`✅ Loaded ${allSales.length} sales from API`);
+        renderAll();
+        showToast('✅ Sales loaded successfully', 'success');
+
+    } catch (error) {
+        console.error('❌ Failed to fetch sales:', error);
+
+        // Try to load from localStorage cache
+        const cached = loadFromCache();
+        if (cached && cached.length > 0) {
+            allSales = cached;
+            renderAll();
+            showToast('⚠️ Using cached data (API unavailable)', 'warning');
+        } else {
+            showToast('❌ Failed to load sales data', 'error');
+            renderEmptyState();
+        }
+    }
+
+    showLoading(false);
+}
+
+/**
+ * FETCH STATS FROM API
+ */
+async function fetchStats() {
+    try {
+        const response = await fetch(API_ENDPOINTS.stats, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        const stats = await response.json();
+        updateStatsUI(stats);
+        return stats;
+
+    } catch (error) {
+        console.warn('⚠️ Failed to fetch stats, calculating locally:', error);
+        // Fallback: calculate from local data
+        if (allSales.length > 0) {
+            const stats = calculateStats(allSales);
+            updateStatsUI(stats);
+            return stats;
+        }
+        return null;
+    }
+}
+
+/**
+ * CREATE NEW SALE VIA API
+ */
+async function createSale(saleData) {
+    console.log('📤 Creating sale via API...', saleData);
+
+    const response = await fetch(API_ENDPOINTS.sales, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(saleData)
     });
 
-    document.getElementById('chickenSalesForm').addEventListener('submit', function (e) {
-        e.preventDefault();
-        recordChickenSale();
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+
+    // Handle different response formats
+    if (result.id || result.data?.id) {
+        return result.data || result;
+    }
+
+    throw new Error('Invalid response format from API');
+}
+
+/**
+ * DELETE SALE VIA API
+ */
+async function deleteSaleFromAPI(saleId) {
+    console.log(`🗑️ Deleting sale ${saleId} via API...`);
+
+    const response = await fetch(API_ENDPOINTS.sale(saleId), {
+        method: 'DELETE',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
     });
 
-    document.querySelectorAll('.sales-tabs .tab-btn').forEach(function (btn) {
+    if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    return true;
+}
+
+/**
+ * UPDATE SALE VIA API
+ */
+async function updateSaleFromAPI(saleId, updateData) {
+    console.log(`📝 Updating sale ${saleId} via API...`);
+
+    const response = await fetch(API_ENDPOINTS.sale(saleId), {
+        method: 'PUT',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updateData)
+    });
+
+    if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    return result.data || result;
+}
+
+// ============================================================
+// CACHE HELPERS
+// ============================================================
+
+function saveToCache(data) {
+    try {
+        localStorage.setItem('whitestone_sales_cache', JSON.stringify({
+            data: data,
+            timestamp: Date.now()
+        }));
+        console.log('💾 Sales cached');
+    } catch (e) {
+        console.warn('Failed to cache sales:', e);
+    }
+}
+
+function loadFromCache() {
+    try {
+        const cached = localStorage.getItem('whitestone_sales_cache');
+        if (cached) {
+            const parsed = JSON.parse(cached);
+            // Cache valid for 5 minutes
+            if (Date.now() - parsed.timestamp < 300000) {
+                console.log('📦 Loaded from cache');
+                return parsed.data;
+            }
+        }
+        return null;
+    } catch (e) {
+        return null;
+    }
+}
+
+// ============================================================
+// STATS CALCULATION (FALLBACK)
+// ============================================================
+
+function calculateStats(data) {
+    let totalEggs = 0;
+    let totalChickens = 0;
+    let totalRevenue = 0;
+    let monthlyRevenue = 0;
+
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    data.forEach(sale => {
+        const qty = parseInt(sale.quantity) || 0;
+        const amount = parseFloat(sale.amount) || 0;
+
+        if (sale.type === 'egg') {
+            totalEggs += qty;
+        } else if (sale.type === 'chicken') {
+            totalChickens += qty;
+        }
+        totalRevenue += amount;
+
+        try {
+            const saleDate = new Date(sale.date);
+            if (saleDate.getMonth() === currentMonth && saleDate.getFullYear() === currentYear) {
+                monthlyRevenue += amount;
+            }
+        } catch (e) { }
+    });
+
+    return {
+        totalEggs,
+        totalChickens,
+        totalRevenue,
+        monthlyRevenue,
+        totalTransactions: data.length
+    };
+}
+
+// ============================================================
+// UI UPDATES
+// ============================================================
+
+function updateStatsUI(stats) {
+    const eggEl = document.getElementById('totalEggSales');
+    const chickenEl = document.getElementById('totalChickenSales');
+    const revenueEl = document.getElementById('totalRevenue');
+    const monthEl = document.getElementById('monthlyRevenue');
+    const countEl = document.getElementById('totalSalesCount');
+
+    if (eggEl) eggEl.textContent = (stats.totalEggs || 0).toLocaleString();
+    if (chickenEl) chickenEl.textContent = (stats.totalChickens || 0).toLocaleString();
+    if (revenueEl) revenueEl.textContent = `R${(stats.totalRevenue || 0).toFixed(2)}`;
+    if (monthEl) monthEl.textContent = `R${(stats.monthlyRevenue || 0).toFixed(2)}`;
+    if (countEl) countEl.textContent = (stats.totalTransactions || 0);
+}
+
+function showLoading(loading) {
+    isLoading = loading;
+    const container = document.getElementById('allSalesContainer');
+    if (loading && container) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <span class="empty-icon">⏳</span>
+                <p>Loading sales data...</p>
+                <span class="empty-sub">Please wait</span>
+            </div>
+        `;
+    }
+}
+
+// ============================================================
+// RENDER FUNCTIONS
+// ============================================================
+
+function renderAll() {
+    fetchStats();
+    renderSalesList();
+    saveToCache(allSales);
+}
+
+function renderSalesList() {
+    const container = document.getElementById('allSalesContainer');
+    if (!container) return;
+
+    // Filter and sort
+    let filtered = [...allSales];
+
+    // Filter by type
+    if (currentFilter !== 'all') {
+        filtered = filtered.filter(s => s.type === currentFilter);
+    }
+
+    // Sort by date (newest first)
+    filtered.sort((a, b) => {
+        try {
+            return new Date(b.date) - new Date(a.date);
+        } catch (e) {
+            return 0;
+        }
+    });
+
+    // Paginate
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    const paginated = filtered.slice(start, start + ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+
+    // Update counts
+    const countEl = document.getElementById('totalSalesCount');
+    if (countEl) countEl.textContent = filtered.length;
+
+    if (paginated.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <span class="empty-icon">📊</span>
+                <p>${filtered.length === 0 ? 'No sales recorded yet' : 'No matching sales found'}</p>
+                <span class="empty-sub">${filtered.length === 0 ? 'Start selling eggs or chickens' : 'Try adjusting your filters'}</span>
+            </div>
+        `;
+        return;
+    }
+
+    // Build HTML
+    let html = '';
+    paginated.forEach(sale => {
+        try {
+            const date = new Date(sale.date);
+            const formattedDate = date.toLocaleDateString('en-ZA', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            });
+
+            const typeEmoji = sale.type === 'egg' ? '🥚' : '🐔';
+            const typeLabel = sale.type === 'egg' ? 'Egg Sale' : 'Chicken Sale';
+            const unitLabel = sale.type === 'egg' ? 'eggs' : 'chickens';
+            const qty = parseInt(sale.quantity) || 0;
+            const amount = parseFloat(sale.amount) || 0;
+            const status = sale.status || 'completed';
+            const customer = sale.customer || 'Unknown';
+            const description = sale.description || '';
+
+            html += `
+                <div class="history-item" data-id="${sale.id}">
+                    <div class="history-item-header">
+                        <span class="history-type">${typeEmoji} ${typeLabel}</span>
+                        <span class="history-date">📅 ${formattedDate}</span>
+                        <span class="history-status ${status}">${status}</span>
+                        <button class="history-delete" onclick="deleteSale('${sale.id}')" title="Delete sale">🗑️</button>
+                    </div>
+                    <div class="history-item-body">
+                        <span class="history-customer"><strong>${escapeHtml(customer)}</strong></span>
+                        ${description ? `<span class="history-description">${escapeHtml(description)}</span>` : ''}
+                        <span class="history-quantity">${qty.toLocaleString()} ${unitLabel}</span>
+                        <span class="history-amount">R${amount.toFixed(2)}</span>
+                    </div>
+                </div>
+            `;
+        } catch (e) {
+            console.warn('Error rendering sale:', e);
+        }
+    });
+
+    container.innerHTML = html;
+
+    // Update pagination controls
+    updatePagination(filtered.length, totalPages);
+}
+
+function updatePagination(total, totalPages) {
+    const infoEl = document.getElementById('paginationInfo');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    if (infoEl) {
+        infoEl.textContent = `Page ${currentPage} of ${totalPages || 1} (${total} items)`;
+    }
+    if (prevBtn) prevBtn.disabled = currentPage <= 1;
+    if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
+}
+
+function renderEmptyState() {
+    const container = document.getElementById('allSalesContainer');
+    if (container) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <span class="empty-icon">🔌</span>
+                <p>Unable to load sales</p>
+                <span class="empty-sub">Please check your API connection</span>
+                <br><br>
+                <button class="btn btn-primary" onclick="fetchSales()">🔄 Retry</button>
+            </div>
+        `;
+    }
+}
+
+// ============================================================
+// CRUD OPERATIONS
+// ============================================================
+
+/**
+ * DELETE SALE
+ */
+async function deleteSale(saleId) {
+    if (!confirm('Are you sure you want to delete this sale?')) return;
+
+    showLoading(true);
+
+    try {
+        // Delete from API
+        await deleteSaleFromAPI(saleId);
+
+        // Remove from local array
+        allSales = allSales.filter(s => s.id !== saleId);
+        renderAll();
+        showToast('🗑️ Sale deleted successfully', 'success');
+
+    } catch (error) {
+        console.error('❌ Delete failed:', error);
+        showToast(`❌ Failed to delete sale: ${error.message}`, 'error');
+    }
+
+    showLoading(false);
+}
+
+/**
+ * HANDLE EGG SALE
+ */
+async function handleEggSale(e) {
+    e.preventDefault();
+
+    const buyerName = document.getElementById('buyerName').value.trim();
+    const saleDate = document.getElementById('saleDate').value;
+    const eggSize = document.getElementById('eggSize').value;
+    const crates = parseInt(document.getElementById('crates').value) || 0;
+    const pieces = parseInt(document.getElementById('pieces').value) || 0;
+    const pricePerCrate = parseFloat(document.getElementById('pricePerCrate').value) || 0;
+    const notes = document.getElementById('saleNotes').value.trim();
+
+    // Validation
+    if (!buyerName) {
+        showToast('Please enter a buyer name', 'error');
+        return;
+    }
+
+    if (crates <= 0) {
+        showToast('Please enter a valid number of crates', 'error');
+        return;
+    }
+
+    if (pricePerCrate <= 0) {
+        showToast('Please enter a valid price per crate', 'error');
+        return;
+    }
+
+    const totalEggs = (crates * 30) + pieces;
+    const totalAmount = crates * pricePerCrate;
+
+    const saleData = {
+        type: 'egg',
+        customer: buyerName,
+        date: saleDate || new Date().toISOString().split('T')[0],
+        description: `${eggSize} eggs${notes ? ' - ' + notes : ''}`,
+        quantity: totalEggs,
+        amount: totalAmount,
+        status: 'completed',
+        crates: crates,
+        pieces: pieces,
+        pricePerCrate: pricePerCrate
+    };
+
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = '⏳ Saving...';
+
+    try {
+        // Save to API
+        const newSale = await createSale(saleData);
+
+        // Add to local array
+        allSales.unshift(newSale);
+        renderAll();
+
+        // Reset form
+        e.target.reset();
+        document.getElementById('saleDate').value = new Date().toISOString().split('T')[0];
+        document.getElementById('crates').value = 1;
+        document.getElementById('pieces').value = 0;
+        document.getElementById('pricePerCrate').value = '';
+
+        showToast(`✅ Egg sale recorded for ${buyerName} - R${totalAmount.toFixed(2)}`, 'success');
+
+    } catch (error) {
+        console.error('❌ Failed to record egg sale:', error);
+        showToast(`❌ Failed to record egg sale: ${error.message}`, 'error');
+    }
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Record Egg Sale';
+}
+
+/**
+ * HANDLE CHICKEN SALE
+ */
+async function handleChickenSale(e) {
+    e.preventDefault();
+
+    const buyerName = document.getElementById('chickenBuyer').value.trim();
+    const saleDate = document.getElementById('chickenSaleDate').value;
+    const chickenType = document.getElementById('chickenType').value;
+    const quantity = parseInt(document.getElementById('chickenQuantity').value) || 0;
+    const pricePerChicken = parseFloat(document.getElementById('chickenPrice').value) || 0;
+    const status = document.getElementById('chickenStatus').value;
+    const notes = document.getElementById('chickenNotes').value.trim();
+
+    // Validation
+    if (!buyerName) {
+        showToast('Please enter a buyer name', 'error');
+        return;
+    }
+
+    if (quantity <= 0) {
+        showToast('Please enter a valid quantity', 'error');
+        return;
+    }
+
+    if (pricePerChicken <= 0) {
+        showToast('Please enter a valid price per chicken', 'error');
+        return;
+    }
+
+    const totalAmount = quantity * pricePerChicken;
+
+    const saleData = {
+        type: 'chicken',
+        customer: buyerName,
+        date: saleDate || new Date().toISOString().split('T')[0],
+        description: `${chickenType} - ${status}${notes ? ' - ' + notes : ''}`,
+        quantity: quantity,
+        amount: totalAmount,
+        status: 'completed',
+        chickenType: chickenType,
+        pricePerChicken: pricePerChicken,
+        chickenStatus: status
+    };
+
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = '⏳ Saving...';
+
+    try {
+        // Save to API
+        const newSale = await createSale(saleData);
+
+        // Add to local array
+        allSales.unshift(newSale);
+        renderAll();
+
+        // Reset form
+        e.target.reset();
+        document.getElementById('chickenSaleDate').value = new Date().toISOString().split('T')[0];
+        document.getElementById('chickenQuantity').value = 1;
+        document.getElementById('chickenPrice').value = '';
+
+        showToast(`✅ Chicken sale recorded for ${buyerName} - R${totalAmount.toFixed(2)}`, 'success');
+
+    } catch (error) {
+        console.error('❌ Failed to record chicken sale:', error);
+        showToast(`❌ Failed to record chicken sale: ${error.message}`, 'error');
+    }
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Record Chicken Sale';
+}
+
+// ============================================================
+// FORM SETUP
+// ============================================================
+
+function setupFormListeners() {
+    // Egg sale form
+    const eggForm = document.getElementById('eggSalesForm');
+    if (eggForm) {
+        eggForm.addEventListener('submit', handleEggSale);
+    }
+
+    // Chicken sale form
+    const chickenForm = document.getElementById('chickenSalesForm');
+    if (chickenForm) {
+        chickenForm.addEventListener('submit', handleChickenSale);
+    }
+
+    // Live summary updates
+    const crates = document.getElementById('crates');
+    const pieces = document.getElementById('pieces');
+    const pricePerCrate = document.getElementById('pricePerCrate');
+    if (crates) crates.addEventListener('input', updateEggSummary);
+    if (pieces) pieces.addEventListener('input', updateEggSummary);
+    if (pricePerCrate) pricePerCrate.addEventListener('input', updateEggSummary);
+
+    const chickenQty = document.getElementById('chickenQuantity');
+    const chickenPrice = document.getElementById('chickenPrice');
+    if (chickenQty) chickenQty.addEventListener('input', updateChickenSummary);
+    if (chickenPrice) chickenPrice.addEventListener('input', updateChickenSummary);
+
+    console.log('✅ Form listeners set up');
+}
+
+function updateEggSummary() {
+    const crates = parseInt(document.getElementById('crates').value) || 0;
+    const pieces = parseInt(document.getElementById('pieces').value) || 0;
+    const pricePerCrate = parseFloat(document.getElementById('pricePerCrate').value) || 0;
+
+    const totalEggs = (crates * 30) + pieces;
+    const totalAmount = crates * pricePerCrate;
+
+    const eggsEl = document.getElementById('totalEggsSale');
+    const totalEl = document.getElementById('grandTotal');
+    if (eggsEl) eggsEl.textContent = totalEggs.toLocaleString();
+    if (totalEl) totalEl.textContent = `R${totalAmount.toFixed(2)}`;
+}
+
+function updateChickenSummary() {
+    const quantity = parseInt(document.getElementById('chickenQuantity').value) || 0;
+    const pricePerChicken = parseFloat(document.getElementById('chickenPrice').value) || 0;
+
+    const totalAmount = quantity * pricePerChicken;
+
+    const qtyEl = document.getElementById('totalChickensSale');
+    const totalEl = document.getElementById('chickenGrandTotal');
+    if (qtyEl) qtyEl.textContent = quantity.toLocaleString();
+    if (totalEl) totalEl.textContent = `R${totalAmount.toFixed(2)}`;
+}
+
+// ============================================================
+// TAB SETUP
+// ============================================================
+
+function setupTabListeners() {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', function () {
-            document.querySelectorAll('.sales-tabs .tab-btn').forEach(function (b) {
-                b.classList.remove('active');
-            });
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
             this.classList.add('active');
-
-            document.querySelectorAll('.tab-content').forEach(function (tc) {
-                tc.classList.remove('active');
-            });
-            document.getElementById(this.dataset.tab + '-tab').classList.add('active');
-
-            if (this.dataset.tab === 'history') {
-                loadAllSalesHistory();
+            const tabId = this.dataset.tab + '-tab';
+            const tabContent = document.getElementById(tabId);
+            if (tabContent) {
+                tabContent.classList.add('active');
             }
         });
     });
-
-    document.getElementById('crates').addEventListener('input', calculateEggTotal);
-    document.getElementById('pieces').addEventListener('input', calculateEggTotal);
-    document.getElementById('pricePerCrate').addEventListener('input', calculateEggTotal);
-
-    document.getElementById('chickenQuantity').addEventListener('input', calculateChickenTotal);
-    document.getElementById('chickenPrice').addEventListener('input', calculateChickenTotal);
-});
-
-function loadPricingIntoForms() {
-    var pricing = DB.get('pricing');
-    if (pricing) {
-        document.getElementById('pricePerCrate').value = pricing.eggTray || 120;
-        document.getElementById('chickenPrice').value = pricing.dressedChicken || 90;
-    }
+    console.log('✅ Tab listeners set up');
 }
 
-function calculateEggTotal() {
-    var crates = parseInt(document.getElementById('crates').value) || 0;
-    var pieces = parseInt(document.getElementById('pieces').value) || 0;
-    var price = parseFloat(document.getElementById('pricePerCrate').value) || 0;
+// ============================================================
+// NAV SETUP
+// ============================================================
 
-    var totalEggs = (crates * 30) + pieces;
-    var total = crates * price;
-
-    document.getElementById('totalEggsSale').textContent = totalEggs;
-    document.getElementById('grandTotal').textContent = 'R' + total.toFixed(2);
-}
-
-function calculateChickenTotal() {
-    var quantity = parseInt(document.getElementById('chickenQuantity').value) || 0;
-    var price = parseFloat(document.getElementById('chickenPrice').value) || 0;
-
-    var total = quantity * price;
-
-    document.getElementById('totalChickensSale').textContent = quantity;
-    document.getElementById('chickenGrandTotal').textContent = 'R' + total.toFixed(2);
-}
-
-function recordEggSale() {
-    var buyerName = document.getElementById('buyerName').value.trim();
-    var saleDate = document.getElementById('saleDate').value;
-    var eggSize = document.getElementById('eggSize').value;
-    var crates = parseInt(document.getElementById('crates').value) || 0;
-    var pieces = parseInt(document.getElementById('pieces').value) || 0;
-    var pricePerCrate = parseFloat(document.getElementById('pricePerCrate').value) || 0;
-    var notes = document.getElementById('saleNotes').value.trim();
-
-    if (!buyerName || !saleDate || crates === 0) {
-        alert('Please fill in all required fields');
-        return;
-    }
-
-    var totalEggs = (crates * 30) + pieces;
-    var total = crates * pricePerCrate;
-
-    var sale = {
-        id: Date.now(),
-        type: 'egg',
-        buyerName: buyerName,
-        saleDate: saleDate,
-        eggSize: eggSize,
-        crates: crates,
-        pieces: pieces,
-        pricePerCrate: pricePerCrate,
-        totalEggs: totalEggs,
-        total: total,
-        notes: notes,
-        recordedAt: new Date().toISOString()
-    };
-
-    DB.add('sales', sale);
-
-    // Update customer
-    updateCustomerPurchases(buyerName, total);
-
-    // Update stock
-    var stock = DB.getAll('stock');
-    var eggStock = stock.find(function (s) { return s.itemType === 'egg'; });
-    if (eggStock) {
-        var newQuantity = Math.max(0, (eggStock.quantity || 0) - Math.ceil(totalEggs / 30));
-        DB.update('stock', eggStock.id, {
-            itemType: 'egg',
-            quantity: newQuantity,
-            unit: 'tray',
-            price: eggStock.price,
-            lastUpdated: new Date().toISOString()
+function setupNavListener() {
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('whitestone_token');
+                window.location.href = 'login.html';
+            }
         });
     }
 
-    alert('Egg sale recorded: ' + totalEggs + ' eggs for R' + total.toFixed(2));
-    document.getElementById('eggSalesForm').reset();
-    document.getElementById('saleDate').value = new Date().toISOString().split('T')[0];
-    document.getElementById('totalEggsSale').textContent = '0';
-    document.getElementById('grandTotal').textContent = 'R0.00';
-    loadPricingIntoForms();
-    loadSalesStats();
-    loadAllSalesHistory();
-}
-
-function recordChickenSale() {
-    var buyer = document.getElementById('chickenBuyer').value.trim();
-    var saleDate = document.getElementById('chickenSaleDate').value;
-    var type = document.getElementById('chickenType').value;
-    var quantity = parseInt(document.getElementById('chickenQuantity').value) || 0;
-    var price = parseFloat(document.getElementById('chickenPrice').value) || 0;
-    var status = document.getElementById('chickenStatus').value;
-    var notes = document.getElementById('chickenNotes').value.trim();
-
-    if (!buyer || !saleDate || quantity === 0) {
-        alert('Please fill in all required fields');
-        return;
-    }
-
-    var total = quantity * price;
-
-    var chickens = DB.getAll('chickens') || [];
-    var available = chickens.filter(function (c) { return c.type === type && !c.sold; });
-    var totalAvailable = available.reduce(function (sum, c) { return sum + c.quantity; }, 0);
-
-    if (quantity > totalAvailable) {
-        alert('Not enough ' + type + 's available. Available: ' + totalAvailable);
-        return;
-    }
-
-    var sale = {
-        id: Date.now(),
-        type: 'chicken',
-        buyer: buyer,
-        saleDate: saleDate,
-        chickenType: type,
-        quantity: quantity,
-        price: price,
-        status: status,
-        total: total,
-        notes: notes,
-        recordedAt: new Date().toISOString()
-    };
-
-    DB.add('chickenSales', sale);
-
-    // Update customer
-    updateCustomerPurchases(buyer, total);
-
-    var remaining = quantity;
-    for (var i = 0; i < available.length && remaining > 0; i++) {
-        var chicken = available[i];
-        var sold = Math.min(chicken.quantity, remaining);
-        var newQuantity = chicken.quantity - sold;
-        if (newQuantity === 0) {
-            DB.update('chickens', chicken.id, { quantity: 0, sold: true });
-        } else {
-            DB.update('chickens', chicken.id, { quantity: newQuantity });
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function (e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+            e.preventDefault();
+            fetchSales();
+            showToast('🔄 Refreshing data...', 'info');
         }
-        remaining -= sold;
-    }
-
-    alert('Chicken sale recorded: ' + quantity + ' ' + type + '(s) for R' + total.toFixed(2));
-    document.getElementById('chickenSalesForm').reset();
-    document.getElementById('chickenSaleDate').value = new Date().toISOString().split('T')[0];
-    document.getElementById('totalChickensSale').textContent = '0';
-    document.getElementById('chickenGrandTotal').textContent = 'R0.00';
-    loadPricingIntoForms();
-    loadSalesStats();
-    loadAllSalesHistory();
-}
-
-function updateCustomerPurchases(name, amount) {
-    var customers = DB.getAll('customers');
-    var customer = customers.find(function (c) { return c.name === name; });
-    if (customer) {
-        var totalPurchases = (customer.totalPurchases || 0) + amount;
-        DB.update('customers', customer.id, {
-            name: customer.name,
-            phone: customer.phone,
-            email: customer.email,
-            address: customer.address,
-            type: customer.type,
-            totalPurchases: totalPurchases,
-            lastPurchase: new Date().toISOString()
-        });
-    }
-}
-
-function loadSalesStats() {
-    var eggSales = DB.getAll('sales') || [];
-    var chickenSales = DB.getAll('chickenSales') || [];
-
-    var totalEggsSold = eggSales.reduce(function (sum, s) { return sum + (s.totalEggs || 0); }, 0);
-    document.getElementById('totalEggSales').textContent = totalEggsSold;
-
-    var totalChickensSold = chickenSales.reduce(function (sum, s) { return sum + (s.quantity || 0); }, 0);
-    document.getElementById('totalChickenSales').textContent = totalChickensSold;
-
-    var eggRevenue = eggSales.reduce(function (sum, s) { return sum + (s.total || 0); }, 0);
-    var chickenRevenue = chickenSales.reduce(function (sum, s) { return sum + (s.total || 0); }, 0);
-    var totalRevenue = eggRevenue + chickenRevenue;
-    document.getElementById('totalRevenue').textContent = 'R' + totalRevenue.toFixed(2);
-
-    var now = new Date();
-    var month = now.getMonth();
-    var year = now.getFullYear();
-    var monthlyEgg = eggSales.filter(function (s) {
-        var d = new Date(s.saleDate);
-        return d.getMonth() === month && d.getFullYear() === year;
-    }).reduce(function (sum, s) { return sum + (s.total || 0); }, 0);
-
-    var monthlyChicken = chickenSales.filter(function (s) {
-        var d = new Date(s.saleDate);
-        return d.getMonth() === month && d.getFullYear() === year;
-    }).reduce(function (sum, s) { return sum + (s.total || 0); }, 0);
-
-    document.getElementById('monthlyRevenue').textContent = 'R' + (monthlyEgg + monthlyChicken).toFixed(2);
-}
-
-function loadAllSalesHistory() {
-    var container = document.getElementById('allSalesContainer');
-    var eggSales = DB.getAll('sales') || [];
-    var chickenSales = DB.getAll('chickenSales') || [];
-
-    var totalSales = eggSales.length + chickenSales.length;
-    document.getElementById('totalSalesCount').textContent = totalSales;
-
-    if (totalSales === 0) {
-        container.innerHTML =
-            '<div class="empty-state">' +
-            '<span class="empty-icon">📊</span>' +
-            '<p>No sales recorded yet</p>' +
-            '<span class="empty-sub">Start selling eggs or chickens</span>' +
-            '</div>';
-        return;
-    }
-
-    var allSales = [];
-
-    eggSales.forEach(function (s) {
-        allSales.push({
-            type: 'egg',
-            date: s.saleDate,
-            buyer: s.buyerName,
-            item: s.eggSize + ' eggs',
-            quantity: s.totalEggs + ' eggs',
-            total: s.total,
-            notes: s.notes || '',
-            recordedAt: s.recordedAt
-        });
     });
-
-    chickenSales.forEach(function (s) {
-        allSales.push({
-            type: 'chicken',
-            date: s.saleDate,
-            buyer: s.buyer,
-            item: s.chickenType + ' (' + s.status + ')',
-            quantity: s.quantity + ' chickens',
-            total: s.total,
-            notes: s.notes || '',
-            recordedAt: s.recordedAt
-        });
-    });
-
-    allSales.sort(function (a, b) {
-        return new Date(b.date) - new Date(a.date);
-    });
-
-    var html = '';
-    for (var i = 0; i < allSales.length; i++) {
-        var s = allSales[i];
-        var typeIcon = s.type === 'egg' ? '🥚' : '🐔';
-        var typeClass = s.type === 'egg' ? 'egg-type' : 'chicken-type';
-
-        html += '<div class="history-card" style="border-left: 4px solid ' + (s.type === 'egg' ? 'rgba(201,168,76,0.3)' : 'rgba(10,22,40,0.3)') + ';">' +
-            '<div class="history-card-header">' +
-            '<span class="history-type-badge ' + typeClass + '">' + typeIcon + ' ' + s.type.toUpperCase() + ' SALE</span>' +
-            '<span class="history-date">' + formatDate(s.date) + '</span>' +
-            '</div>' +
-            '<div class="history-card-body">' +
-            '<div><strong>' + s.buyer + '</strong> - ' + s.item + '</div>' +
-            '<div>' + s.quantity + '</div>' +
-            '<div style="font-weight: 700; color: var(--gold-dark);">R' + s.total.toFixed(2) + '</div>' +
-            (s.notes ? '<div style="font-size: 12px; color: var(--text-muted);">📝 ' + s.notes + '</div>' : '') +
-            '</div>' +
-            '</div>';
-    }
-
-    container.innerHTML = html;
 }
+
+// ============================================================
+// PAGINATION
+// ============================================================
+
+function prevPage() {
+    if (currentPage > 1) {
+        currentPage--;
+        renderSalesList();
+    }
+}
+
+function nextPage() {
+    const total = allSales.length;
+    const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+    if (currentPage < totalPages) {
+        currentPage++;
+        renderSalesList();
+    }
+}
+
+function setFilter(filter) {
+    currentFilter = filter;
+    currentPage = 1;
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === filter);
+    });
+    renderSalesList();
+}
+
+// ============================================================
+// UTILITY FUNCTIONS
+// ============================================================
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function showToast(message, type = 'success') {
+    const existing = document.querySelector('.toast-notification');
+    if (existing) existing.remove();
+
+    const toast = document.createElement('div');
+    toast.className = `toast-notification ${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// ============================================================
+// EXPOSE GLOBALLY
+// ============================================================
+
+// Pagination functions
+window.prevPage = prevPage;
+window.nextPage = nextPage;
+window.setFilter = setFilter;
+
+// CRUD functions
+window.deleteSale = deleteSale;
+window.fetchSales = fetchSales;
+
+// Utility
+window.showToast = showToast;
+
+// Debug helpers
+window.getSales = () => allSales;
+window.getStats = () => calculateStats(allSales);
+
+console.log('✅ Sales.js loaded successfully');
+console.log(`📍 API Base: ${API_BASE}`);
+console.log(`🔗 Endpoints:`, API_ENDPOINTS);

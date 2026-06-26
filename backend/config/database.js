@@ -1,28 +1,19 @@
-// config/database.js - SQLite database connection and table creation
+﻿// config/database.js - SQLite database connection
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
-// Database file path (creates database.db in the backend folder)
 const dbPath = path.join(__dirname, '..', 'database.db');
 
-// Create database connection
 const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
-        console.error('❌ Error connecting to database:', err.message);
+        console.error('âŒ Error connecting to database:', err.message);
     } else {
-        console.log('✅ Connected to SQLite database');
-        console.log('📁 Database file:', dbPath);
+        console.log('âœ… Connected to SQLite database');
     }
 });
 
-// ============================================
-// CREATE ALL TABLES
-// ============================================
-
+// Create all tables
 function createTables() {
-    console.log('📊 Creating database tables...');
-
-    // EMPLOYEES
     db.run(`
         CREATE TABLE IF NOT EXISTS employees (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -40,7 +31,6 @@ function createTables() {
         )
     `);
 
-    // CUSTOMERS
     db.run(`
         CREATE TABLE IF NOT EXISTS customers (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -55,7 +45,6 @@ function createTables() {
         )
     `);
 
-    // STOCK
     db.run(`
         CREATE TABLE IF NOT EXISTS stock (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -67,7 +56,6 @@ function createTables() {
         )
     `);
 
-    // FEED
     db.run(`
         CREATE TABLE IF NOT EXISTS feed (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -77,7 +65,6 @@ function createTables() {
         )
     `);
 
-    // COOPS
     db.run(`
         CREATE TABLE IF NOT EXISTS coops (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -90,7 +77,6 @@ function createTables() {
         )
     `);
 
-    // BATCHES
     db.run(`
         CREATE TABLE IF NOT EXISTS batches (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -105,7 +91,6 @@ function createTables() {
         )
     `);
 
-    // EGG PRODUCTION
     db.run(`
         CREATE TABLE IF NOT EXISTS egg_production (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -122,7 +107,6 @@ function createTables() {
         )
     `);
 
-    // EGG SALES
     db.run(`
         CREATE TABLE IF NOT EXISTS egg_sales (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -139,7 +123,6 @@ function createTables() {
         )
     `);
 
-    // CHICKEN SALES
     db.run(`
         CREATE TABLE IF NOT EXISTS chicken_sales (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -155,7 +138,6 @@ function createTables() {
         )
     `);
 
-    // CHICKENS
     db.run(`
         CREATE TABLE IF NOT EXISTS chickens (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -171,7 +153,6 @@ function createTables() {
         )
     `);
 
-    // EQUIPMENT
     db.run(`
         CREATE TABLE IF NOT EXISTS equipment (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -184,7 +165,6 @@ function createTables() {
         )
     `);
 
-    // SECURITY
     db.run(`
         CREATE TABLE IF NOT EXISTS security (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -195,7 +175,6 @@ function createTables() {
         )
     `);
 
-    // FEED CONSUMPTION
     db.run(`
         CREATE TABLE IF NOT EXISTS feed_consumption (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -209,7 +188,6 @@ function createTables() {
         )
     `);
 
-    // FEED STOCK RECORDS
     db.run(`
         CREATE TABLE IF NOT EXISTS feed_stock_records (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -224,7 +202,6 @@ function createTables() {
         )
     `);
 
-    // PRICING (Current)
     db.run(`
         CREATE TABLE IF NOT EXISTS pricing (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -236,7 +213,6 @@ function createTables() {
         )
     `);
 
-    // PRICING HISTORY
     db.run(`
         CREATE TABLE IF NOT EXISTS pricing_history (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -248,127 +224,26 @@ function createTables() {
         )
     `);
 
-    console.log('✅ All database tables created/verified!');
+    console.log('âœ… Database tables created/verified');
 }
 
-// Initialize database with tables
 createTables();
 
-// ============================================
-// INSERT DEFAULT DATA
-// ============================================
-
-function insertDefaultData() {
-    console.log('📊 Inserting default data...');
-
-    // Check if employees exist
-    db.get('SELECT COUNT(*) as count FROM employees', (err, row) => {
-        if (err) {
-            console.error('❌ Error checking employees:', err.message);
-            return;
-        }
-        if (row.count === 0) {
-            db.run(`
-                INSERT INTO employees (username, password_hash, name, surname, position, role, access_rights)
-                VALUES ('admin', '', 'Nomagugu', 'Admin', 'Owner', 'owner', 'admin,manager,owner')
-            `, (err) => {
-                if (err) console.error('❌ Error inserting admin:', err.message);
-                else console.log('✅ Default admin user created');
-            });
-        }
-    });
-
-    // Check if pricing exists
-    db.get('SELECT COUNT(*) as count FROM pricing', (err, row) => {
-        if (err) {
-            console.error('❌ Error checking pricing:', err.message);
-            return;
-        }
-        if (row.count === 0) {
-            db.run(`
-                INSERT INTO pricing (egg_tray, egg_piece, dressed_chicken, undressed_chicken)
-                VALUES (120.00, 2.00, 90.00, 85.00)
-            `, (err) => {
-                if (err) console.error('❌ Error inserting pricing:', err.message);
-                else console.log('✅ Default pricing created');
-            });
-        }
-    });
-
-    // Check if stock exists
-    db.get('SELECT COUNT(*) as count FROM stock', (err, row) => {
-        if (err) {
-            console.error('❌ Error checking stock:', err.message);
-            return;
-        }
-        if (row.count === 0) {
-            db.run(`
-                INSERT INTO stock (item_type, quantity, unit, price)
-                VALUES 
-                    ('broiler', 320, 'bird', 85.00),
-                    ('layer', 240, 'bird', 0),
-                    ('egg', 540, 'tray', 120.00)
-            `, (err) => {
-                if (err) console.error('❌ Error inserting stock:', err.message);
-                else console.log('✅ Default stock created');
-            });
-        }
-    });
-
-    // Check if feed exists
-    db.get('SELECT COUNT(*) as count FROM feed', (err, row) => {
-        if (err) {
-            console.error('❌ Error checking feed:', err.message);
-            return;
-        }
-        if (row.count === 0) {
-            db.run(`
-                INSERT INTO feed (feed_type, quantity_kg)
-                VALUES 
-                    ('Layer Feed Premium', 1850),
-                    ('Layer Feed Standard', 1200),
-                    ('Broiler Starter', 900),
-                    ('Broiler Finisher', 700)
-            `, (err) => {
-                if (err) console.error('❌ Error inserting feed:', err.message);
-                else console.log('✅ Default feed created');
-            });
-        }
-    });
-
-    // Check if coops exist
-    db.get('SELECT COUNT(*) as count FROM coops', (err, row) => {
-        if (err) {
-            console.error('❌ Error checking coops:', err.message);
-            return;
-        }
-        if (row.count === 0) {
-            const coops = [
-                { coop: 1, zone: 'A', stock: 45, health: 'Good', notes: 'Full capacity - healthy flock' },
-                { coop: 1, zone: 'B', stock: 38, health: 'Excellent', notes: 'Growing well - excellent condition' },
-                { coop: 1, zone: 'C', stock: 42, health: 'Good', notes: 'Routine check complete' },
-                { coop: 2, zone: 'A', stock: 35, health: 'Good', notes: 'Good production - healthy' },
-                { coop: 2, zone: 'B', stock: 40, health: 'Fair', notes: 'Need more space - fair condition' },
-                { coop: 2, zone: 'C', stock: 30, health: 'Good', notes: 'Health check due' },
-                { coop: 3, zone: 'A', stock: 25, health: 'Fair', notes: 'Young flock - developing well' },
-                { coop: 3, zone: 'B', stock: 20, health: 'Good', notes: 'Excellent condition' },
-                { coop: 3, zone: 'C', stock: 18, health: 'Excellent', notes: 'Ready for sale' }
-            ];
-            coops.forEach(c => {
-                db.run(`
-                    INSERT INTO coops (coop_number, zone_letter, current_stock, health_status, notes)
-                    VALUES (?, ?, ?, ?, ?)
-                `, [c.coop, c.zone, c.stock, c.health, c.notes]);
-            });
-            console.log('✅ Default coops created (9 zones)');
-        }
-    });
-}
-
-// Run after tables are created
-setTimeout(() => {
-    insertDefaultData();
-    console.log('✅ Database initialization complete!');
-}, 500);
+// Insert default admin user
+db.get('SELECT * FROM employees WHERE username = ?', ['admin'], (err, row) => {
+    if (err) {
+        console.error('Error checking admin:', err.message);
+        return;
+    }
+    if (!row) {
+        db.run(`
+            INSERT INTO employees (username, password_hash, name, surname, position, role, access_rights)
+            VALUES ('admin', '', 'Nomagugu', 'Admin', 'Owner', 'owner', 'admin,manager,owner')
+        `, (err) => {
+            if (err) console.error('Error creating admin:', err.message);
+            else console.log('âœ… Default admin user created');
+        });
+    }
+});
 
 module.exports = db;

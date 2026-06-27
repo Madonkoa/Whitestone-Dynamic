@@ -1,0 +1,293 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stock Management</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { width: 100%; overflow-x: hidden; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f1f5f9; display: flex; min-height: 100vh; }
+        
+        .sidebar { width: 240px; min-width: 240px; background: #0f172a; color: #e2e8f0; padding: 20px 0; height: 100vh; position: sticky; top: 0; overflow-y: auto; flex-shrink: 0; }
+        .sidebar .logo { padding: 0 20px 30px 20px; font-size: 22px; font-weight: 700; color: #fff; }
+        .sidebar .logo span { color: #3b82f6; }
+        .sidebar .nav-item { display: block; padding: 10px 20px; color: #94a3b8; text-decoration: none; font-size: 14px; border-left: 3px solid transparent; transition: 0.2s; cursor: pointer; }
+        .sidebar .nav-item:hover { background: #1e293b; color: #fff; }
+        .sidebar .nav-item.active { background: #1e293b; color: #fff; border-left-color: #3b82f6; }
+        .sidebar .nav-section { padding: 20px 20px 8px 20px; font-size: 11px; text-transform: uppercase; color: #475569; font-weight: 600; letter-spacing: 0.5px; }
+        
+        .main { flex: 1; padding: 30px 35px; background: #f1f5f9; min-width: 0; }
+        
+        .page-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 25px; }
+        .page-header h1 { font-size: 28px; color: #0f172a; }
+        .page-header p { color: #64748b; font-size: 15px; }
+        .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn { padding: 8px 18px; border-radius: 8px; border: none; font-weight: 600; font-size: 14px; cursor: pointer; background: #fff; color: #1e293b; border: 1px solid #e2e8f0; transition: 0.2s; }
+        .btn-primary { background: #2563eb; color: #fff; border-color: #2563eb; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-outline:hover { background: #e2e8f0; }
+        
+        .tabs { display: flex; gap: 4px; flex-wrap: wrap; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 25px; }
+        .tab { padding: 8px 20px; border: none; background: transparent; font-weight: 500; font-size: 14px; color: #64748b; cursor: pointer; border-bottom: 3px solid transparent; transition: 0.2s; }
+        .tab:hover { color: #0f172a; }
+        .tab.active { color: #2563eb; border-bottom-color: #2563eb; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 25px; }
+        .stat-card { background: #fff; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; }
+        .stat-card .label { font-size: 13px; color: #64748b; font-weight: 500; }
+        .stat-card .value { font-size: 28px; font-weight: 700; color: #0f172a; margin-top: 5px; }
+        .stat-card .sub { font-size: 13px; color: #94a3b8; margin-top: 3px; }
+        
+        .conversion-box { background: #fff; padding: 18px 24px; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; flex-wrap: wrap; align-items: center; gap: 30px; margin-bottom: 25px; }
+        .conversion-box .label { font-weight: 600; color: #0f172a; }
+        .conversion-box .stat { display: flex; align-items: baseline; gap: 5px; }
+        .conversion-box .stat .num { font-size: 24px; font-weight: 700; color: #0f172a; }
+        .conversion-box .stat .unit { color: #94a3b8; font-size: 14px; }
+        .conversion-box .divider { width: 1px; height: 30px; background: #e2e8f0; }
+        
+        .category-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 25px; }
+        .category-item { background: #fff; padding: 14px 18px; border-radius: 10px; border: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+        .category-item .name { font-weight: 500; color: #1e293b; }
+        .category-item .count { font-weight: 700; color: #0f172a; font-size: 20px; }
+        
+        .empty-state { text-align: center; padding: 50px 20px; background: #fff; border-radius: 12px; border: 2px dashed #cbd5e1; margin: 10px 0; }
+        .empty-state .icon { font-size: 50px; margin-bottom: 10px; }
+        .empty-state p { color: #94a3b8; font-size: 16px; }
+        .empty-state .btn { margin-top: 15px; }
+        
+        .movements-section { margin-top: 30px; }
+        .movements-section h2 { font-size: 18px; margin-bottom: 12px; color: #0f172a; }
+        .movement-item { display: flex; justify-content: space-between; padding: 12px 16px; background: #fff; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 6px; }
+        .movement-item .product { font-weight: 500; }
+        .movement-item .qty { font-weight: 600; color: #2563eb; }
+        .movement-item .date { color: #94a3b8; font-size: 13px; }
+        
+        table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; }
+        thead { background: #f8fafc; }
+        th { padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: #475569; border-bottom: 1px solid #e2e8f0; }
+        td { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; }
+        tr:last-child td { border-bottom: none; }
+        
+        @media (max-width: 1024px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .category-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; min-width: unset; height: auto; position: relative; padding: 15px; }
+            .sidebar .nav-item { display: inline-block; padding: 8px 15px; }
+            .sidebar .nav-section { display: none; }
+            .main { padding: 15px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .category-grid { grid-template-columns: 1fr 1fr; }
+            .page-header h1 { font-size: 22px; }
+            .header-actions { width: 100%; }
+            .header-actions .btn { flex: 1; justify-content: center; }
+            .tabs { flex-wrap: nowrap; overflow-x: auto; }
+            .tab { white-space: nowrap; font-size: 13px; padding: 6px 14px; }
+            .conversion-box { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .conversion-box .divider { display: none; }
+        }
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .category-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo">🐔 <span>Stock</span>Manager</div>
+        <div class="nav-section">Management</div>
+        <a class="nav-item active">📊 Dashboard</a>
+        <a class="nav-item">📦 Stock</a>
+        <div class="nav-section">Production</div>
+        <a class="nav-item">🐣 Birds</a>
+        <a class="nav-item">🥚 Eggs</a>
+        <div class="nav-section">Health</div>
+        <a class="nav-item">💉 Vaccines</a>
+        <a class="nav-item">💊 Meds</a>
+        <div class="nav-section">Inventory</div>
+        <a class="nav-item">🥫 Feed</a>
+        <a class="nav-item">📦 Packaging</a>
+        <a class="nav-item">🔧 Equipment</a>
+    </aside>
+
+    <main class="main" id="app">
+        <div class="page-header">
+            <div>
+                <h1>📦 Stock Management</h1>
+                <p>Monitor poultry and egg inventory in real-time</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-primary" @click="addProduct">➕ Add Product</button>
+                <button class="btn btn-outline" @click="addVariant">🔀 Add Variant</button>
+                <button class="btn btn-outline" @click="refresh">🔄 Refresh</button>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active">FEED STOCK</button>
+            <button class="tab">TOTAL BIRDS</button>
+            <button class="tab">VACCINES & MEDS</button>
+            <button class="tab">INVENTORY & MEDS</button>
+            <button class="tab">STOCK VALUE</button>
+            <button class="tab">LOW STOCK ALERTS</button>
+            <button class="tab">FEED DAYS REMAINING</button>
+        </div>
+
+        <!-- STATS - DIRECT DATA, NO BACKEND -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="label">🥚 Total Eggs</div>
+                <div class="value">1,240</div>
+                <div class="sub">In stock</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">🐔 Total Birds</div>
+                <div class="value">2,850</div>
+                <div class="sub">In stock</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">🌾 Feed Stock</div>
+                <div class="value">650 kg</div>
+                <div class="sub">In stock</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">💉 Vaccines & Meds</div>
+                <div class="value">23</div>
+                <div class="sub">Items in stock</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">⚠️ Low Stock Alerts</div>
+                <div class="value" style="color:#22c55e;">0</div>
+                <div class="sub">All items in stock</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">⏳ Feed Days Remaining</div>
+                <div class="value">12</div>
+                <div class="sub">Days of feed left</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">💰 Inventory Value</div>
+                <div class="value">$8,420</div>
+                <div class="sub">Total stock value</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">📊 Total Items</div>
+                <div class="value">47</div>
+                <div class="sub">In stock</div>
+            </div>
+        </div>
+
+        <!-- CONVERSION RATIO -->
+        <div class="conversion-box">
+            <span class="label">📈 Feed Conversion Ratio</span>
+            <div class="stat">
+                <span class="num">340</span>
+                <span class="unit">kg feed</span>
+            </div>
+            <div class="divider"></div>
+            <div class="stat">
+                <span class="num">280</span>
+                <span class="unit">kg gained</span>
+            </div>
+            <div style="color:#94a3b8;font-size:14px;margin-left:auto;">
+                Ratio: 1.21
+            </div>
+        </div>
+
+        <!-- CATEGORIES -->
+        <div class="category-grid">
+            <div class="category-item"><span class="name">🐔 Birds</span><span class="count">2,850</span></div>
+            <div class="category-item"><span class="name">🌾 Feed</span><span class="count">650 kg</span></div>
+            <div class="category-item"><span class="name">🥚 Eggs</span><span class="count">1,240</span></div>
+            <div class="category-item"><span class="name">💊 Medications</span><span class="count">8</span></div>
+            <div class="category-item"><span class="name">🔧 Equipment</span><span class="count">12</span></div>
+            <div class="category-item"><span class="name">📦 Packaging</span><span class="count">45</span></div>
+        </div>
+
+        <!-- PRODUCTS TABLE -->
+        <div style="overflow-x:auto;margin-bottom:25px;">
+            <table>
+                <thead>
+                    <tr><th>Product</th><th>Category</th><th>Quantity</th><th>Value</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Layer Mash</strong></td><td>Feed</td><td>450 kg</td><td>$675</td></tr>
+                    <tr><td><strong>Broiler Starter</strong></td><td>Feed</td><td>200 kg</td><td>$340</td></tr>
+                    <tr><td><strong>Fresh Eggs (Tray)</strong></td><td>Eggs</td><td>120 trays</td><td>$360</td></tr>
+                    <tr><td><strong>Newcastle Vaccine</strong></td><td>Vaccines</td><td>15 vials</td><td>$225</td></tr>
+                    <tr><td><strong>Antibiotic Solution</strong></td><td>Meds</td><td>8 bottles</td><td>$160</td></tr>
+                    <tr><td><strong>Egg Cartons</strong></td><td>Packaging</td><td>500 pcs</td><td>$125</td></tr>
+                    <tr><td><strong>Feeding Troughs</strong></td><td>Equipment</td><td>25 units</td><td>$375</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- MOVEMENTS -->
+        <div class="movements-section">
+            <h2>🔄 Recent Stock Movements</h2>
+            <div class="movement-item">
+                <span class="product">Layer Mash</span>
+                <span class="qty">+50 kg</span>
+                <span class="date">2026-06-27 09:30</span>
+            </div>
+            <div class="movement-item">
+                <span class="product">Fresh Eggs</span>
+                <span class="qty" style="color:#ef4444;">-24 trays</span>
+                <span class="date">2026-06-27 08:15</span>
+            </div>
+            <div class="movement-item">
+                <span class="product">Broiler Starter</span>
+                <span class="qty">+30 kg</span>
+                <span class="date">2026-06-26 14:20</span>
+            </div>
+            <div class="movement-item">
+                <span class="product">Egg Cartons</span>
+                <span class="qty" style="color:#ef4444;">-100 pcs</span>
+                <span class="date">2026-06-26 11:45</span>
+            </div>
+            <div class="movement-item">
+                <span class="product">Newcastle Vaccine</span>
+                <span class="qty" style="color:#ef4444;">-2 vials</span>
+                <span class="date">2026-06-25 16:00</span>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Simple Vue-like functionality without external dependency
+        document.querySelectorAll('.btn-primary').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const name = prompt('Enter product name:');
+                if (!name) return;
+                const category = prompt('Category (Feed/Eggs/Meds/Equipment/Packaging):') || 'Other';
+                const qty = prompt('Quantity:') || '0';
+                const unit = prompt('Unit (kg/trays/vials/pcs):') || 'units';
+                const value = prompt('Value ($):') || '0';
+                alert(`Added: ${name} (${category}) - ${qty} ${unit} - $${value}\n\nRefresh page to see updates.`);
+                location.reload();
+            });
+        });
+
+        document.querySelectorAll('.btn-outline').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (this.textContent.includes('Refresh')) {
+                    location.reload();
+                } else {
+                    alert('Select a product to create a variant');
+                }
+            });
+        });
+
+        // Tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

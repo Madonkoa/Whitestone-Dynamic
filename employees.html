@@ -1,6 +1,5 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,146 +7,102 @@
     <link rel="stylesheet" href="css/style.css">
     <style>
         /* ===== COMPACT STYLES ===== */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            margin-bottom: 16px;
-        }
-        .stat-card {
-            background: #fff;
-            padding: 12px 16px;
-            border-radius: 8px;
-            border: 1px solid #E8E4E0;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        .stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 16px; }
+        .stat-card { background: #fff; padding: 12px 16px; border-radius: 8px; border: 1px solid #E8E4E0; display: flex; align-items: center; gap: 12px; }
         .stat-icon { font-size: 22px; }
         .stat-info h3 { font-size: 9px; color: #888; font-weight: 600; text-transform: uppercase; margin: 0; }
         .stat-info p { font-size: 20px; font-weight: 700; color: #0A1628; margin: 0; line-height: 1.2; }
         .stat-info .sub { font-size: 10px; color: #94a3b8; }
-
         .top-bar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 14px; border-bottom: 1px solid #E8E4E0; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
         .top-bar-left h1 { font-size: 20px; font-weight: 700; color: #0A1628; }
         .welcome-text { color: #888; font-size: 12px; margin-top: 2px; }
         .top-bar-right { display: flex; align-items: center; gap: 12px; }
         .date-display { color: #888; font-size: 12px; }
         .user-avatar { width: 30px; height: 30px; background: #0A1628; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; color: #fff; font-size: 12px; }
-
         .content-section { background: #fff; padding: 18px 22px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); border: 1px solid #E8E4E0; }
         .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; }
         .section-header h2 { font-size: 15px; font-weight: 600; color: #0A1628; }
         .section-controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-        .search-box { display: flex; align-items: center; gap: 6px; }
         .search-box input { padding: 5px 10px; border: 1px solid #E8E4E0; border-radius: 6px; font-size: 12px; width: 180px; font-family: 'Inter', sans-serif; }
-        .search-box input:focus { outline: none; border-color: #0A1628; }
         .filter-select { padding: 5px 10px; border: 1px solid #E8E4E0; border-radius: 6px; font-size: 12px; background: #fff; font-family: 'Inter', sans-serif; cursor: pointer; }
-
         .primary-btn { padding: 6px 16px; background: #0A1628; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 12px; transition: all 0.2s; }
         .primary-btn:hover { background: #1A2A4A; transform: translateY(-1px); }
         .secondary-btn { padding: 6px 16px; background: #f0f2f5; color: #0A1628; border: 1px solid #E8E4E0; border-radius: 6px; cursor: pointer; font-size: 12px; transition: all 0.2s; }
         .secondary-btn:hover { background: #e5e7eb; }
-
         .table-container { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 800px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 700px; }
         thead { background: #0A1628; }
-        thead th { color: #fff; padding: 8px 12px; text-align: left; font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+        thead th { color: #fff; padding: 8px 12px; text-align: left; font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
         tbody td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; color: #4A4A4A; }
         tbody tr:hover { background: #f5f2ed; cursor: pointer; }
-        tbody tr.expanded { background: #f0f2f5; }
-
         .status-badge { padding: 2px 10px; border-radius: 12px; font-size: 10px; font-weight: 600; display: inline-block; }
         .status-badge.active { background: #D4EDDA; color: #155724; }
         .status-badge.inactive { background: #F8D7DA; color: #721C24; }
         .status-badge.on-leave { background: #FFF3CD; color: #856404; }
-
-        .role-badge { padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 500; display: inline-block; }
+        .role-badge { padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 500; display: inline-block; min-width: 70px; text-align: center; white-space: nowrap; }
         .role-badge.owner { background: #0A1628; color: #fff; }
         .role-badge.manager { background: #3B82F6; color: #fff; }
         .role-badge.farmer { background: #22C55E; color: #fff; }
         .role-badge.sales { background: #F59E0B; color: #fff; }
         .role-badge.accountant { background: #8B5CF6; color: #fff; }
         .role-badge.foreman { background: #EC4899; color: #fff; }
-
-        .action-btn { padding: 3px 8px; border-radius: 4px; border: none; font-size: 11px; cursor: pointer; transition: all 0.2s; }
-        .action-btn.edit { background: #DBEAFE; color: #2563EB; }
-        .action-btn.edit:hover { background: #BFDBFE; }
-        .action-btn.delete { background: #FEE2E2; color: #EF4444; }
-        .action-btn.delete:hover { background: #FECACA; }
+        .role-badge.hr { background: #06B6D4; color: #fff; }
+        .employee-id-badge { background: #E8E4E0; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; color: #0A1628; font-family: 'Courier New', monospace; }
+        .action-btn { padding: 5px 10px; border-radius: 6px; border: none; font-size: 14px; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; min-width: 32px; min-height: 32px; background: #f1f5f9; color: #1e293b; }
+        .action-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         .action-btn.view { background: #E0E7FF; color: #4F46E5; }
-        .action-btn.view:hover { background: #C7D2FE; }
-
+        .action-btn.edit { background: #DBEAFE; color: #2563EB; }
+        .action-btn.archive { background: #FEF3C7; color: #D97706; }
         .empty-state { text-align: center; padding: 30px 20px; color: #888; }
         .empty-state .icon { font-size: 36px; display: block; margin-bottom: 8px; opacity: 0.5; }
 
-        /* Modal */
+        /* Modal styles */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
-        .modal-content { background: #fff; padding: 24px; border-radius: 10px; max-width: 550px; width: 90%; max-height: 90vh; overflow-y: auto; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .modal-content { background: #fff; padding: 24px; border-radius: 10px; max-width: 750px; width: 95%; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 2px solid #E8E4E0; padding-bottom: 12px; }
         .modal-header h2 { font-size: 18px; font-weight: 600; color: #0A1628; }
         .modal-close { font-size: 24px; cursor: pointer; color: #888; background: none; border: none; }
         .modal-close:hover { color: #0A1628; }
+
+        .tab-bar { display: flex; gap: 2px; margin-bottom: 16px; flex-wrap: wrap; border-bottom: 1px solid #E8E4E0; }
+        .tab-btn { padding: 8px 16px; background: none; border: none; font-size: 11px; font-weight: 600; color: #888; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; font-family: 'Inter', sans-serif; }
+        .tab-btn:hover { color: #0A1628; }
+        .tab-btn.active { color: #0A1628; border-bottom-color: #0A1628; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
         .form-group { margin-bottom: 10px; }
         .form-group label { font-size: 11px; font-weight: 600; display: block; margin-bottom: 3px; color: #4A4A4A; }
-        .form-group input, .form-group select { width: 100%; padding: 6px 10px; border: 1px solid #E8E4E0; border-radius: 6px; font-size: 12px; font-family: 'Inter', sans-serif; }
-        .form-group input:focus, .form-group select:focus { outline: none; border-color: #0A1628; }
+        .form-group label .required { color: #EF4444; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 6px 10px; border: 1px solid #E8E4E0; border-radius: 6px; font-size: 12px; font-family: 'Inter', sans-serif; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #0A1628; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .form-actions { display: flex; gap: 8px; margin-top: 14px; justify-content: flex-end; }
-        .form-actions .primary-btn { padding: 8px 24px; }
-        .form-actions .secondary-btn { padding: 8px 24px; }
+        .form-actions { display: flex; gap: 8px; margin-top: 14px; justify-content: flex-end; border-top: 1px solid #E8E4E0; padding-top: 14px; }
 
-        /* Delete Modal */
-        .delete-modal .modal-content { max-width: 380px; text-align: center; }
-        .delete-modal .confirm-icon { font-size: 48px; display: block; margin-bottom: 8px; }
-        .delete-modal .confirm-text { font-size: 14px; color: #4A4A4A; margin-bottom: 6px; }
-        .delete-modal .confirm-name { font-weight: 700; color: #0A1628; }
+        .section-title { font-size: 13px; font-weight: 600; color: #0A1628; margin: 12px 0 8px 0; padding-bottom: 4px; border-bottom: 1px solid #E8E4E0; }
+        .compliance-badge { font-size: 10px; padding: 2px 8px; border-radius: 4px; display: inline-block; }
+        .compliance-badge.required { background: #FEE2E2; color: #DC2626; }
+        .compliance-badge.popia { background: #FEF3C7; color: #D97706; }
 
-        /* Employee Details Row */
         .details-row { display: none; background: #f8fafc; }
         .details-row.visible { display: table-row; }
-        .details-row td { padding: 16px 20px; }
-        .details-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-        .detail-item { background: #fff; padding: 10px 14px; border-radius: 6px; border: 1px solid #E8E4E0; }
-        .detail-item .label { font-size: 9px; text-transform: uppercase; color: #888; font-weight: 600; }
-        .detail-item .value { font-size: 13px; font-weight: 500; color: #0A1628; margin-top: 2px; }
-        .detail-item .value .status-badge { font-size: 10px; }
+        .details-row td { padding: 20px 24px !important; background: #f8fafc; border-top: 2px solid #E8E4E0; }
+        .details-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        .detail-item { background: #fff; padding: 12px 16px; border-radius: 8px; border: 1px solid #E8E4E0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+        .detail-item .label { font-size: 9px; text-transform: uppercase; color: #94a3b8; font-weight: 600; letter-spacing: 0.5px; }
+        .detail-item .value { font-size: 14px; font-weight: 500; color: #0A1628; margin-top: 4px; }
 
-        /* Bulk Actions */
-        .bulk-actions { display: none; gap: 8px; align-items: center; padding: 8px 12px; background: #f0f2f5; border-radius: 6px; margin-bottom: 10px; }
-        .bulk-actions.visible { display: flex; flex-wrap: wrap; }
-        .bulk-actions .bulk-count { font-size: 12px; font-weight: 600; color: #0A1628; }
-        .checkbox-col { width: 30px; text-align: center; }
-        .checkbox-col input[type="checkbox"] { cursor: pointer; }
+        .input-wrapper { position: relative; }
+        .validation-icon { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 18px; }
+        .password-strength { height: 4px; border-radius: 2px; margin-top: 4px; transition: all 0.3s ease; background: #E8E4E0; }
+        .password-strength.weak { background: #EF4444; width: 33%; }
+        .password-strength.medium { background: #F59E0B; width: 66%; }
+        .password-strength.strong { background: #22C55E; width: 100%; }
 
-        /* Activity Log */
-        .activity-log { margin-top: 4px; }
-        .activity-item { display: flex; justify-content: space-between; padding: 2px 0; font-size: 11px; color: #4A4A4A; border-bottom: 1px solid #f1f5f9; }
-        .activity-item .time { color: #94a3b8; font-size: 10px; }
-
-        @media (max-width: 992px) {
-            .stats-grid { grid-template-columns: repeat(3, 1fr); }
-            .form-row { grid-template-columns: 1fr; }
-            .details-grid { grid-template-columns: 1fr 1fr; }
-        }
-        @media (max-width: 768px) {
-            .stats-grid { grid-template-columns: 1fr 1fr; }
-            .section-controls { flex-direction: column; align-items: stretch; }
-            .search-box input { width: 100%; }
-            .top-bar { flex-direction: column; align-items: flex-start; }
-            .top-bar-right { width: 100%; justify-content: space-between; }
-            .modal-content { max-width: 95%; padding: 16px; }
-            .details-grid { grid-template-columns: 1fr; }
-            .bulk-actions { flex-direction: column; align-items: stretch; }
-        }
-        @media (max-width: 480px) {
-            .stats-grid { grid-template-columns: 1fr; }
-            table { min-width: 600px; font-size: 10px; }
-            thead th, tbody td { padding: 5px 8px; }
-        }
+        @media (max-width: 768px) { .stats-grid { grid-template-columns: 1fr 1fr; } .section-controls { flex-direction: column; align-items: stretch; } .search-box input { width: 100%; } .details-grid { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 480px) { .stats-grid { grid-template-columns: 1fr; } table { min-width: 600px; } .details-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
-
 <body>
     <div class="dashboard-container">
         <nav class="sidebar">
@@ -157,7 +112,7 @@
                 <div class="sidebar-divider"></div>
                 <p>Poultry Management</p>
             </div>
-            <ul class="nav-menu" id="mainNav">
+            <ul class="nav-menu">
                 <li><a href="dashboard.html"><span class="icon">📊</span> <span>Dashboard</span></a></li>
                 <li><a href="employees.html" class="active"><span class="icon">👥</span> <span>Employees</span></a></li>
                 <li><a href="stock.html"><span class="icon">📦</span> <span>Stock</span></a></li>
@@ -177,68 +132,23 @@
 
         <div class="main-content">
             <div class="top-bar">
-                <div class="top-bar-left">
-                    <h1>👥 Employee Management</h1>
-                    <p class="welcome-text">Manage your team and their <span>access rights</span></p>
-                </div>
-                <div class="top-bar-right">
-                    <span class="date-display" id="dateDisplay"></span>
-                    <div class="user-avatar" id="userAvatar">U</div>
-                </div>
+                <div class="top-bar-left"><h1>👥 Employee Management</h1><p class="welcome-text">Manage your team - <span>POPIA & BCEA compliant</span></p></div>
+                <div class="top-bar-right"><span class="date-display" id="dateDisplay"></span><div class="user-avatar" id="userAvatar">U</div></div>
             </div>
 
-            <!-- Stats -->
-            <div class="stats-grid" id="statsGrid">
-                <div class="stat-card">
-                    <div class="stat-icon">👥</div>
-                    <div class="stat-info">
-                        <h3>Total Employees</h3>
-                        <p id="totalEmployees">0</p>
-                        <span class="sub">All employees</span>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">🟢</div>
-                    <div class="stat-info">
-                        <h3>Active</h3>
-                        <p id="activeEmployees">0</p>
-                        <span class="sub">Currently working</span>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">🟡</div>
-                    <div class="stat-info">
-                        <h3>On Leave</h3>
-                        <p id="onLeaveEmployees">0</p>
-                        <span class="sub">Away</span>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">🔴</div>
-                    <div class="stat-info">
-                        <h3>Inactive</h3>
-                        <p id="inactiveEmployees">0</p>
-                        <span class="sub">Not active</span>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">👑</div>
-                    <div class="stat-info">
-                        <h3>Roles</h3>
-                        <p id="roleCount">0</p>
-                        <span class="sub">Different roles</span>
-                    </div>
-                </div>
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-info"><h3>Total</h3><p id="totalEmployees">0</p><span class="sub">All employees</span></div></div>
+                <div class="stat-card"><div class="stat-icon">🟢</div><div class="stat-info"><h3>Active</h3><p id="activeEmployees">0</p><span class="sub">Currently working</span></div></div>
+                <div class="stat-card"><div class="stat-icon">🟡</div><div class="stat-info"><h3>On Leave</h3><p id="onLeaveEmployees">0</p><span class="sub">Away</span></div></div>
+                <div class="stat-card"><div class="stat-icon">🔴</div><div class="stat-info"><h3>Archived</h3><p id="inactiveEmployees">0</p><span class="sub">Not active</span></div></div>
+                <div class="stat-card"><div class="stat-icon">📄</div><div class="stat-info"><h3>Probation</h3><p id="probationEmployees">0</p><span class="sub">Probation period</span></div></div>
             </div>
 
-            <!-- Content Section -->
             <div class="content-section">
                 <div class="section-header">
                     <h2>All Employees</h2>
                     <div class="section-controls">
-                        <div class="search-box">
-                            <input type="text" id="searchInput" placeholder="🔍 Search employees..." oninput="filterEmployees()">
-                        </div>
+                        <div class="search-box"><input type="text" id="searchInput" placeholder="🔍 Search..." oninput="filterEmployees()"></div>
                         <select class="filter-select" id="roleFilter" onchange="filterEmployees()">
                             <option value="all">All Roles</option>
                             <option value="owner">👑 Owner</option>
@@ -247,129 +157,163 @@
                             <option value="foreman">🔧 Foreman</option>
                             <option value="sales">💰 Sales</option>
                             <option value="accountant">📊 Accountant</option>
+                            <option value="hr">👤 HR</option>
                         </select>
                         <select class="filter-select" id="statusFilter" onchange="filterEmployees()">
                             <option value="all">All Status</option>
                             <option value="active">🟢 Active</option>
                             <option value="on-leave">🟡 On Leave</option>
-                            <option value="inactive">🔴 Inactive</option>
+                            <option value="inactive">🔴 Archived</option>
                         </select>
                         <button class="primary-btn" onclick="openAddModal()">➕ Add Employee</button>
                     </div>
                 </div>
 
-                <!-- Bulk Actions -->
-                <div class="bulk-actions" id="bulkActions">
-                    <span class="bulk-count" id="bulkCount">0 selected</span>
-                    <button class="secondary-btn" onclick="bulkDelete()">🗑️ Delete Selected</button>
-                    <select class="filter-select" id="bulkRoleSelect" onchange="bulkUpdateRole()">
-                        <option value="">Update Role...</option>
-                        <option value="owner">👑 Owner</option>
-                        <option value="manager">👔 Manager</option>
-                        <option value="farmer">🌾 Farmer</option>
-                        <option value="foreman">🔧 Foreman</option>
-                        <option value="sales">💰 Sales</option>
-                        <option value="accountant">📊 Accountant</option>
-                    </select>
-                    <button class="secondary-btn" onclick="clearSelection()">✖️ Clear</button>
-                </div>
-
                 <div class="table-container">
                     <table>
-                        <thead>
-                            <tr>
-                                <th class="checkbox-col"><input type="checkbox" id="selectAll" onchange="toggleAll()"></th>
-                                <th>ID</th>
-                                <th>Username</th>
-                                <th>Name</th>
-                                <th>Surname</th>
-                                <th>Role</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="employeeTableBody">
-                            <tr><td colspan="8" class="empty-state"><span class="icon">⏳</span>Loading employees...</td></tr>
-                        </tbody>
+                        <thead><tr><th>EmployeeID</th><th>Name</th><th>Surname</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody id="employeeTableBody"><tr><td colspan="6" class="empty-state"><span class="icon">⏳</span>Loading...</td></tr></tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Add/Edit Modal -->
+    <!-- EMPLOYEE MODAL WITH 8 TABS -->
     <div id="employeeModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalTitle">Add Employee</h2>
-                <button class="modal-close" onclick="closeModal()">&times;</button>
-            </div>
+            <div class="modal-header"><h2 id="modalTitle">Add Employee</h2><button class="modal-close" onclick="closeModal()">&times;</button></div>
             <form id="employeeForm">
                 <input type="hidden" id="employeeId">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Username *</label>
-                        <input type="text" id="empUsername" required placeholder="username">
+                <input type="hidden" id="employeeNumber">
+                
+                <div class="tab-bar">
+                    <button type="button" class="tab-btn active" data-tab="tab-personal" onclick="switchTab('tab-personal')">👤 Personal</button>
+                    <button type="button" class="tab-btn" data-tab="tab-employment" onclick="switchTab('tab-employment')">💼 Employment</button>
+                    <button type="button" class="tab-btn" data-tab="tab-financial" onclick="switchTab('tab-financial')">💰 Financial</button>
+                    <button type="button" class="tab-btn" data-tab="tab-leave" onclick="switchTab('tab-leave')">🌴 Leave</button>
+                    <button type="button" class="tab-btn" data-tab="tab-documents" onclick="switchTab('tab-documents')">📄 Documents</button>
+                    <button type="button" class="tab-btn" data-tab="tab-compliance" onclick="switchTab('tab-compliance')">⚖️ Compliance</button>
+                    <button type="button" class="tab-btn" data-tab="tab-roles" onclick="switchTab('tab-roles')">🔐 Roles</button>
+                    <button type="button" class="tab-btn" data-tab="tab-termination" onclick="switchTab('tab-termination')">🚫 Termination</button>
+                </div>
+
+                <!-- TAB 1: PERSONAL -->
+                <div id="tab-personal" class="tab-content active">
+                    <div class="section-title">Personal Information</div>
+                    <div class="form-row">
+                        <div class="form-group"><label>EmployeeID</label><input type="text" id="empEmployeeNumber" readonly style="background:#e8e4e0;font-weight:600;"></div>
+                        <div class="form-group"><label>Username *</label><input type="text" id="empUsername" required placeholder="username"></div>
                     </div>
-                    <div class="form-group" id="passwordGroup">
-                        <label>Password</label>
-                        <input type="password" id="empPassword" placeholder="Leave blank to keep current">
+                    <div class="form-row">
+                        <div class="form-group"><label>First Name *</label><input type="text" id="empName" required placeholder="First name"></div>
+                        <div class="form-group"><label>Last Name *</label><input type="text" id="empSurname" required placeholder="Last name"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" id="passwordGroup"><label>Password *</label><input type="password" id="empPassword" placeholder="Minimum 6 characters"></div>
+                        <div class="form-group"><label>Email *</label><input type="email" id="empEmail" required placeholder="email@example.com"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Phone *</label><input type="text" id="empPhone" required placeholder="+27 82 123 4567"></div>
+                        <div class="form-group"><label>Date of Birth</label><input type="date" id="empDob"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>ID Number</label><input type="text" id="empIdNumber" placeholder="ID or Passport"></div>
+                        <div class="form-group"><label>Emergency Contact</label><input type="text" id="empEmergencyName" placeholder="Full name"></div>
+                    </div>
+                    <div class="form-group"><label>Emergency Phone</label><input type="text" id="empEmergencyPhone" placeholder="+27 82 123 4567"></div>
+                </div>
+
+                <!-- TAB 2: EMPLOYMENT -->
+                <div id="tab-employment" class="tab-content">
+                    <div class="section-title">Employment Details</div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Department</label><input type="text" id="empDepartment" placeholder="e.g. Production"></div>
+                        <div class="form-group"><label>Job Title</label><input type="text" id="empJobTitle" placeholder="e.g. Senior Farmer"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Role *</label><select id="empRole" required><option value="">Select</option><option value="owner">👑 Owner</option><option value="manager">👔 Manager</option><option value="farmer">🌾 Farmer</option><option value="foreman">🔧 Foreman</option><option value="sales">💰 Sales</option><option value="accountant">📊 Accountant</option><option value="hr">👤 HR</option></select></div>
+                        <div class="form-group"><label>Status</label><select id="empStatus"><option value="active">🟢 Active</option><option value="on-leave">🟡 On Leave</option><option value="inactive">🔴 Archived</option></select></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Employment Type</label><select id="empEmploymentType"><option value="permanent">Permanent</option><option value="fixed-term">Fixed-term</option><option value="casual">Casual</option><option value="temp">Temporary</option><option value="probation">Probation</option></select></div>
+                        <div class="form-group"><label>Contract Start</label><input type="date" id="empContractStart"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Contract End</label><input type="date" id="empContractEnd"></div>
+                        <div class="form-group"><label>Probation (days)</label><input type="number" id="empProbationDays" value="90"></div>
                     </div>
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>First Name *</label>
-                        <input type="text" id="empName" required placeholder="First name">
+
+                <!-- TAB 3: FINANCIAL -->
+                <div id="tab-financial" class="tab-content">
+                    <div class="section-title">Salary & Banking</div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Salary Amount</label><input type="number" id="empSalaryAmount" step="0.01" placeholder="0.00"></div>
+                        <div class="form-group"><label>Salary Type</label><select id="empSalaryType"><option value="monthly">Monthly</option><option value="hourly">Hourly</option><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="annual">Annual</option></select></div>
                     </div>
-                    <div class="form-group">
-                        <label>Last Name *</label>
-                        <input type="text" id="empSurname" required placeholder="Last name">
+                    <div class="form-row">
+                        <div class="form-group"><label>Bank Name</label><input type="text" id="empBankName" placeholder="e.g. ABSA"></div>
+                        <div class="form-group"><label>Bank Account</label><input type="text" id="empBankAccount" placeholder="1234567890"></div>
                     </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" id="empEmail" placeholder="email@example.com">
+                    <div class="form-row">
+                        <div class="form-group"><label>Branch Code</label><input type="text" id="empBankBranchCode" placeholder="123456"></div>
+                        <div class="form-group"><label>Tax Reference (SARS)</label><input type="text" id="empTaxReference" placeholder="1234567890"></div>
                     </div>
-                    <div class="form-group">
-                        <label>Phone</label>
-                        <input type="text" id="empPhone" placeholder="+27 82 123 4567">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Role *</label>
-                        <select id="empRole" required>
-                            <option value="">Select Role</option>
-                            <option value="owner">👑 Owner</option>
-                            <option value="manager">👔 Manager</option>
-                            <option value="farmer">🌾 Farmer</option>
-                            <option value="foreman">🔧 Foreman</option>
-                            <option value="sales">💰 Sales</option>
-                            <option value="accountant">📊 Accountant</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Status</label>
-                        <select id="empStatus">
-                            <option value="active">🟢 Active</option>
-                            <option value="on-leave">🟡 On Leave</option>
-                            <option value="inactive">🔴 Inactive</option>
-                        </select>
+                    <div class="form-row">
+                        <div class="form-group"><label>UIF Number</label><input type="text" id="empUifNumber" placeholder="UIF1234567890"></div>
+                        <div class="form-group"><label>Pension Fund</label><input type="text" id="empPensionNumber" placeholder="PEN1234567890"></div>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label>Access Rights</label>
-                    <select id="empAccess" multiple style="height:60px;">
-                        <option value="admin">Admin</option>
-                        <option value="manager">Manager</option>
-                        <option value="farmer">Farmer</option>
-                        <option value="sales">Sales</option>
-                        <option value="accountant">Accountant</option>
-                        <option value="owner">Owner</option>
-                    </select>
-                    <span style="font-size:10px;color:#94a3b8;">Hold Ctrl/Cmd to select multiple</span>
+
+                <!-- TAB 4: LEAVE -->
+                <div id="tab-leave" class="tab-content">
+                    <div class="section-title">Leave Balances</div>
+                    <div class="form-row"><div class="form-group"><label>Annual Leave Remaining</label><input type="number" id="empAnnualLeaveRemaining" value="15"></div><div class="form-group"><label>Annual Leave Taken</label><input type="number" id="empAnnualLeaveTaken" value="0"></div></div>
+                    <div class="form-row"><div class="form-group"><label>Sick Leave Remaining</label><input type="number" id="empSickLeaveRemaining" value="30"></div><div class="form-group"><label>Sick Leave Taken</label><input type="number" id="empSickLeaveTaken" value="0"></div></div>
+                    <div class="form-row"><div class="form-group"><label>Family Responsibility Remaining</label><input type="number" id="empFamilyLeaveRemaining" value="3"></div><div class="form-group"><label>Family Responsibility Taken</label><input type="number" id="empFamilyLeaveTaken" value="0"></div></div>
+                    <div class="form-row"><div class="form-group"><label>Maternity Leave Remaining</label><input type="number" id="empMaternityLeaveRemaining" value="120"></div><div class="form-group"><label>Maternity Leave Taken</label><input type="number" id="empMaternityLeaveTaken" value="0"></div></div>
                 </div>
+
+                <!-- TAB 5: DOCUMENTS -->
+                <div id="tab-documents" class="tab-content">
+                    <div class="section-title">Employee Documents</div>
+                    <div class="form-group"><label>Employment Contract</label><input type="file" id="empContractFile" accept=".pdf,.doc,.docx"></div>
+                    <div class="form-group"><label>ID Copy</label><input type="file" id="empIdFile" accept=".pdf,.jpg,.png"></div>
+                    <div class="form-group"><label>CV / Resume</label><input type="file" id="empCvFile" accept=".pdf,.doc,.docx"></div>
+                </div>
+
+                <!-- TAB 6: COMPLIANCE -->
+                <div id="tab-compliance" class="tab-content">
+                    <div class="section-title">POPIA Compliance</div>
+                    <div class="form-group"><label>POPIA Consent Date</label><input type="date" id="empPopiaConsentDate"></div>
+                    <div class="form-group" style="display:flex;align-items:center;gap:10px;"><input type="checkbox" id="empPopiaConsent" style="width:auto;"><label style="margin:0;font-size:12px;cursor:pointer;">✅ POPIA Consent obtained</label></div>
+                    <div class="section-title">Acknowledgements</div>
+                    <div class="form-group" style="display:flex;align-items:center;gap:10px;"><input type="checkbox" id="empHandbookAck" style="width:auto;"><label style="margin:0;font-size:12px;cursor:pointer;">📖 Employee Handbook Acknowledged</label></div>
+                    <div class="form-group" style="display:flex;align-items:center;gap:10px;"><input type="checkbox" id="empCodeOfConductAck" style="width:auto;"><label style="margin:0;font-size:12px;cursor:pointer;">📜 Code of Conduct Acknowledged</label></div>
+                    <div class="form-group" style="display:flex;align-items:center;gap:10px;"><input type="checkbox" id="empHealthSafetyAck" style="width:auto;"><label style="margin:0;font-size:12px;cursor:pointer;">🛡️ Health & Safety Signed</label></div>
+                    <div class="form-row"><div class="form-group"><label>Performance Rating</label><select id="empPerformanceRating"><option value="0">Not rated</option><option value="1">⭐ 1 - Poor</option><option value="2">⭐ 2 - Needs Improvement</option><option value="3">⭐ 3 - Meets Expectations</option><option value="4">⭐ 4 - Exceeds</option><option value="5">⭐ 5 - Outstanding</option></select></div><div class="form-group"><label>Last Review Date</label><input type="date" id="empLastReviewDate"></div></div>
+                    <div class="form-group"><label>Review Notes</label><textarea id="empReviewNotes" rows="2"></textarea></div>
+                </div>
+
+                <!-- TAB 7: ROLES -->
+                <div id="tab-roles" class="tab-content">
+                    <div class="section-title">Role & Access Rights</div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Primary Role *</label><select id="empPrimaryRole" required><option value="">Select</option><option value="owner">👑 Owner (Level 10)</option><option value="manager">👔 Manager (Level 8)</option><option value="foreman">🔧 Foreman (Level 6)</option><option value="farmer">🌾 Farmer (Level 4)</option><option value="sales">💰 Sales (Level 5)</option><option value="accountant">📊 Accountant (Level 7)</option><option value="hr">👤 HR (Level 6)</option></select></div>
+                        <div class="form-group"><label>Access Level</label><select id="empAccessLevel" disabled><option value="full">🔓 Full Access</option><option value="high">🔑 High Access</option><option value="mid">🔐 Mid Access</option><option value="limited">🔒 Limited Access</option></select></div>
+                    </div>
+                </div>
+
+                <!-- TAB 8: TERMINATION -->
+                <div id="tab-termination" class="tab-content">
+                    <div class="section-title">Termination</div>
+                    <div class="form-row"><div class="form-group"><label>Termination Date</label><input type="date" id="empTerminationDate"></div><div class="form-group"><label>Termination Reason</label><select id="empTerminationReason"><option value="">Select</option><option value="resignation">Resignation</option><option value="dismissal">Dismissal</option><option value="retrenchment">Retrenchment</option><option value="end-of-contract">End of Contract</option><option value="retirement">Retirement</option><option value="other">Other</option></select></div></div>
+                    <div class="form-row"><div class="form-group"><label>Notice Period (days)</label><input type="number" id="empNoticePeriodDays" value="30"></div><div class="form-group"><label>Notice Given Date</label><input type="date" id="empNoticeGivenDate"></div></div>
+                    <div class="form-row"><div class="form-group"><label>Final Pay Date</label><input type="date" id="empFinalPayDate"></div></div>
+                    <div class="form-group"><label>Exit Interview Notes</label><textarea id="empExitInterviewNotes" rows="3"></textarea></div>
+                </div>
+
                 <div class="form-actions">
                     <button type="button" class="secondary-btn" onclick="closeModal()">Cancel</button>
                     <button type="submit" class="primary-btn" id="saveBtn">💾 Save Employee</button>
@@ -378,16 +322,16 @@
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div id="deleteModal" class="modal delete-modal">
-        <div class="modal-content">
-            <div class="confirm-icon">🗑️</div>
-            <h3 style="font-size:16px;color:#0A1628;margin-bottom:4px;">Delete Employee</h3>
-            <p class="confirm-text">Are you sure you want to delete <strong class="confirm-name" id="deleteName">this employee</strong>?</p>
-            <p style="font-size:11px;color:#94a3b8;margin-bottom:12px;">This action cannot be undone.</p>
-            <div class="form-actions" style="justify-content:center;">
-                <button class="secondary-btn" onclick="closeDeleteModal()">Cancel</button>
-                <button class="primary-btn" style="background:#EF4444;" onclick="confirmDelete()">Yes, Delete</button>
+    <!-- ARCHIVE MODAL -->
+    <div id="archiveModal" class="modal">
+        <div class="modal-content" style="max-width:400px;text-align:center;">
+            <div style="font-size:48px;">📦</div>
+            <h3 style="font-size:16px;color:#0A1628;margin-bottom:4px;">Archive Employee</h3>
+            <p style="font-size:14px;color:#4A4A4A;margin-bottom:6px;">Archive <strong id="archiveName" style="font-weight:700;color:#0A1628;">this employee</strong>?</p>
+            <p style="font-size:11px;color:#94a3b8;margin-bottom:12px;">Removes from active view but keeps records for audit.</p>
+            <div style="display:flex;gap:8px;justify-content:center;border-top:1px solid #E8E4E0;padding-top:14px;">
+                <button class="secondary-btn" onclick="closeArchiveModal()">Cancel</button>
+                <button class="primary-btn" style="background:#D97706;" onclick="confirmArchive()">📦 Archive</button>
             </div>
         </div>
     </div>
@@ -398,12 +342,34 @@
         if (!token) window.location.href = 'login.html';
 
         let allEmployees = [];
-        let deleteTargetId = null;
-        let selectedEmployees = new Set();
+        let archiveTargetId = null;
+        let expandedRow = null;
 
         document.getElementById('dateDisplay').textContent = new Date().toLocaleDateString('en-US', {
             weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
         });
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(function(el) { el.classList.remove('active'); });
+            document.querySelectorAll('.tab-btn').forEach(function(el) { el.classList.remove('active'); });
+            document.getElementById(tabId).classList.add('active');
+            document.querySelector('[data-tab="' + tabId + '"]').classList.add('active');
+        }
+
+        function generateEmployeeNumber() {
+            var count = allEmployees.length + 1;
+            var padded = String(count).padStart(3, '0');
+            return 'WS-EMP' + padded;
+        }
+
+        function toggleDetails(employeeNumber) {
+            if (expandedRow === employeeNumber) {
+                expandedRow = null;
+            } else {
+                expandedRow = employeeNumber;
+            }
+            renderTable(allEmployees);
+        }
 
         // ===== LOAD USER =====
         async function loadUser() {
@@ -414,14 +380,8 @@
                 if (res.ok) {
                     const user = await res.json();
                     document.getElementById('userAvatar').textContent = (user.name || 'U')[0].toUpperCase();
-                } else {
-                    localStorage.removeItem('token');
-                    window.location.href = 'login.html';
                 }
-            } catch (e) {
-                localStorage.removeItem('token');
-                window.location.href = 'login.html';
-            }
+            } catch(e) {}
         }
 
         // ===== LOAD EMPLOYEES =====
@@ -430,8 +390,16 @@
                 const res = await fetch(API_URL + '/api/employees', {
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
-                if (!res.ok) throw new Error('API error');
+                if (!res.ok) {
+                    if (res.status === 401) {
+                        console.error('Unauthorized - redirecting to login');
+                        window.location.href = 'login.html';
+                        return;
+                    }
+                    throw new Error('API error: ' + res.status);
+                }
                 allEmployees = await res.json();
+                console.log('Employees loaded:', allEmployees.length);
                 updateStats();
                 renderTable(allEmployees);
             } catch (error) {
@@ -442,327 +410,213 @@
 
         function loadSampleData() {
             allEmployees = [
-                { id: 1, username: 'admin', name: 'Nomagugu', surname: 'Admin', role: 'owner', access_rights: 'admin,manager,owner', is_active: 1, email: 'admin@whitestone.com', phone: '+27 82 123 4567', created_at: '2026-01-01', last_login: '2026-06-27 09:30' },
-                { id: 2, username: 'joe', name: 'Farmer', surname: 'Joe', role: 'farmer', access_rights: 'farmer', is_active: 1, email: 'joe@whitestone.com', phone: '+27 83 987 6543', created_at: '2026-02-15', last_login: '2026-06-27 08:15' },
-                { id: 3, username: 'testuser', name: 'Test', surname: 'User', role: 'farmer', access_rights: 'farmer', is_active: 1, email: 'test@whitestone.com', phone: '', created_at: '2026-03-10', last_login: '2026-06-26 17:00' },
-                { id: 5, username: 'thabang', name: 'Thabang', surname: 'Madonko', role: 'owner', access_rights: 'admin,manager,owner', is_active: 1, email: 'thabang@whitestone.com', phone: '+27 84 555 1234', created_at: '2026-01-01', last_login: '2026-06-27 10:00' },
-                { id: 7, username: 'sarah', name: 'Sarah', surname: 'Ndlovu', role: 'manager', access_rights: 'admin,manager', is_active: 1, email: 'sarah@whitestone.com', phone: '+27 82 444 5678', created_at: '2026-02-01', last_login: '2026-06-27 08:45' },
-                { id: 8, username: 'david', name: 'David', surname: 'Mokoena', role: 'foreman', access_rights: 'farmer', is_active: 1, email: 'david@whitestone.com', phone: '+27 73 333 9012', created_at: '2026-03-01', last_login: '2026-06-26 16:30' },
-                { id: 9, username: 'grace', name: 'Grace', surname: 'Nkosi', role: 'sales', access_rights: 'sales', is_active: 1, email: 'grace@whitestone.com', phone: '+27 82 222 3456', created_at: '2026-04-01', last_login: '2026-06-27 11:20' },
-                { id: 10, username: 'peter', name: 'Peter', surname: 'Zulu', role: 'accountant', access_rights: 'accountant', is_active: 1, email: 'peter@whitestone.com', phone: '+27 83 111 7890', created_at: '2026-05-01', last_login: '2026-06-26 14:00' },
-                { id: 11, username: 'nomagugu', name: 'Nomagugu', surname: 'Admin', role: 'owner', access_rights: 'admin,manager,owner', is_active: 1, email: 'nomagugu@whitestone.com', phone: '', created_at: '2026-01-15', last_login: '2026-06-27 09:00' }
+                { id: 1, employee_number: 'WS-EMP001', username: 'admin', name: 'Nomagugu', surname: 'Admin', role: 'owner', is_active: 'active', email: 'admin@whitestone.com', phone: '+27 82 123 4567' },
+                { id: 2, employee_number: 'WS-EMP002', username: 'joe', name: 'Farmer', surname: 'Joe', role: 'farmer', is_active: 'active', email: 'joe@whitestone.com', phone: '+27 83 987 6543' }
             ];
             updateStats();
             renderTable(allEmployees);
         }
 
-        // ===== UPDATE STATS =====
         function updateStats() {
-            const total = allEmployees.length;
-            const active = allEmployees.filter(e => e.is_active === 1 || e.is_active === true).length;
-            const inactive = allEmployees.filter(e => e.is_active === 0 || e.is_active === false).length;
-            const onLeave = allEmployees.filter(e => e.is_active === 'on-leave').length;
-            const roles = new Set(allEmployees.map(e => e.role));
-
+            var total = allEmployees.length;
+            var active = allEmployees.filter(function(e) { return e.is_active === 'active' || e.is_active === 1 || e.is_active === true; }).length;
+            var inactive = allEmployees.filter(function(e) { return e.is_active === 'inactive' || e.is_active === 0 || e.is_active === false; }).length;
+            var onLeave = allEmployees.filter(function(e) { return e.is_active === 'on-leave'; }).length;
             document.getElementById('totalEmployees').textContent = total;
             document.getElementById('activeEmployees').textContent = active;
             document.getElementById('onLeaveEmployees').textContent = onLeave;
             document.getElementById('inactiveEmployees').textContent = inactive;
-            document.getElementById('roleCount').textContent = roles.size;
         }
 
-        // ===== RENDER TABLE =====
         function renderTable(employees) {
-            const tbody = document.getElementById('employeeTableBody');
+            var tbody = document.getElementById('employeeTableBody');
             if (!employees || employees.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="empty-state"><span class="icon">📭</span>No employees found</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><span class="icon">📭</span>No employees found</td></tr>';
                 return;
             }
 
-            tbody.innerHTML = employees.map(e => {
-                const status = e.is_active === 1 || e.is_active === true ? 'active' :
-                              e.is_active === 'on-leave' ? 'on-leave' : 'inactive';
-                const statusLabel = status === 'active' ? '🟢 Active' :
-                                   status === 'on-leave' ? '🟡 On Leave' : '🔴 Inactive';
-                const statusClass = status;
-                
-                const roleClass = e.role || 'farmer';
-                const roleLabel = e.role ? e.role.charAt(0).toUpperCase() + e.role.slice(1) : 'Farmer';
-                
-                const checked = selectedEmployees.has(e.id) ? 'checked' : '';
-                const isExpanded = window.expandedRow === e.id;
+            var html = '';
+            employees.forEach(function(e) {
+                var status = e.is_active === 'active' || e.is_active === 1 || e.is_active === true ? 'active' :
+                            e.is_active === 'on-leave' ? 'on-leave' : 'inactive';
+                var statusLabel = status === 'active' ? '🟢 Active' :
+                                 status === 'on-leave' ? '🟡 On Leave' : '🔴 Archived';
+                var roleClass = e.role || 'farmer';
+                var roleLabel = e.role ? e.role.charAt(0).toUpperCase() + e.role.slice(1) : 'Farmer';
+                var empNumber = e.employee_number || 'WS-EMP' + String(e.id).padStart(3, '0');
+                var isExpanded = (expandedRow === empNumber);
 
-                return `
-                <tr class="${isExpanded ? 'expanded' : ''}" onclick="toggleDetails(${e.id})">
-                    <td class="checkbox-col" onclick="event.stopPropagation();">
-                        <input type="checkbox" class="emp-checkbox" data-id="${e.id}" ${checked} onchange="toggleSelect(${e.id})">
-                    </td>
-                    <td>${e.id}</td>
-                    <td><strong>${e.username}</strong></td>
-                    <td>${e.name || ''}</td>
-                    <td>${e.surname || ''}</td>
-                    <td><span class="role-badge ${roleClass}">${roleLabel}</span></td>
-                    <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
-                    <td onclick="event.stopPropagation();">
-                        <button class="action-btn view" onclick="toggleDetails(${e.id})">👁️</button>
-                        <button class="action-btn edit" onclick="editEmployee(${e.id})">✏️</button>
-                        <button class="action-btn delete" onclick="openDeleteModal(${e.id})">🗑️</button>
-                    </td>
-                </tr>
-                ${isExpanded ? `
-                <tr class="details-row visible">
-                    <td colspan="8">
-                        <div class="details-grid">
-                            <div class="detail-item">
-                                <div class="label">Full Name</div>
-                                <div class="value">${e.name || ''} ${e.surname || ''}</div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="label">Username</div>
-                                <div class="value">${e.username}</div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="label">Role</div>
-                                <div class="value"><span class="role-badge ${roleClass}">${roleLabel}</span></div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="label">Access Rights</div>
-                                <div class="value" style="font-size:11px;">${e.access_rights || 'None'}</div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="label">Email</div>
-                                <div class="value">${e.email || 'Not set'}</div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="label">Phone</div>
-                                <div class="value">${e.phone || 'Not set'}</div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="label">Status</div>
-                                <div class="value"><span class="status-badge ${statusClass}">${statusLabel}</span></div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="label">Created Date</div>
-                                <div class="value">${e.created_at || 'N/A'}</div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="label">Last Login</div>
-                                <div class="value">${e.last_login || 'Never'}</div>
-                            </div>
-                            <div class="detail-item" style="grid-column:1/-1;">
-                                <div class="label">Activity Log</div>
-                                <div class="activity-log">
-                                    <div class="activity-item"><span>✅ Logged in</span><span class="time">${e.last_login || 'Never'}</span></div>
-                                    <div class="activity-item"><span>📝 Updated profile</span><span class="time">2026-06-26 15:30</span></div>
-                                    <div class="activity-item"><span>👁️ Viewed dashboard</span><span class="time">2026-06-26 14:00</span></div>
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                ` : ''}
-                `;
-            }).join('');
-
-            updateBulkActions();
-        }
-
-        // ===== TOGGLE DETAILS =====
-        window.toggleDetails = function(id) {
-            if (window.expandedRow === id) {
-                window.expandedRow = null;
-            } else {
-                window.expandedRow = id;
-            }
-            filterEmployees();
-        };
-
-        // ===== TOGGLE SELECT =====
-        window.toggleSelect = function(id) {
-            if (selectedEmployees.has(id)) {
-                selectedEmployees.delete(id);
-            } else {
-                selectedEmployees.add(id);
-            }
-            updateBulkActions();
-            filterEmployees();
-        };
-
-        window.toggleAll = function() {
-            const checked = document.getElementById('selectAll').checked;
-            const visible = allEmployees.filter(e => {
-                const search = document.getElementById('searchInput').value.toLowerCase();
-                const role = document.getElementById('roleFilter').value;
-                const status = document.getElementById('statusFilter').value;
-                const matchSearch = (e.username || '').toLowerCase().includes(search) ||
-                                   (e.name || '').toLowerCase().includes(search) ||
-                                   (e.surname || '').toLowerCase().includes(search);
-                const matchRole = role === 'all' || (e.role || '') === role;
-                const eStatus = e.is_active === 1 || e.is_active === true ? 'active' :
-                               e.is_active === 'on-leave' ? 'on-leave' : 'inactive';
-                const matchStatus = status === 'all' || eStatus === status;
-                return matchSearch && matchRole && matchStatus;
-            });
-            
-            visible.forEach(e => {
-                if (checked) {
-                    selectedEmployees.add(e.id);
-                } else {
-                    selectedEmployees.delete(e.id);
+                var detailsHtml = '';
+                if (isExpanded) {
+                    detailsHtml = '<tr class="details-row visible"><td colspan="6"><div class="details-grid">' +
+                        '<div class="detail-item"><div class="label">👤 Full Name</div><div class="value">' + (e.name || '') + ' ' + (e.surname || '') + '</div></div>' +
+                        '<div class="detail-item"><div class="label">📛 Username</div><div class="value">' + e.username + '</div></div>' +
+                        '<div class="detail-item"><div class="label">📧 Email</div><div class="value">' + (e.email || 'Not set') + '</div></div>' +
+                        '<div class="detail-item"><div class="label">📱 Phone</div><div class="value">' + (e.phone || 'Not set') + '</div></div>' +
+                        '<div class="detail-item"><div class="label">🆔 EmployeeID</div><div class="value"><span class="employee-id-badge">' + empNumber + '</span></div></div>' +
+                        '<div class="detail-item"><div class="label">🎯 Role</div><div class="value"><span class="role-badge ' + roleClass + '">' + roleLabel + '</span></div></div>' +
+                        '<div class="detail-item"><div class="label">📊 Status</div><div class="value"><span class="status-badge ' + status + '">' + statusLabel + '</span></div></div>' +
+                        '<div class="detail-item"><div class="label">🏢 Department</div><div class="value">' + (e.department || 'Not assigned') + '</div></div>' +
+                        '<div class="detail-item"><div class="label">🔑 Password</div><div class="value"><button class="btn-reset-password" onclick="openResetModal(\'' + empNumber + '\')" style="background:#FCE4EC;color:#C62828;padding:4px 12px;border:none;border-radius:4px;cursor:pointer;font-size:11px;">🔑 Reset Password</button></div></div>' +
+                        '</div></td></tr>';
                 }
+
+                var isArchived = (status === 'inactive');
+                var archiveBtn = isArchived ? 
+                    '<button class="action-btn archive" disabled title="Archived" style="opacity:0.5;cursor:not-allowed;">📦</button>' :
+                    '<button class="action-btn archive" onclick="openArchiveModal(\'' + empNumber + '\')" title="Archive">📦</button>';
+
+                html += '<tr class="' + (isExpanded ? 'expanded' : '') + '" onclick="toggleDetails(\'' + empNumber + '\')">' +
+                    '<td><span class="employee-id-badge">' + empNumber + '</span></td>' +
+                    '<td>' + (e.name || '') + '</td>' +
+                    '<td>' + (e.surname || '') + '</td>' +
+                    '<td><span class="role-badge ' + roleClass + '">' + roleLabel + '</span></td>' +
+                    '<td><span class="status-badge ' + status + '">' + statusLabel + '</span></td>' +
+                    '<td onclick="event.stopPropagation();">' +
+                        '<button class="action-btn view" onclick="toggleDetails(\'' + empNumber + '\')" title="View">👁️</button>' +
+                        '<button class="action-btn edit" onclick="openEditModal(\'' + empNumber + '\')" title="Edit">✏️</button>' +
+                        archiveBtn +
+                    '</td>' +
+                '</tr>' + detailsHtml;
             });
-            updateBulkActions();
-            filterEmployees();
-        };
-
-        function updateBulkActions() {
-            const count = selectedEmployees.size;
-            const bulk = document.getElementById('bulkActions');
-            const countEl = document.getElementById('bulkCount');
-            
-            if (count > 0) {
-                bulk.classList.add('visible');
-                countEl.textContent = `${count} selected`;
-            } else {
-                bulk.classList.remove('visible');
-            }
-            document.getElementById('selectAll').checked = false;
+            tbody.innerHTML = html;
         }
 
-        function clearSelection() {
-            selectedEmployees.clear();
-            updateBulkActions();
-            filterEmployees();
-        }
-
-        async function bulkDelete() {
-            if (selectedEmployees.size === 0) return;
-            if (!confirm(`Delete ${selectedEmployees.size} selected employees?`)) return;
-
-            for (const id of selectedEmployees) {
-                try {
-                    await fetch(`${API_URL}/api/employees/${id}`, {
-                        method: 'DELETE',
-                        headers: { 'Authorization': 'Bearer ' + token }
-                    });
-                } catch (e) {}
-            }
-            selectedEmployees.clear();
-            loadEmployees();
-        }
-
-        async function bulkUpdateRole() {
-            const role = document.getElementById('bulkRoleSelect').value;
-            if (!role || selectedEmployees.size === 0) return;
-            if (!confirm(`Update ${selectedEmployees.size} employees to role: ${role}?`)) return;
-
-            for (const id of selectedEmployees) {
-                try {
-                    await fetch(`${API_URL}/api/employees/${id}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer ' + token
-                        },
-                        body: JSON.stringify({ role: role })
-                    });
-                } catch (e) {}
-            }
-            selectedEmployees.clear();
-            document.getElementById('bulkRoleSelect').value = '';
-            loadEmployees();
-        }
-
-        // ===== FILTER EMPLOYEES =====
         function filterEmployees() {
-            const search = document.getElementById('searchInput').value.toLowerCase();
-            const role = document.getElementById('roleFilter').value;
-            const status = document.getElementById('statusFilter').value;
-
-            let filtered = allEmployees.filter(e => {
-                const matchSearch = (e.username || '').toLowerCase().includes(search) ||
-                                   (e.name || '').toLowerCase().includes(search) ||
-                                   (e.surname || '').toLowerCase().includes(search);
-                const matchRole = role === 'all' || (e.role || '') === role;
-                const eStatus = e.is_active === 1 || e.is_active === true ? 'active' :
-                               e.is_active === 'on-leave' ? 'on-leave' : 'inactive';
-                const matchStatus = status === 'all' || eStatus === status;
+            var search = document.getElementById('searchInput').value.toLowerCase();
+            var role = document.getElementById('roleFilter').value;
+            var status = document.getElementById('statusFilter').value;
+            var filtered = allEmployees.filter(function(e) {
+                var matchSearch = (e.username || '').toLowerCase().includes(search) ||
+                                 (e.name || '').toLowerCase().includes(search) ||
+                                 (e.surname || '').toLowerCase().includes(search) ||
+                                 (e.employee_number || '').toLowerCase().includes(search);
+                var matchRole = role === 'all' || (e.role || '') === role;
+                var eStatus = e.is_active === 'active' || e.is_active === 1 || e.is_active === true ? 'active' :
+                              e.is_active === 'on-leave' ? 'on-leave' : 'inactive';
+                var matchStatus = status === 'all' || eStatus === status;
                 return matchSearch && matchRole && matchStatus;
             });
-
             renderTable(filtered);
         }
 
-        // ===== MODAL FUNCTIONS =====
+        // ===== OPEN ADD MODAL =====
         function openAddModal() {
             document.getElementById('modalTitle').textContent = 'Add Employee';
             document.getElementById('employeeForm').reset();
             document.getElementById('employeeId').value = '';
+            var empNum = generateEmployeeNumber();
+            document.getElementById('employeeNumber').value = empNum;
+            document.getElementById('empEmployeeNumber').value = empNum;
             document.getElementById('passwordGroup').style.display = 'block';
+            document.getElementById('empPassword').required = true;
             document.getElementById('saveBtn').textContent = '💾 Save Employee';
             document.getElementById('employeeModal').style.display = 'flex';
+            switchTab('tab-personal');
         }
 
-        function closeModal() {
-            document.getElementById('employeeModal').style.display = 'none';
-        }
+        // ===== OPEN EDIT MODAL =====
+        function openEditModal(employeeNumber) {
+            var employee = allEmployees.find(function(e) { return e.employee_number === employeeNumber; });
+            if (!employee) { alert('Employee not found'); return; }
 
-        function editEmployee(id) {
-            const employee = allEmployees.find(e => e.id === id);
-            if (!employee) return;
-
-            document.getElementById('modalTitle').textContent = 'Edit Employee';
+            document.getElementById('modalTitle').textContent = 'Edit Employee - ' + employee.employee_number;
             document.getElementById('employeeId').value = employee.id;
+            document.getElementById('employeeNumber').value = employee.employee_number;
+            document.getElementById('empEmployeeNumber').value = employee.employee_number;
             document.getElementById('empUsername').value = employee.username || '';
             document.getElementById('empName').value = employee.name || '';
             document.getElementById('empSurname').value = employee.surname || '';
             document.getElementById('empEmail').value = employee.email || '';
             document.getElementById('empPhone').value = employee.phone || '';
+            document.getElementById('empDepartment').value = employee.department || '';
             document.getElementById('empRole').value = employee.role || '';
-            document.getElementById('empStatus').value = employee.is_active === 1 || employee.is_active === true ? 'active' :
+            document.getElementById('empStatus').value = employee.is_active === 'active' || employee.is_active === 1 || employee.is_active === true ? 'active' :
                                                         employee.is_active === 'on-leave' ? 'on-leave' : 'inactive';
-            
-            const access = (employee.access_rights || employee.role || '').split(',');
-            const select = document.getElementById('empAccess');
-            for (let option of select.options) {
-                option.selected = access.includes(option.value);
-            }
-            
             document.getElementById('passwordGroup').style.display = 'none';
+            document.getElementById('empPassword').required = false;
             document.getElementById('saveBtn').textContent = '💾 Update Employee';
             document.getElementById('employeeModal').style.display = 'flex';
+            switchTab('tab-personal');
+        }
+
+        function closeModal() { document.getElementById('employeeModal').style.display = 'none'; }
+
+        // ===== ARCHIVE FUNCTIONS =====
+        function openArchiveModal(employeeNumber) {
+            var employee = allEmployees.find(function(e) { return e.employee_number === employeeNumber; });
+            if (!employee) {
+                alert("Employee not found");
+                return;
+            }
+            archiveTargetId = employeeNumber;
+            document.getElementById("archiveName").textContent = (employee.name || "") + " " + (employee.surname || "") + " (" + employee.employee_number + ")";
+            document.getElementById("archiveModal").style.display = "flex";
+        }
+
+        function closeArchiveModal() { document.getElementById('archiveModal').style.display = 'none'; archiveTargetId = null; }
+
+        async function confirmArchive() {
+            if (!archiveTargetId) return;
+            try {
+                var res = await fetch(API_URL + '/api/employees/' + archiveTargetId, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (res.ok) { alert('📦 Employee archived!'); closeArchiveModal(); loadEmployees(); }
+                else { var error = await res.json(); alert('❌ ' + (error.error || 'Failed to archive')); }
+            } catch (e) { alert('❌ Network error.'); }
+        }
+
+        // ===== OPEN RESET PASSWORD MODAL =====
+        function openResetModal(employeeNumber) {
+            var employee = allEmployees.find(function(e) { return e.employee_number === employeeNumber; });
+            if (!employee) { alert('Employee not found'); return; }
+            
+            // Simple password reset - just prompt
+            var newPassword = prompt('Enter new password for ' + (employee.name || '') + ' ' + (employee.surname || '') + ' (' + employee.employee_number + '):');
+            if (!newPassword) return;
+            if (newPassword.length < 6) { alert('Password must be at least 6 characters'); return; }
+            
+            // Call API to update password
+            fetch(API_URL + '/api/employees/' + employeeNumber, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({ password: newPassword })
+            })
+            .then(res => {
+                if (res.ok) { alert('✅ Password updated successfully!'); }
+                else { alert('❌ Failed to update password'); }
+            })
+            .catch(() => { alert('❌ Network error'); });
         }
 
         // ===== SAVE EMPLOYEE =====
         document.getElementById('employeeForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
-            const id = document.getElementById('employeeId').value;
-            const data = {
+            var id = document.getElementById('employeeId').value;
+            var employeeNumber = document.getElementById('employeeNumber').value;
+            var password = document.getElementById('empPassword').value;
+            var data = {
+                employee_number: employeeNumber,
                 username: document.getElementById('empUsername').value.trim(),
                 name: document.getElementById('empName').value.trim(),
                 surname: document.getElementById('empSurname').value.trim(),
                 email: document.getElementById('empEmail').value.trim(),
                 phone: document.getElementById('empPhone').value.trim(),
                 role: document.getElementById('empRole').value,
-                is_active: document.getElementById('empStatus').value,
-                access_rights: Array.from(document.getElementById('empAccess').selectedOptions)
-                                .map(opt => opt.value).join(',')
+                is_active: document.getElementById('empStatus').value
             };
-
-            if (!data.username || !data.name || !data.surname || !data.role) {
-                alert('Please fill in all required fields.');
-                return;
-            }
-
-            const password = document.getElementById('empPassword').value;
             if (password) data.password = password;
-
-            const method = id ? 'PUT' : 'POST';
-            const url = id ? `${API_URL}/api/employees/${id}` : `${API_URL}/api/employees`;
-
+            if (!data.username || !data.name || !data.surname || !data.role) { alert('⚠️ Please fill in all required fields.'); return; }
+            if (!id && !password) { alert('⚠️ Password is required for new employees.'); return; }
+            var method = id ? 'PUT' : 'POST';
+            var url = id ? API_URL + '/api/employees/' + employeeNumber : API_URL + '/api/employees';
             try {
-                const res = await fetch(url, {
+                var res = await fetch(url, {
                     method: method,
                     headers: {
                         'Content-Type': 'application/json',
@@ -770,65 +624,17 @@
                     },
                     body: JSON.stringify(data)
                 });
-                
-                if (res.ok) {
-                    alert(id ? '✅ Employee updated successfully!' : '✅ Employee added successfully!');
-                    closeModal();
-                    loadEmployees();
-                } else {
-                    const error = await res.json();
-                    alert(error.error || 'Failed to save employee');
-                }
-            } catch (e) {
-                alert('Network error. Please try again.');
-            }
+                if (res.ok) { alert(id ? '✅ Employee updated!' : '✅ Employee added!'); closeModal(); loadEmployees(); }
+                else { var error = await res.json(); alert('❌ ' + (error.error || 'Failed to save')); }
+            } catch (e) { alert('❌ Network error.'); }
         });
 
-        // ===== DELETE FUNCTIONS =====
-        function openDeleteModal(id) {
-            const employee = allEmployees.find(e => e.id === id);
-            if (!employee) return;
-            deleteTargetId = id;
-            document.getElementById('deleteName').textContent = `${employee.name || ''} ${employee.surname || ''}`;
-            document.getElementById('deleteModal').style.display = 'flex';
-        }
-
-        function closeDeleteModal() {
-            document.getElementById('deleteModal').style.display = 'none';
-            deleteTargetId = null;
-        }
-
-        async function confirmDelete() {
-            if (!deleteTargetId) return;
-            
-            try {
-                const res = await fetch(`${API_URL}/api/employees/${deleteTargetId}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
-                
-                if (res.ok) {
-                    alert('✅ Employee deleted successfully!');
-                    closeDeleteModal();
-                    loadEmployees();
-                } else {
-                    const error = await res.json();
-                    alert(error.error || 'Failed to delete employee');
-                }
-            } catch (e) {
-                alert('Network error. Please try again.');
-            }
-        }
-
-        // ===== LOGOUT =====
         document.getElementById('logoutBtn').addEventListener('click', function(e) {
             e.preventDefault();
             localStorage.removeItem('token');
-            localStorage.removeItem('user');
             window.location.href = 'login.html';
         });
 
-        // ===== INIT =====
         loadUser();
         loadEmployees();
         setInterval(loadEmployees, 30000);

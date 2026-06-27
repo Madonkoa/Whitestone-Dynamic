@@ -1,4 +1,132 @@
-﻿// routes/employees.js - Complete employee routes
+﻿/**
+ * @swagger
+ * /api/employees:
+ *   get:
+ *     summary: Get all employees
+ *     tags: [Employees]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of employees
+ *   post:
+ *     summary: Create new employee
+ *     tags: [Employees]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CreateEmployeeRequest'
+ *     responses:
+ *       201:
+ *         description: Employee created
+ *
+ * /api/employees/{employeeNumber}:
+ *   get:
+ *     summary: Get employee by ID
+ *     tags: [Employees]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: employeeNumber
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Employee found
+ *   put:
+ *     summary: Update employee
+ *     tags: [Employees]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: employeeNumber
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CreateEmployeeRequest'
+ *     responses:
+ *       200:
+ *         description: Employee updated
+ *   delete:
+ *     summary: Archive employee
+ *     tags: [Employees]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: employeeNumber
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Employee archived
+ *
+ * /api/employees/{employeeNumber}/verify-password:
+ *   post:
+ *     summary: Verify current password
+ *     tags: [Employees]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: employeeNumber
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               currentPassword:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Password verified
+ *
+ * /api/employees/{employeeNumber}/reset-password:
+ *   post:
+ *     summary: Reset password
+ *     tags: [Employees]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: employeeNumber
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               currentPassword:
+ *                 type: string
+ *               newPassword:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Password reset
+ */
+// routes/employees.js - Complete employee routes
 const express = require('express');
 const router = express.Router();
 const db = require('../config/database');
@@ -130,6 +258,7 @@ router.post('/:employeeNumber/reset-password', async (req, res) => {
 });
 
 module.exports = router;
+
 
 
 

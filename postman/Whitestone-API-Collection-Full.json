@@ -1,1494 +1,416 @@
 ﻿{
-    "info":  {
-                 "name":  "WhiteStone Farm API",
-                 "_postman_id":  "whitestone-full-api",
-                 "description":  "Complete WhiteStone Poultry Farm Management System API",
-                 "schema":  "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-             },
-    "event":  [
-                  {
-                      "listen":  "prerequest",
-                      "script":  {
-                                     "exec":  [
-                                                  "// Auto-detect server port",
-                                                  "const host = pm.environment.get(\u0027host\u0027) || \u0027localhost\u0027;",
-                                                  "const savedPort = pm.environment.get(\u0027port\u0027);",
-                                                  "",
-                                                  "if (savedPort) {",
-                                                  "    pm.environment.set(\u0027baseUrl\u0027, \u0027http://\u0027 + host + \u0027:\u0027 + savedPort);",
-                                                  "} else {",
-                                                  "    const ports = [5500, 5501, 5502, 5503, 3000, 5000];",
-                                                  "    (async function detectServer() {",
-                                                  "        for (const port of ports) {",
-                                                  "            try {",
-                                                  "                const response = await pm.sendRequest({",
-                                                  "                    url: \u0027http://\u0027 + host + \u0027:\u0027 + port + \u0027/api/health\u0027,",
-                                                  "                    method: \u0027GET\u0027,",
-                                                  "                    timeout: 1000",
-                                                  "                });",
-                                                  "                if (response.code === 200) {",
-                                                  "                    pm.environment.set(\u0027port\u0027, port);",
-                                                  "                    pm.environment.set(\u0027baseUrl\u0027, \u0027http://\u0027 + host + \u0027:\u0027 + port);",
-                                                  "                    console.log(\u0027Server detected on port \u0027 + port);",
-                                                  "                    return;",
-                                                  "                }",
-                                                  "            } catch(e) {}",
-                                                  "        }",
-                                                  "        console.log(\u0027No server found, using port 5500\u0027);",
-                                                  "        pm.environment.set(\u0027port\u0027, \u00275500\u0027);",
-                                                  "        pm.environment.set(\u0027baseUrl\u0027, \u0027http://localhost:5500\u0027);",
-                                                  "    })();",
-                                                  "}",
-                                                  "",
-                                                  "// Auto-add token to requests (except login/register/health)",
-                                                  "const path = pm.request.url.path;",
-                                                  "if (path \u0026\u0026 !path.includes(\u0027login\u0027) \u0026\u0026 !path.includes(\u0027register\u0027) \u0026\u0026 !path.includes(\u0027health\u0027)) {",
-                                                  "    const token = pm.environment.get(\u0027token\u0027);",
-                                                  "    if (token) {",
-                                                  "        pm.request.headers.add({",
-                                                  "            key: \u0027Authorization\u0027,",
-                                                  "            value: \u0027Bearer \u0027 + token",
-                                                  "        });",
-                                                  "    }",
-                                                  "}"
-                                              ],
-                                     "type":  "text/javascript"
-                                 }
-                  },
-                  {
-                      "listen":  "test",
-                      "script":  {
-                                     "exec":  [
-                                                  "// Save token from login response",
-                                                  "if (pm.response.code === 200) {",
-                                                  "    const response = pm.response.json();",
-                                                  "    if (response.token) {",
-                                                  "        pm.environment.set(\u0027token\u0027, response.token);",
-                                                  "        console.log(\u0027Token saved successfully\u0027);",
-                                                  "    }",
-                                                  "}"
-                                              ],
-                                     "type":  "text/javascript"
-                                 }
-                  }
-              ],
-    "item":  [
-                 {
-                     "name":  "1. Authentication",
-                     "item":  [
-                                  {
-                                      "name":  "Login",
-                                      "request":  {
-                                                      "method":  "POST",
-                                                      "header":  [
-                                                                     {
-                                                                         "key":  "Content-Type",
-                                                                         "value":  "application/json"
-                                                                     }
-                                                                 ],
-                                                      "body":  {
-                                                                   "mode":  "raw",
-                                                                   "raw":  "{\n    \"username\": \"admin\",\n    \"password\": \"Admin123!\"\n}"
-                                                               },
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/auth/login",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "auth",
-                                                                               "login"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Register User",
-                                      "request":  {
-                                                      "method":  "POST",
-                                                      "header":  [
-                                                                     {
-                                                                         "key":  "Content-Type",
-                                                                         "value":  "application/json"
-                                                                     }
-                                                                 ],
-                                                      "body":  {
-                                                                   "mode":  "raw",
-                                                                   "raw":  "{\n    \"username\": \"newuser\",\n    \"password\": \"Password123!\",\n    \"name\": \"New\",\n    \"surname\": \"User\",\n    \"position\": \"Worker\",\n    \"role\": \"user\"\n}"
-                                                               },
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/auth/register",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "auth",
-                                                                               "register"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Get Current User (Me)",
-                                      "request":  {
-                                                      "method":  "GET",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/auth/me",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "auth",
-                                                                               "me"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Logout",
-                                      "request":  {
-                                                      "method":  "POST",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/auth/logout",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "auth",
-                                                                               "logout"
-                                                                           ]
-                                                              }
-                                                  },
-                                      "event":  [
-                                                    {
-                                                        "script":  {
-                                                                       "exec":  [
-                                                                                    "// Clear token from environment on logout",
-                                                                                    "pm.environment.unset(\u0027token\u0027);",
-                                                                                    "console.log(\u0027✅ Token cleared - You are now logged out\u0027);"
-                                                                                ],
-                                                                       "type":  "text/javascript"
-                                                                   },
-                                                        "listen":  "test"
-                                                    }
-                                                ]
-                                  }
-                              ]
-                 },
-                 {
-                     "name":  "2. Employees",
-                     "item":  [
-                                  {
-                                      "name":  "Get All Employees",
-                                      "request":  {
-                                                      "method":  "GET",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/employees",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "employees"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Create Employee",
-                                      "request":  {
-                                                      "method":  "POST",
-                                                      "header":  [
-                                                                     {
-                                                                         "key":  "Content-Type",
-                                                                         "value":  "application/json"
-                                                                     }
-                                                                 ],
-                                                      "body":  {
-                                                                   "mode":  "raw",
-                                                                   "raw":  "{\n    \"username\": \"jane_doe\",\n    \"password\": \"Password123!\",\n    \"name\": \"Jane\",\n    \"surname\": \"Doe\",\n    \"position\": \"Manager\",\n    \"role\": \"manager\"\n}"
-                                                               },
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/employees",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "employees"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Update Employee",
-                                      "request":  {
-                                                      "method":  "PUT",
-                                                      "header":  [
-                                                                     {
-                                                                         "key":  "Content-Type",
-                                                                         "value":  "application/json"
-                                                                     }
-                                                                 ],
-                                                      "body":  {
-                                                                   "mode":  "raw",
-                                                                   "raw":  "{\n    \"username\": \"jane_doe\",\n    \"name\": \"Jane\",\n    \"surname\": \"Smith\",\n    \"position\": \"Senior Manager\",\n    \"role\": \"manager\",\n    \"is_active\": 1\n}"
-                                                               },
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/employees/1",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "employees",
-                                                                               "1"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Delete Employee",
-                                      "request":  {
-                                                      "method":  "DELETE",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/employees/2",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "employees",
-                                                                               "2"
-                                                                           ]
-                                                              }
-                                                  }
-                                  }
-                              ]
-                 },
-                 {
-                     "name":  "3. Stock",
-                     "item":  [
-                                  {
-                                      "name":  "Get All Stock",
-                                      "request":  {
-                                                      "method":  "GET",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/stock",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "stock"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Create Stock Item",
-                                      "request":  {
-                                                      "method":  "POST",
-                                                      "header":  [
-                                                                     {
-                                                                         "key":  "Content-Type",
-                                                                         "value":  "application/json"
-                                                                     }
-                                                                 ],
-                                                      "body":  {
-                                                                   "mode":  "raw",
-                                                                   "raw":  "{\n    \"item_type\": \"Chicken Feed\",\n    \"quantity\": 500,\n    \"unit\": \"kg\",\n    \"price\": 2500\n}"
-                                                               },
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/stock",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "stock"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Update Stock",
-                                      "request":  {
-                                                      "method":  "PUT",
-                                                      "header":  [
-                                                                     {
-                                                                         "key":  "Content-Type",
-                                                                         "value":  "application/json"
-                                                                     }
-                                                                 ],
-                                                      "body":  {
-                                                                   "mode":  "raw",
-                                                                   "raw":  "{\n    \"item_type\": \"Chicken Feed\",\n    \"quantity\": 450,\n    \"unit\": \"kg\",\n    \"price\": 2500\n}"
-                                                               },
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/stock/1",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "stock",
-                                                                               "1"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Delete Stock",
-                                      "request":  {
-                                                      "method":  "DELETE",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/stock/1",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "stock",
-                                                                               "1"
-                                                                           ]
-                                                              }
-                                                  }
-                                  }
-                              ]
-                 },
-                 {
-                     "name":  "4. Feed",
-                     "item":  [
-                                  {
-                                      "name":  "Get All Feed",
-                                      "request":  {
-                                                      "method":  "GET",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/feed",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "feed"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Create Feed",
-                                      "request":  {
-                                                      "method":  "POST",
-                                                      "header":  [
-                                                                     {
-                                                                         "key":  "Content-Type",
-                                                                         "value":  "application/json"
-                                                                     }
-                                                                 ],
-                                                      "body":  {
-                                                                   "mode":  "raw",
-                                                                   "raw":  "{\n    \"feed_type\": \"Layers Mash\",\n    \"quantity_kg\": 1000\n}"
-                                                               },
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/feed",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "feed"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Record Feed Consumption",
-                                      "request":  {
-                                                      "method":  "POST",
-                                                      "header":  [
-                                                                     {
-                                                                         "key":  "Content-Type",
-                                                                         "value":  "application/json"
-                                                                     }
-                                                                 ],
-                                                      "body":  {
-                                                                   "mode":  "raw",
-                                                                   "raw":  "{\n    \"feed_type\": \"Layers Mash\",\n    \"date\": \"2026-06-26\",\n    \"bags\": 10,\n    \"bag_size\": 50,\n    \"total_kg\": 500,\n    \"condition\": \"Good\"\n}"
-                                                               },
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/feed/consumption",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "feed",
-                                                                               "consumption"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Record Feed Stock",
-                                      "request":  {
-                                                      "method":  "POST",
-                                                      "header":  [
-                                                                     {
-                                                                         "key":  "Content-Type",
-                                                                         "value":  "application/json"
-                                                                     }
-                                                                 ],
-                                                      "body":  {
-                                                                   "mode":  "raw",
-                                                                   "raw":  "{\n    \"feed_type\": \"Layers Mash\",\n    \"date\": \"2026-06-26\",\n    \"bags\": 20,\n    \"bag_size\": 50,\n    \"total_kg\": 1000,\n    \"total_cost\": 25000,\n    \"supplier\": \"Feed Supplier Co.\"\n}"
-                                                               },
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/feed/stock",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "feed",
-                                                                               "stock"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Get Feed Consumption",
-                                      "request":  {
-                                                      "method":  "GET",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/feed/consumption",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "feed",
-                                                                               "consumption"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Get Feed Stock Records",
-                                      "request":  {
-                                                      "method":  "GET",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/feed/stock",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "feed",
-                                                                               "stock"
-                                                                           ]
-                                                              }
-                                                  }
-                                  }
-                              ]
-                 },
-                 {
-                     "name":  "5. Coops",
-                     "item":  [
-                                  {
-                                      "name":  "Get All Coops",
-                                      "request":  {
-                                                      "method":  "GET",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/coops",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "coops"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Create Coop",
-                                      "request":  {
-                                                      "method":  "POST",
-                                                      "header":  [
-                                                                     {
-                                                                         "key":  "Content-Type",
-                                                                         "value":  "application/json"
-                                                                     }
-                                                                 ],
-                                                      "body":  {
-                                                                   "mode":  "raw",
-                                                                   "raw":  "{\n    \"coop_number\": 1,\n    \"zone_letter\": \"A\",\n    \"current_stock\": 100,\n    \"health_status\": \"Good\",\n    \"notes\": \"Main coop\"\n}"
-                                                               },
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/coops",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "coops"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Update Coop",
-                                      "request":  {
-                                                      "method":  "PUT",
-                                                      "header":  [
-                                                                     {
-                                                                         "key":  "Content-Type",
-                                                                         "value":  "application/json"
-                                                                     }
-                                                                 ],
-                                                      "body":  {
-                                                                   "mode":  "raw",
-                                                                   "raw":  "{\n    \"coop_number\": 1,\n    \"zone_letter\": \"A\",\n    \"current_stock\": 95,\n    \"health_status\": \"Excellent\",\n    \"notes\": \"Updated\"\n}"
-                                                               },
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/coops/1",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "coops",
-                                                                               "1"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Delete Coop",
-                                      "request":  {
-                                                      "method":  "DELETE",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/coops/1",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "coops",
-                                                                               "1"
-                                                                           ]
-                                                              }
-                                                  }
-                                  }
-                              ]
-                 },
-                 {
-                     "name":  "6. Egg Production",
-                     "item":  [
-                                  {
-                                      "name":  "Get All Egg Production",
-                                      "request":  {
-                                                      "method":  "GET",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/eggs",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "eggs"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Get Egg Stats",
-                                      "request":  {
-                                                      "method":  "GET",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/eggs/stats",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "eggs",
-                                                                               "stats"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Record Egg Production",
-                                      "request":  {
-                                                      "method":  "POST",
-                                                      "header":  [
-                                                                     {
-                                                                         "key":  "Content-Type",
-                                                                         "value":  "application/json"
-                                                                     }
-                                                                 ],
-                                                      "body":  {
-                                                                   "mode":  "raw",
-                                                                   "raw":  "{\n    \"date\": \"2026-06-26\",\n    \"batch_id\": 1,\n    \"small_eggs\": 50,\n    \"medium_eggs\": 100,\n    \"large_eggs\": 75,\n    \"xl_eggs\": 25,\n    \"total\": 250,\n    \"notes\": \"Good production day\"\n}"
-                                                               },
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/eggs",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "eggs"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Update Egg Production",
-                                      "request":  {
-                                                      "method":  "PUT",
-                                                      "header":  [
-                                                                     {
-                                                                         "key":  "Content-Type",
-                                                                         "value":  "application/json"
-                                                                     }
-                                                                 ],
-                                                      "body":  {
-                                                                   "mode":  "raw",
-                                                                   "raw":  "{\n    \"date\": \"2026-06-26\",\n    \"batch_id\": 1,\n    \"small_eggs\": 55,\n    \"medium_eggs\": 105,\n    \"large_eggs\": 80,\n    \"xl_eggs\": 30,\n    \"total\": 270,\n    \"notes\": \"Updated production\"\n}"
-                                                               },
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/eggs/1",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "eggs",
-                                                                               "1"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Delete Egg Production",
-                                      "request":  {
-                                                      "method":  "DELETE",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/eggs/1",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "eggs",
-                                                                               "1"
-                                                                           ]
-                                                              }
-                                                  }
-                                  }
-                              ]
-                 },
-                 {
-                     "name":  "7. Sales",
-                     "item":  [
-                                  {
-                                      "name":  "Get All Egg Sales",
-                                      "request":  {
-                                                      "method":  "GET",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/sales/eggs",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "sales",
-                                                                               "eggs"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Get All Chicken Sales",
-                                      "request":  {
-                                                      "method":  "GET",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/sales/chickens",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "sales",
-                                                                               "chickens"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Get Sales Stats",
-                                      "request":  {
-                                                      "method":  "GET",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/sales/stats",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "sales",
-                                                                               "stats"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Create Egg Sale",
-                                      "request":  {
-                                                      "method":  "POST",
-                                                      "header":  [
-                                                                     {
-                                                                         "key":  "Content-Type",
-                                                                         "value":  "application/json"
-                                                                     }
-                                                                 ],
-                                                      "body":  {
-                                                                   "mode":  "raw",
-                                                                   "raw":  "{\n    \"buyer_name\": \"Supermarket XYZ\",\n    \"sale_date\": \"2026-06-26\",\n    \"egg_size\": \"Large\",\n    \"crates\": 10,\n    \"pieces\": 300,\n    \"price_per_crate\": 450,\n    \"total_eggs\": 300,\n    \"total\": 4500,\n    \"notes\": \"Weekly delivery\"\n}"
-                                                               },
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/sales/eggs",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "sales",
-                                                                               "eggs"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Create Chicken Sale",
-                                      "request":  {
-                                                      "method":  "POST",
-                                                      "header":  [
-                                                                     {
-                                                                         "key":  "Content-Type",
-                                                                         "value":  "application/json"
-                                                                     }
-                                                                 ],
-                                                      "body":  {
-                                                                   "mode":  "raw",
-                                                                   "raw":  "{\n    \"buyer\": \"Butcher Shop ABC\",\n    \"sale_date\": \"2026-06-26\",\n    \"chicken_type\": \"Broiler\",\n    \"quantity\": 50,\n    \"price\": 120,\n    \"status\": \"dressed\",\n    \"total\": 6000,\n    \"notes\": \"Dressed chicken order\"\n}"
-                                                               },
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/sales/chickens",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "sales",
-                                                                               "chickens"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Delete Egg Sale",
-                                      "request":  {
-                                                      "method":  "DELETE",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/sales/eggs/1",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "sales",
-                                                                               "eggs",
-                                                                               "1"
-                                                                           ]
-                                                              }
-                                                  }
-                                  }
-                              ]
-                 },
-                 {
-                     "name":  "8. Chickens",
-                     "item":  [
-                                  {
-                                      "name":  "Get All Chickens",
-                                      "request":  {
-                                                      "method":  "GET",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/chickens",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "chickens"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Create Chicken Record",
-                                      "request":  {
-                                                      "method":  "POST",
-                                                      "header":  [
-                                                                     {
-                                                                         "key":  "Content-Type",
-                                                                         "value":  "application/json"
-                                                                     }
-                                                                 ],
-                                                      "body":  {
-                                                                   "mode":  "raw",
-                                                                   "raw":  "{\n    \"type\": \"Layer\",\n    \"batch\": \"BATCH-2026-001\",\n    \"quantity\": 500,\n    \"age\": 20,\n    \"health\": \"Good\",\n    \"ready_for_sale\": 0,\n    \"egg_production\": 1\n}"
-                                                               },
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/chickens",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "chickens"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Update Chicken Record",
-                                      "request":  {
-                                                      "method":  "PUT",
-                                                      "header":  [
-                                                                     {
-                                                                         "key":  "Content-Type",
-                                                                         "value":  "application/json"
-                                                                     }
-                                                                 ],
-                                                      "body":  {
-                                                                   "mode":  "raw",
-                                                                   "raw":  "{\n    \"type\": \"Layer\",\n    \"batch\": \"BATCH-2026-001\",\n    \"quantity\": 480,\n    \"age\": 22,\n    \"health\": \"Excellent\",\n    \"ready_for_sale\": 1,\n    \"egg_production\": 1,\n    \"sold\": 20\n}"
-                                                               },
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/chickens/1",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "chickens",
-                                                                               "1"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Delete Chicken Record",
-                                      "request":  {
-                                                      "method":  "DELETE",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/chickens/1",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "chickens",
-                                                                               "1"
-                                                                           ]
-                                                              }
-                                                  }
-                                  }
-                              ]
-                 },
-                 {
-                     "name":  "9. Customers",
-                     "item":  [
-                                  {
-                                      "name":  "Get All Customers",
-                                      "request":  {
-                                                      "method":  "GET",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/customers",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "customers"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Get Customer Stats",
-                                      "request":  {
-                                                      "method":  "GET",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/customers/stats",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "customers",
-                                                                               "stats"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Create Customer",
-                                      "request":  {
-                                                      "method":  "POST",
-                                                      "header":  [
-                                                                     {
-                                                                         "key":  "Content-Type",
-                                                                         "value":  "application/json"
-                                                                     }
-                                                                 ],
-                                                      "body":  {
-                                                                   "mode":  "raw",
-                                                                   "raw":  "{\n    \"name\": \"ABC Retail\",\n    \"phone\": \"+27 123 4567\",\n    \"email\": \"info@abcretail.com\",\n    \"address\": \"123 Main Street\",\n    \"type\": \"wholesale\"\n}"
-                                                               },
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/customers",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "customers"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Update Customer",
-                                      "request":  {
-                                                      "method":  "PUT",
-                                                      "header":  [
-                                                                     {
-                                                                         "key":  "Content-Type",
-                                                                         "value":  "application/json"
-                                                                     }
-                                                                 ],
-                                                      "body":  {
-                                                                   "mode":  "raw",
-                                                                   "raw":  "{\n    \"name\": \"ABC Retail\",\n    \"phone\": \"+27 123 4567\",\n    \"email\": \"info@abcretail.com\",\n    \"address\": \"456 New Street\",\n    \"type\": \"vip\",\n    \"total_purchases\": 15000\n}"
-                                                               },
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/customers/1",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "customers",
-                                                                               "1"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Delete Customer",
-                                      "request":  {
-                                                      "method":  "DELETE",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/customers/1",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "customers",
-                                                                               "1"
-                                                                           ]
-                                                              }
-                                                  }
-                                  }
-                              ]
-                 },
-                 {
-                     "name":  "10. Batches",
-                     "item":  [
-                                  {
-                                      "name":  "Get All Batches",
-                                      "request":  {
-                                                      "method":  "GET",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/batches",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "batches"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Create Batch",
-                                      "request":  {
-                                                      "method":  "POST",
-                                                      "header":  [
-                                                                     {
-                                                                         "key":  "Content-Type",
-                                                                         "value":  "application/json"
-                                                                     }
-                                                                 ],
-                                                      "body":  {
-                                                                   "mode":  "raw",
-                                                                   "raw":  "{\n    \"batch_number\": \"BATCH-2026-001\",\n    \"type\": \"Layer\",\n    \"quantity\": 500,\n    \"age\": 0,\n    \"status\": \"Active\",\n    \"start_date\": \"2026-06-26\",\n    \"notes\": \"New layer batch\"\n}"
-                                                               },
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/batches",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "batches"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Update Batch",
-                                      "request":  {
-                                                      "method":  "PUT",
-                                                      "header":  [
-                                                                     {
-                                                                         "key":  "Content-Type",
-                                                                         "value":  "application/json"
-                                                                     }
-                                                                 ],
-                                                      "body":  {
-                                                                   "mode":  "raw",
-                                                                   "raw":  "{\n    \"batch_number\": \"BATCH-2026-001\",\n    \"type\": \"Layer\",\n    \"quantity\": 480,\n    \"age\": 2,\n    \"status\": \"Active\",\n    \"start_date\": \"2026-06-26\",\n    \"notes\": \"Updated batch info\"\n}"
-                                                               },
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/batches/1",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "batches",
-                                                                               "1"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Delete Batch",
-                                      "request":  {
-                                                      "method":  "DELETE",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/batches/1",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "batches",
-                                                                               "1"
-                                                                           ]
-                                                              }
-                                                  }
-                                  }
-                              ]
-                 },
-                 {
-                     "name":  "11. Pricing",
-                     "item":  [
-                                  {
-                                      "name":  "Get All Pricing",
-                                      "request":  {
-                                                      "method":  "GET",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/pricing",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "pricing"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Get Current Pricing",
-                                      "request":  {
-                                                      "method":  "GET",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/pricing/current",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "pricing",
-                                                                               "current"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Create Pricing",
-                                      "request":  {
-                                                      "method":  "POST",
-                                                      "header":  [
-                                                                     {
-                                                                         "key":  "Content-Type",
-                                                                         "value":  "application/json"
-                                                                     }
-                                                                 ],
-                                                      "body":  {
-                                                                   "mode":  "raw",
-                                                                   "raw":  "{\n    \"product_type\": \"Eggs\",\n    \"price_per_unit\": 15,\n    \"size\": \"large\",\n    \"description\": \"Large eggs per piece\"\n}"
-                                                               },
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/pricing",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "pricing"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Update Pricing",
-                                      "request":  {
-                                                      "method":  "PUT",
-                                                      "header":  [
-                                                                     {
-                                                                         "key":  "Content-Type",
-                                                                         "value":  "application/json"
-                                                                     }
-                                                                 ],
-                                                      "body":  {
-                                                                   "mode":  "raw",
-                                                                   "raw":  "{\n    \"product_type\": \"Eggs\",\n    \"price_per_unit\": 18,\n    \"size\": \"large\",\n    \"description\": \"Updated large egg pricing\",\n    \"is_current\": 1\n}"
-                                                               },
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/pricing/1",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "pricing",
-                                                                               "1"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Delete Pricing",
-                                      "request":  {
-                                                      "method":  "DELETE",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/pricing/1",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "pricing",
-                                                                               "1"
-                                                                           ]
-                                                              }
-                                                  }
-                                  }
-                              ]
-                 },
-                 {
-                     "name":  "12. Security",
-                     "item":  [
-                                  {
-                                      "name":  "Get Security Logs",
-                                      "request":  {
-                                                      "method":  "GET",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/security/logs",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "security",
-                                                                               "logs"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Create Security Log",
-                                      "request":  {
-                                                      "method":  "POST",
-                                                      "header":  [
-                                                                     {
-                                                                         "key":  "Content-Type",
-                                                                         "value":  "application/json"
-                                                                     }
-                                                                 ],
-                                                      "body":  {
-                                                                   "mode":  "raw",
-                                                                   "raw":  "{\n    \"user_id\": 1,\n    \"action\": \"LOGIN_SUCCESS\",\n    \"details\": \"User logged in successfully\",\n    \"ip_address\": \"192.168.1.1\"\n}"
-                                                               },
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/security/logs",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "security",
-                                                                               "logs"
-                                                                           ]
-                                                              }
-                                                  }
-                                  }
-                              ]
-                 },
-                 {
-                     "name":  "13. Equipment",
-                     "item":  [
-                                  {
-                                      "name":  "Get All Equipment",
-                                      "request":  {
-                                                      "method":  "GET",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/equipment",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "equipment"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Create Equipment",
-                                      "request":  {
-                                                      "method":  "POST",
-                                                      "header":  [
-                                                                     {
-                                                                         "key":  "Content-Type",
-                                                                         "value":  "application/json"
-                                                                     }
-                                                                 ],
-                                                      "body":  {
-                                                                   "mode":  "raw",
-                                                                   "raw":  "{\n    \"name\": \"Industrial Incubator\",\n    \"type\": \"Incubator\",\n    \"quantity\": 2,\n    \"condition\": \"Excellent\",\n    \"maintenance_schedule\": \"Monthly\",\n    \"notes\": \"500 egg capacity each\"\n}"
-                                                               },
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/equipment",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "equipment"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Update Equipment",
-                                      "request":  {
-                                                      "method":  "PUT",
-                                                      "header":  [
-                                                                     {
-                                                                         "key":  "Content-Type",
-                                                                         "value":  "application/json"
-                                                                     }
-                                                                 ],
-                                                      "body":  {
-                                                                   "mode":  "raw",
-                                                                   "raw":  "{\n    \"name\": \"Industrial Incubator\",\n    \"type\": \"Incubator\",\n    \"quantity\": 2,\n    \"condition\": \"Needs Maintenance\",\n    \"maintenance_schedule\": \"Weekly\",\n    \"notes\": \"Scheduled for service\"\n}"
-                                                               },
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/equipment/1",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "equipment",
-                                                                               "1"
-                                                                           ]
-                                                              }
-                                                  }
-                                  },
-                                  {
-                                      "name":  "Delete Equipment",
-                                      "request":  {
-                                                      "method":  "DELETE",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/equipment/1",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "equipment",
-                                                                               "1"
-                                                                           ]
-                                                              }
-                                                  }
-                                  }
-                              ]
-                 },
-                 {
-                     "name":  "14. Health Check",
-                     "item":  [
-                                  {
-                                      "name":  "API Health",
-                                      "request":  {
-                                                      "method":  "GET",
-                                                      "header":  [
-
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/health",
-                                                                  "host":  [
-                                                                               "{{baseUrl}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "api",
-                                                                               "health"
-                                                                           ]
-                                                              }
-                                                  }
-                                  }
-                              ]
-                 }
-             ],
-    "variable":  [
-                     {
-                         "key":  "baseUrl",
-                         "value":  "http://localhost:5500",
-                         "type":  "string"
-                     },
-                     {
-                         "key":  "token",
-                         "value":  "",
-                         "type":  "string"
-                     }
-                 ]
+  "info": {
+    "name": "Whitestone API - Full Collection",
+    "description": "Complete Whitestone API with Authentication and all endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Employees",
+      "item": [
+        {
+          "name": "Get All Employees",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/employees",
+              "host": ["{{base_url}}"],
+              "path": ["api", "employees"]
+            }
+          }
+        },
+        {
+          "name": "Get Employee by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/employees/WS-EMP001",
+              "host": ["{{base_url}}"],
+              "path": ["api", "employees", "WS-EMP001"]
+            }
+          }
+        },
+        {
+          "name": "Create Employee",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"newemployee\",\n    \"password\": \"password123\",\n    \"name\": \"John\",\n    \"surname\": \"Doe\",\n    \"email\": \"john.doe@whitestone.com\",\n    \"phone\": \"+27 82 123 4567\",\n    \"role\": \"farmer\",\n    \"is_active\": \"active\",\n    \"department\": \"Production\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/employees",
+              "host": ["{{base_url}}"],
+              "path": ["api", "employees"]
+            }
+          }
+        },
+        {
+          "name": "Update Employee",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"John Updated\",\n    \"surname\": \"Doe Updated\",\n    \"email\": \"john.updated@whitestone.com\",\n    \"phone\": \"+27 82 987 6543\",\n    \"role\": \"manager\",\n    \"is_active\": \"active\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/employees/WS-EMP001",
+              "host": ["{{base_url}}"],
+              "path": ["api", "employees", "WS-EMP001"]
+            }
+          }
+        },
+        {
+          "name": "Archive Employee (Soft Delete)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/employees/WS-EMP001",
+              "host": ["{{base_url}}"],
+              "path": ["api", "employees", "WS-EMP001"]
+            }
+          }
+        },
+        {
+          "name": "Verify Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"currentPassword\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/employees/WS-EMP001/verify-password",
+              "host": ["{{base_url}}"],
+              "path": ["api", "employees", "WS-EMP001", "verify-password"]
+            }
+          }
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"currentPassword\": \"password123\",\n    \"newPassword\": \"newpassword456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/employees/WS-EMP001/reset-password",
+              "host": ["{{base_url}}"],
+              "path": ["api", "employees", "WS-EMP001", "reset-password"]
+            }
+          }
+        },
+        {
+          "name": "Get Employee Permissions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/employees/WS-EMP001/permissions",
+              "host": ["{{base_url}}"],
+              "path": ["api", "employees", "WS-EMP001", "permissions"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Stock",
+      "item": [
+        {
+          "name": "Get All Stock",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/stock",
+              "host": ["{{base_url}}"],
+              "path": ["api", "stock"]
+            }
+          }
+        },
+        {
+          "name": "Add Stock Item",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Layer Mash\",\n    \"category\": \"Feed\",\n    \"quantity\": 450,\n    \"unit\": \"kg\",\n    \"price\": 4.50\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/stock",
+              "host": ["{{base_url}}"],
+              "path": ["api", "stock"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Feed",
+      "item": [
+        {
+          "name": "Get Feed Data",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/feed",
+              "host": ["{{base_url}}"],
+              "path": ["api", "feed"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Eggs",
+      "item": [
+        {
+          "name": "Get Egg Production",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/eggs",
+              "host": ["{{base_url}}"],
+              "path": ["api", "eggs"]
+            }
+          }
+        },
+        {
+          "name": "Record Egg Production",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"date\": \"2026-06-27\",\n    \"total\": 180,\n    \"small\": 20,\n    \"medium\": 60,\n    \"large\": 70,\n    \"xl\": 30\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/eggs",
+              "host": ["{{base_url}}"],
+              "path": ["api", "eggs"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Batches",
+      "item": [
+        {
+          "name": "Get All Batches",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/batches",
+              "host": ["{{base_url}}"],
+              "path": ["api", "batches"]
+            }
+          }
+        },
+        {
+          "name": "Create Batch",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Batch 2026-001\",\n    \"type\": \"Broiler\",\n    \"quantity\": 500,\n    \"start_date\": \"2026-06-01\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/batches",
+              "host": ["{{base_url}}"],
+              "path": ["api", "batches"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Environment",
+      "item": [],
+      "variable": [
+        {
+          "key": "base_url",
+          "value": "http://localhost:5500",
+          "type": "string"
+        },
+        {
+          "key": "token",
+          "value": "",
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5500",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ]
 }

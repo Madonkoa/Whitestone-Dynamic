@@ -1,7 +1,7 @@
 ﻿{
   "info": {
     "name": "Whitestone API - Full Collection",
-    "description": "Complete Whitestone API with Authentication and all endpoints",
+    "description": "Complete Whitestone API with Stock endpoints",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -12,211 +12,17 @@
           "name": "Login",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin123\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/auth/login",
-              "host": ["{{base_url}}"],
-              "path": ["api", "auth", "login"]
-            }
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin123\"\n}"},
+            "url": {"raw": "{{base_url}}/api/auth/login", "host": ["{{base_url}}"], "path": ["api", "auth", "login"]}
           }
         },
         {
           "name": "Get Current User",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/auth/me",
-              "host": ["{{base_url}}"],
-              "path": ["api", "auth", "me"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Employees",
-      "item": [
-        {
-          "name": "Get All Employees",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/employees",
-              "host": ["{{base_url}}"],
-              "path": ["api", "employees"]
-            }
-          }
-        },
-        {
-          "name": "Get Employee by ID",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/employees/WS-EMP001",
-              "host": ["{{base_url}}"],
-              "path": ["api", "employees", "WS-EMP001"]
-            }
-          }
-        },
-        {
-          "name": "Create Employee",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"username\": \"newemployee\",\n    \"password\": \"password123\",\n    \"name\": \"John\",\n    \"surname\": \"Doe\",\n    \"email\": \"john.doe@whitestone.com\",\n    \"phone\": \"+27 82 123 4567\",\n    \"role\": \"farmer\",\n    \"is_active\": \"active\",\n    \"department\": \"Production\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/employees",
-              "host": ["{{base_url}}"],
-              "path": ["api", "employees"]
-            }
-          }
-        },
-        {
-          "name": "Update Employee",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"name\": \"John Updated\",\n    \"surname\": \"Doe Updated\",\n    \"email\": \"john.updated@whitestone.com\",\n    \"phone\": \"+27 82 987 6543\",\n    \"role\": \"manager\",\n    \"is_active\": \"active\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/employees/WS-EMP001",
-              "host": ["{{base_url}}"],
-              "path": ["api", "employees", "WS-EMP001"]
-            }
-          }
-        },
-        {
-          "name": "Archive Employee (Soft Delete)",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/employees/WS-EMP001",
-              "host": ["{{base_url}}"],
-              "path": ["api", "employees", "WS-EMP001"]
-            }
-          }
-        },
-        {
-          "name": "Verify Password",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"currentPassword\": \"password123\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/employees/WS-EMP001/verify-password",
-              "host": ["{{base_url}}"],
-              "path": ["api", "employees", "WS-EMP001", "verify-password"]
-            }
-          }
-        },
-        {
-          "name": "Reset Password",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"currentPassword\": \"password123\",\n    \"newPassword\": \"newpassword456\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/employees/WS-EMP001/reset-password",
-              "host": ["{{base_url}}"],
-              "path": ["api", "employees", "WS-EMP001", "reset-password"]
-            }
-          }
-        },
-        {
-          "name": "Get Employee Permissions",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/employees/WS-EMP001/permissions",
-              "host": ["{{base_url}}"],
-              "path": ["api", "employees", "WS-EMP001", "permissions"]
-            }
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{base_url}}/api/auth/me", "host": ["{{base_url}}"], "path": ["api", "auth", "me"]}
           }
         }
       ]
@@ -228,189 +34,76 @@
           "name": "Get All Stock",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/stock",
-              "host": ["{{base_url}}"],
-              "path": ["api", "stock"]
-            }
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{base_url}}/api/stock", "host": ["{{base_url}}"], "path": ["api", "stock"]}
           }
         },
         {
-          "name": "Add Stock Item",
+          "name": "Get Stock Item",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{base_url}}/api/stock/1", "host": ["{{base_url}}"], "path": ["api", "stock", "1"]}
+          }
+        },
+        {
+          "name": "Create Stock Item",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"name\": \"Layer Mash\",\n    \"category\": \"Feed\",\n    \"quantity\": 450,\n    \"unit\": \"kg\",\n    \"price\": 4.50\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/stock",
-              "host": ["{{base_url}}"],
-              "path": ["api", "stock"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Feed",
-      "item": [
-        {
-          "name": "Get Feed Data",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/feed",
-              "host": ["{{base_url}}"],
-              "path": ["api", "feed"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Eggs",
-      "item": [
-        {
-          "name": "Get Egg Production",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/eggs",
-              "host": ["{{base_url}}"],
-              "path": ["api", "eggs"]
-            }
+            "body": {"mode": "raw", "raw": "{\n    \"name\": \"Layer Mash\",\n    \"category\": \"Feed\",\n    \"quantity\": 450,\n    \"unit\": \"kg\",\n    \"value\": 675,\n    \"min_threshold\": 50\n}"},
+            "url": {"raw": "{{base_url}}/api/stock", "host": ["{{base_url}}"], "path": ["api", "stock"]}
           }
         },
         {
-          "name": "Record Egg Production",
+          "name": "Update Stock Item",
           "request": {
-            "method": "POST",
+            "method": "PUT",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"date\": \"2026-06-27\",\n    \"total\": 180,\n    \"small\": 20,\n    \"medium\": 60,\n    \"large\": 70,\n    \"xl\": 30\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/eggs",
-              "host": ["{{base_url}}"],
-              "path": ["api", "eggs"]
-            }
+            "body": {"mode": "raw", "raw": "{\n    \"name\": \"Layer Mash Premium\",\n    \"category\": \"Feed\",\n    \"quantity\": 500,\n    \"unit\": \"kg\",\n    \"value\": 750,\n    \"min_threshold\": 50\n}"},
+            "url": {"raw": "{{base_url}}/api/stock/1", "host": ["{{base_url}}"], "path": ["api", "stock", "1"]}
           }
-        }
-      ]
-    },
-    {
-      "name": "Batches",
-      "item": [
+        },
         {
-          "name": "Get All Batches",
+          "name": "Delete Stock Item",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{base_url}}/api/stock/1", "host": ["{{base_url}}"], "path": ["api", "stock", "1"]}
+          }
+        },
+        {
+          "name": "Get Stock Movements",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/batches",
-              "host": ["{{base_url}}"],
-              "path": ["api", "batches"]
-            }
-          }
-        },
-        {
-          "name": "Create Batch",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"name\": \"Batch 2026-001\",\n    \"type\": \"Broiler\",\n    \"quantity\": 500,\n    \"start_date\": \"2026-06-01\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/batches",
-              "host": ["{{base_url}}"],
-              "path": ["api", "batches"]
-            }
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{base_url}}/api/stock/movements", "host": ["{{base_url}}"], "path": ["api", "stock", "movements"]}
           }
         }
       ]
     },
     {
-      "name": "Environment",
-      "item": [],
-      "variable": [
+      "name": "Employees",
+      "item": [
         {
-          "key": "base_url",
-          "value": "http://localhost:5500",
-          "type": "string"
-        },
-        {
-          "key": "token",
-          "value": "",
-          "type": "string"
+          "name": "Get All Employees",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{base_url}}/api/employees", "host": ["{{base_url}}"], "path": ["api", "employees"]}
+          }
         }
       ]
     }
   ],
   "variable": [
-    {
-      "key": "base_url",
-      "value": "http://localhost:5500",
-      "type": "string"
-    },
-    {
-      "key": "token",
-      "value": "",
-      "type": "string"
-    }
+    {"key": "base_url", "value": "http://localhost:5500", "type": "string"},
+    {"key": "token", "value": "", "type": "string"}
   ]
 }

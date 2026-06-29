@@ -1,6 +1,8 @@
 ﻿// app.js - Main Server File
 require('dotenv').config();
 const express = require('express');
+const stockRoutes = require('./routes/stock');
+
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./swagger-config');
 const cors = require('cors');
@@ -130,6 +132,7 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
 
 
 

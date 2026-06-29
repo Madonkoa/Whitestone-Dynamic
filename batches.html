@@ -1,383 +1,157 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Batches - Whitestone Dynamic</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* ===== BATCH FILTERS ===== */
-        .filters-section {
-            background: var(--bg-white);
-            padding: 16px 20px;
-            border-radius: var(--radius-md);
-            border: var(--border-light);
-            box-shadow: var(--shadow-sm);
-            margin-bottom: 16px;
-        }
-        .filters-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            align-items: flex-end;
-        }
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            flex: 1;
-            min-width: 140px;
-        }
-        .filter-group label {
-            font-size: 10px;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
-        .filter-group select,
-        .filter-group input {
-            padding: 6px 10px;
-            border: var(--border-light);
-            border-radius: var(--radius-sm);
-            font-size: 12px;
-            background: var(--bg-secondary);
-            font-family: 'Inter', sans-serif;
-            width: 100%;
-        }
-        .filter-group select:focus,
-        .filter-group input:focus {
-            outline: none;
-            border-color: var(--navy);
-        }
-        .filter-actions {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-            padding-bottom: 2px;
-        }
-        .filter-actions .primary-btn {
-            padding: 6px 16px;
-            font-size: 11px;
-        }
-        .filter-actions .reset-btn {
-            padding: 6px 14px;
-            background: var(--bg-secondary);
-            border: var(--border-light);
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            font-size: 11px;
-            color: var(--text-secondary);
-            font-family: 'Inter', sans-serif;
-            transition: var(--transition);
-        }
-        .filter-actions .reset-btn:hover {
-            background: #e8e4e0;
-        }
-        .filter-count {
-            font-size: 11px;
-            color: var(--text-muted);
-            padding: 6px 0;
-        }
-        .filter-count strong {
-            color: var(--navy);
-        }
+        .filters-section { background: #fff; padding: 16px 20px; border-radius: 8px; border: 1px solid #E8E4E0; margin-bottom: 16px; }
+        .filters-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+        .filter-group { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 140px; }
+        .filter-group label { font-size: 10px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.3px; }
+        .filter-group select, .filter-group input { padding: 6px 10px; border: 1px solid #E8E4E0; border-radius: 4px; font-size: 12px; background: #f8fafc; font-family: 'Inter', sans-serif; width: 100%; }
+        .filter-group select:focus, .filter-group input:focus { outline: none; border-color: #0A1628; }
+        .filter-actions { display: flex; gap: 6px; align-items: center; padding-bottom: 2px; }
+        .filter-actions .primary-btn { padding: 6px 16px; font-size: 11px; }
+        .filter-actions .reset-btn { padding: 6px 14px; background: #f8fafc; border: 1px solid #E8E4E0; border-radius: 4px; cursor: pointer; font-size: 11px; color: #475569; font-family: 'Inter', sans-serif; transition: all 0.2s; }
+        .filter-actions .reset-btn:hover { background: #e8e4e0; }
+        .filter-count { font-size: 11px; color: #94a3b8; padding: 6px 0; }
+        .filter-count strong { color: #0A1628; }
 
-        /* Batch stats */
-        .batch-stats-grid {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 10px;
-            margin-bottom: 16px;
-        }
-        .batch-stat-card {
-            background: var(--bg-white);
-            padding: 10px 14px;
-            border-radius: var(--radius-md);
-            border: var(--border-light);
-            box-shadow: var(--shadow-sm);
-            text-align: center;
-        }
-        .batch-stat-card .stat-number {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--navy);
-            line-height: 1.2;
-        }
-        .batch-stat-card .stat-label {
-            font-size: 8px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
+        .batch-stats-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-bottom: 16px; }
+        .batch-stat-card { background: #fff; padding: 10px 14px; border-radius: 8px; border: 1px solid #E8E4E0; text-align: center; }
+        .batch-stat-card .stat-number { font-size: 18px; font-weight: 700; color: #0A1628; line-height: 1.2; }
+        .batch-stat-card .stat-label { font-size: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.3px; }
 
-        /* Batch cards */
-        .batch-cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 14px;
-        }
-        .batch-card-item {
-            background: var(--bg-white);
-            padding: 16px 18px;
-            border-radius: var(--radius-md);
-            border: var(--border-light);
-            box-shadow: var(--shadow-sm);
-            transition: var(--transition);
-            position: relative;
-        }
-        .batch-card-item:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-md);
-        }
-        .batch-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 8px;
-        }
-        .batch-card-header .batch-number {
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--navy);
-        }
-        .batch-card-header .batch-type {
-            font-size: 11px;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-        .batch-card-status {
-            padding: 2px 10px;
-            border-radius: 20px;
-            font-size: 9px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
+        .batch-cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+        .batch-card-item { background: #fff; padding: 16px 20px; border-radius: 10px; border: 1px solid #E8E4E0; transition: all 0.2s; overflow: hidden; }
+        .batch-card-item:hover { transform: translateY(-3px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+        .batch-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9; gap: 8px; flex-wrap: wrap; }
+        .batch-card-header .batch-number { font-size: 16px; font-weight: 700; color: #0A1628; }
+        .batch-card-header .batch-type { font-size: 11px; color: #94a3b8; font-weight: 500; }
+        .batch-card-status { padding: 2px 12px; border-radius: 20px; font-size: 9px; font-weight: 600; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; }
         .batch-card-status.active { background: #D4EDDA; color: #155724; }
         .batch-card-status.growing { background: #FFF3CD; color: #856404; }
         .batch-card-status.completed { background: #D6EAF8; color: #1A5276; }
         .batch-card-status.sold { background: #E8E8E8; color: #5D6D7E; }
         .batch-card-status.culled { background: #F8D7DA; color: #721C24; }
 
-        .batch-card-details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4px 12px;
-            margin: 8px 0;
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-        .batch-card-details .detail-item {
-            display: flex;
-            justify-content: space-between;
-        }
-        .batch-card-details .detail-item .label {
-            color: var(--text-muted);
-        }
-        .batch-card-details .detail-item .value {
-            font-weight: 500;
-            color: var(--navy);
-        }
+        .batch-card-details { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px 10px; margin: 6px 0 8px 0; font-size: 12px; }
+        .batch-card-details .detail-item { display: flex; justify-content: space-between; padding: 3px 0; align-items: baseline; gap: 4px; min-width: 0; }
+        .batch-card-details .detail-item .label { color: #94a3b8; font-size: 10px; font-weight: 500; white-space: nowrap; flex-shrink: 0; }
+        .batch-card-details .detail-item .value { font-weight: 600; color: #0A1628; font-size: 12px; text-align: right; word-break: break-word; }
+        .batch-card-details .detail-item .value.profit-positive { color: #22C55E; }
+        .batch-card-details .detail-item .value.profit-negative { color: #EF4444; }
+        .batch-card-details .detail-item .value.health-good { color: #22C55E; }
+        .batch-card-details .detail-item .value.health-fair { color: #F59E0B; }
+        .batch-card-details .detail-item .value.health-poor { color: #EF4444; }
 
-        /* History button and modal */
-        .view-history-btn {
-            padding: 2px 10px;
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius-sm);
-            background: var(--bg-secondary);
-            cursor: pointer;
-            font-size: 10px;
-            color: var(--text-secondary);
-            transition: var(--transition);
-            font-family: 'Inter', sans-serif;
-        }
-        .view-history-btn:hover {
-            border-color: var(--navy);
-            color: var(--navy);
-        }
+        .batch-card-actions { display: flex; gap: 4px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #f1f5f9; flex-wrap: wrap; }
+        .batch-card-actions .action-btn-sm { padding: 3px 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 9px; font-weight: 500; transition: all 0.2s; font-family: 'Inter', sans-serif; white-space: nowrap; flex-shrink: 0; }
+        .batch-card-actions .action-btn-sm:hover { transform: translateY(-1px); }
+        .batch-card-actions .action-btn-sm.edit { background: #0A1628; color: #fff; }
+        .batch-card-actions .action-btn-sm.edit:hover { background: #1A2A4A; }
+        .batch-card-actions .action-btn-sm.edit:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+        .batch-card-actions .action-btn-sm.record { background: #C9A84C; color: #fff; }
+        .batch-card-actions .action-btn-sm.record:hover { background: #A8892E; }
+        .batch-card-actions .action-btn-sm.weight { background: #17A2B8; color: #fff; }
+        .batch-card-actions .action-btn-sm.weight:hover { background: #138496; }
+        .batch-card-actions .action-btn-sm.mortality { background: #6F42C1; color: #fff; }
+        .batch-card-actions .action-btn-sm.mortality:hover { background: #5A32A3; }
+        .batch-card-actions .action-btn-sm.health { background: #28A745; color: #fff; }
+        .batch-card-actions .action-btn-sm.health:hover { background: #1E7E34; }
+        .batch-card-actions .action-btn-sm.view { background: #E8E4E0; color: #475569; }
+        .batch-card-actions .action-btn-sm.view:hover { background: #d5d0ca; }
+        .batch-card-actions .action-btn-sm.delete { background: #DC3545; color: #fff; }
+        .batch-card-actions .action-btn-sm.delete:hover { background: #C82333; }
+        .batch-card-actions .action-btn-sm.delete:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-        .batch-card-actions {
-            display: flex;
-            gap: 6px;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: var(--border-light);
-            flex-wrap: wrap;
-        }
-        .batch-card-actions .action-btn-sm {
-            padding: 4px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 10px;
-            font-weight: 500;
-            transition: var(--transition);
-            font-family: 'Inter', sans-serif;
-        }
-        .batch-card-actions .action-btn-sm.edit {
-            background: var(--navy);
-            color: #fff;
-        }
-        .batch-card-actions .action-btn-sm.edit:hover {
-            background: var(--navy-light);
-        }
-        .batch-card-actions .action-btn-sm.view {
-            background: var(--bg-secondary);
-            color: var(--text-secondary);
-        }
-        .batch-card-actions .action-btn-sm.view:hover {
-            background: #e8e4e0;
-        }
-        .batch-card-actions .action-btn-sm.delete {
-            background: #DC3545;
-            color: #fff;
-        }
-        .batch-card-actions .action-btn-sm.delete:hover {
-            background: #C82333;
-        }
-        .batch-card-actions .action-btn-sm.record {
-            background: #C9A84C;
-            color: #fff;
-        }
-        .batch-card-actions .action-btn-sm.record:hover {
-            background: #A8892E;
-        }
+        .no-results { text-align: center; padding: 40px 20px; color: #94a3b8; }
+        .no-results .icon { font-size: 40px; display: block; margin-bottom: 8px; opacity: 0.5; }
 
-        /* History Modal */
-        .history-modal-content {
-            max-width: 600px !important;
-        }
-        .history-timeline {
-            max-height: 400px;
-            overflow-y: auto;
-            padding-right: 8px;
-        }
-        .history-timeline::-webkit-scrollbar {
-            width: 3px;
-        }
-        .history-timeline::-webkit-scrollbar-track {
-            background: var(--bg-secondary);
-        }
-        .history-timeline::-webkit-scrollbar-thumb {
-            background: var(--navy-light);
-            border-radius: 3px;
-        }
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-content { background: #fff; padding: 28px 32px; border-radius: 12px; max-width: 540px; width: 92%; max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 2px solid #f1f5f9; }
+        .modal-header h2 { font-size: 20px; font-weight: 700; color: #0A1628; margin: 0; }
+        .modal-close { font-size: 28px; cursor: pointer; color: #94a3b8; background: none; border: none; padding: 0 4px; transition: 0.2s; line-height: 1; }
+        .modal-close:hover { color: #0A1628; transform: rotate(90deg); }
 
-        .history-item {
-            display: flex;
-            gap: 14px;
-            padding: 10px 0;
-            border-bottom: 1px solid var(--border-light);
-            align-items: flex-start;
-        }
-        .history-item:last-child {
-            border-bottom: none;
-        }
-        .history-item .history-time {
-            font-size: 10px;
-            color: var(--text-muted);
-            min-width: 130px;
-            white-space: nowrap;
-            padding-top: 1px;
-        }
-        .history-item .history-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            flex-shrink: 0;
-            margin-top: 4px;
-        }
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 4px; }
+        .form-group label .required { color: #EF4444; }
+        .form-group input, .form-group select { width: 100%; padding: 10px 14px; border: 2px solid #E8E4E0; border-radius: 8px; font-size: 14px; font-family: 'Inter', sans-serif; transition: all 0.2s; background: #fff; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #0A1628; box-shadow: 0 0 0 3px rgba(10, 22, 40, 0.06); }
+        .form-group input[readonly] { background: #f1f5f9; cursor: not-allowed; color: #475569; }
+        .form-group .helper-text { font-size: 10px; color: #94a3b8; margin-top: 3px; display: block; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .form-actions { display: flex; gap: 10px; margin-top: 20px; padding-top: 16px; border-top: 1px solid #f1f5f9; }
+        .form-actions .btn-primary { flex: 1; padding: 10px 24px; background: #0A1628; color: #fff; border: none; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; font-family: 'Inter', sans-serif; }
+        .form-actions .btn-primary:hover { background: #1A2A4A; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(10, 22, 40, 0.2); }
+        .form-actions .btn-secondary { padding: 10px 24px; background: #fff; color: #475569; border: 2px solid #E8E4E0; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; font-family: 'Inter', sans-serif; }
+        .form-actions .btn-secondary:hover { background: #f8fafc; border-color: #0A1628; }
+
+        .status-hint { background: #f8fafc; padding: 8px 14px; border-radius: 6px; border: 1px solid #E8E4E0; margin: 4px 0 8px 0; font-size: 11px; color: #64748b; }
+        .status-hint strong { color: #0A1628; }
+
+        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+        .toast { padding: 12px 20px; border-radius: 8px; color: #fff; font-size: 13px; font-weight: 500; box-shadow: 0 4px 16px rgba(0,0,0,0.15); animation: slideIn 0.3s ease; min-width: 200px; }
+        .toast.success { background: #22C55E; }
+        .toast.error { background: #EF4444; }
+        .toast.info { background: #0A1628; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* History */
+        .history-modal-content { max-width: 600px !important; }
+        .history-timeline { max-height: 400px; overflow-y: auto; padding-right: 8px; }
+        .history-timeline::-webkit-scrollbar { width: 3px; }
+        .history-timeline::-webkit-scrollbar-track { background: #f8fafc; }
+        .history-timeline::-webkit-scrollbar-thumb { background: #0A1628; border-radius: 3px; }
+        .history-item { display: flex; gap: 14px; padding: 10px 0; border-bottom: 1px solid #f1f5f9; align-items: flex-start; }
+        .history-item:last-child { border-bottom: none; }
+        .history-item .history-time { font-size: 10px; color: #94a3b8; min-width: 130px; white-space: nowrap; padding-top: 1px; }
+        .history-item .history-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
         .history-item .history-dot.status-change { background: #C9A84C; }
         .history-item .history-dot.quantity-change { background: #17A2B8; }
         .history-item .history-dot.notes-update { background: #6F42C1; }
         .history-item .history-dot.creation { background: #28A745; }
+        .history-item .history-content { flex: 1; }
+        .history-item .history-content .history-title { font-size: 12px; font-weight: 500; color: #0A1628; }
+        .history-item .history-content .history-details { font-size: 11px; color: #475569; margin-top: 2px; }
+        .history-item .history-content .history-details .old-val { color: #DC3545; text-decoration: line-through; }
+        .history-item .history-content .history-details .new-val { color: #28A745; font-weight: 500; }
+        .history-empty { text-align: center; padding: 30px 20px; color: #94a3b8; font-size: 13px; }
+        .history-pagination { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; margin-top: 12px; border-top: 1px solid #E8E4E0; }
+        .history-pagination .page-info { font-size: 12px; color: #94a3b8; }
+        .history-pagination .page-info strong { color: #0A1628; }
+        .history-pagination .page-btns { display: flex; gap: 4px; }
+        .history-pagination .page-btns button { padding: 4px 12px; border: 1px solid #E8E4E0; border-radius: 4px; background: #fff; cursor: pointer; font-size: 12px; font-family: 'Inter', sans-serif; transition: all 0.2s; color: #475569; }
+        .history-pagination .page-btns button:hover:not(:disabled) { background: #f1f5f9; border-color: #0A1628; }
+        .history-pagination .page-btns button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .history-pagination .page-btns button.active-page { background: #0A1628; color: #fff; border-color: #0A1628; }
 
-        .history-item .history-content {
-            flex: 1;
-        }
-        .history-item .history-content .history-title {
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--navy);
-        }
-        .history-item .history-content .history-details {
-            font-size: 11px;
-            color: var(--text-secondary);
-            margin-top: 2px;
-        }
-        .history-item .history-content .history-details .old-val {
-            color: #DC3545;
-            text-decoration: line-through;
-        }
-        .history-item .history-content .history-details .new-val {
-            color: #28A745;
-            font-weight: 500;
-        }
-        .history-empty {
-            text-align: center;
-            padding: 30px 20px;
-            color: var(--text-muted);
-            font-size: 13px;
-        }
-
-        .no-results {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-muted);
-        }
-        .no-results .icon {
-            font-size: 40px;
-            display: block;
-            margin-bottom: 8px;
-            opacity: 0.5;
-        }
-
-        /* Responsive */
-        @media (max-width: 992px) {
-            .batch-stats-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-            .batch-cards-grid {
-                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            }
-        }
         @media (max-width: 768px) {
-            .filters-row {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .filter-group {
-                min-width: auto;
-            }
-            .filter-actions {
-                flex-wrap: wrap;
-            }
-            .batch-stats-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-            .batch-cards-grid {
-                grid-template-columns: 1fr;
-            }
-            .history-item {
-                flex-direction: column;
-                gap: 4px;
-            }
-            .history-item .history-time {
-                min-width: auto;
-            }
+            .batch-cards-grid { grid-template-columns: 1fr; }
+            .batch-card-details { grid-template-columns: 1fr 1fr; }
+            .batch-stats-grid { grid-template-columns: repeat(4, 1fr); }
+            .filters-row { flex-direction: column; align-items: stretch; }
+            .filter-group { min-width: auto; }
+            .form-row { grid-template-columns: 1fr; }
+            .history-item { flex-direction: column; gap: 4px; }
+            .history-item .history-time { min-width: auto; }
         }
         @media (max-width: 480px) {
-            .batch-stats-grid {
-                grid-template-columns: 1fr;
-            }
-            .batch-card-details {
-                grid-template-columns: 1fr;
-            }
+            .batch-cards-grid { grid-template-columns: 1fr; }
+            .batch-card-details { grid-template-columns: 1fr; }
+            .batch-stats-grid { grid-template-columns: 1fr 1fr; }
+            .batch-card-actions .action-btn-sm { font-size: 8px; padding: 2px 8px; }
+            .batch-card-header .batch-number { font-size: 14px; }
+            .form-actions { flex-direction: column; }
+            .history-pagination { flex-direction: column; gap: 8px; }
         }
     </style>
 </head>
-
 <body>
     <div class="dashboard-container">
         <nav class="sidebar">
@@ -387,7 +161,7 @@
                 <div class="sidebar-divider"></div>
                 <p>Poultry Management</p>
             </div>
-            <ul class="nav-menu" id="mainNav">
+            <ul class="nav-menu">
                 <li><a href="dashboard.html"><span class="icon">📊</span> <span>Dashboard</span></a></li>
                 <li><a href="employees.html"><span class="icon">👥</span> <span>Employees</span></a></li>
                 <li><a href="stock.html"><span class="icon">📦</span> <span>Stock</span></a></li>
@@ -405,29 +179,28 @@
             </ul>
         </nav>
 
-        <main class="main-content">
-            <header class="top-bar">
+        <div class="main-content">
+            <div class="top-bar">
                 <div class="top-bar-left">
                     <h1>📋 Batch Management</h1>
                     <p class="welcome-text">Track and manage all poultry batches</p>
                 </div>
                 <div class="top-bar-right">
                     <span class="date-display" id="currentDate"></span>
-                    <div class="user-avatar" id="userAvatar">JA</div>
+                    <div class="user-avatar" id="userAvatar">U</div>
                 </div>
-            </header>
+            </div>
 
-            <!-- Batch Stats -->
             <div class="batch-stats-grid" id="batchStats">
-                <div class="batch-stat-card"><div class="stat-number" id="totalBatches">0</div><div class="stat-label">Total Batches</div></div>
+                <div class="batch-stat-card"><div class="stat-number" id="totalBatches">0</div><div class="stat-label">Total</div></div>
                 <div class="batch-stat-card"><div class="stat-number" id="activeBatches">0</div><div class="stat-label">🟢 Active</div></div>
                 <div class="batch-stat-card"><div class="stat-number" id="growingBatches">0</div><div class="stat-label">🟡 Growing</div></div>
                 <div class="batch-stat-card"><div class="stat-number" id="completedBatches">0</div><div class="stat-label">🔵 Completed</div></div>
                 <div class="batch-stat-card"><div class="stat-number" id="soldBatches">0</div><div class="stat-label">⚫ Sold</div></div>
                 <div class="batch-stat-card"><div class="stat-number" id="culledBatches">0</div><div class="stat-label">🔴 Culled</div></div>
+                <div class="batch-stat-card"><div class="stat-number" id="profitBatches">R0</div><div class="stat-label">💰 Profit</div></div>
             </div>
 
-            <!-- Filters -->
             <div class="filters-section">
                 <div class="filters-row">
                     <div class="filter-group">
@@ -445,18 +218,18 @@
                         <label>Type</label>
                         <select id="filterType">
                             <option value="">All Types</option>
-                            <option value="Layer">Layer</option>
                             <option value="Broiler">Broiler</option>
+                            <option value="Layer">Layer</option>
                             <option value="Breeder">Breeder</option>
                             <option value="Pullet">Pullet</option>
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label>From Date</label>
+                        <label>From</label>
                         <input type="date" id="filterDateFrom">
                     </div>
                     <div class="filter-group">
-                        <label>To Date</label>
+                        <label>To</label>
                         <input type="date" id="filterDateTo">
                     </div>
                     <div class="filter-actions">
@@ -467,148 +240,255 @@
                 <div class="filter-count" id="filterCount">Showing <strong>0</strong> batches</div>
             </div>
 
-            <!-- Batch Cards -->
+            <div style="margin-bottom:16px;">
+                <button class="primary-btn" onclick="openAddModal()">+ Add Batch</button>
+            </div>
+
             <div id="batchCardsContainer">
                 <div class="no-results">
                     <span class="icon">📋</span>
                     <p>Loading batches...</p>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
 
-    <!-- Edit Modal -->
+    <!-- ===== BATCH MODAL ===== -->
     <div id="batchModal" class="modal">
-        <div class="modal-content" style="max-width:500px;">
-            <span class="close" id="closeModalBtn">&times;</span>
-            <h2 id="modalTitle">Add Batch</h2>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add Batch</h2>
+                <button class="modal-close" id="closeModalBtn">&times;</button>
+            </div>
             <form id="batchForm">
                 <input type="hidden" id="editBatchId">
-                <div class="form-group">
-                    <label for="batchNumber">Batch Number *</label>
-                    <input type="text" id="batchNumber" required placeholder="B-2026-0015">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Batch Number <span class="required">*</span></label>
+                        <input type="text" id="batchNumber" required readonly>
+                        <span class="helper-text">Auto-generated based on type</span>
+                    </div>
+                    <div class="form-group">
+                        <label>Type <span class="required">*</span></label>
+                        <select id="batchType" required onchange="updateBatchNumber()">
+                            <option value="Broiler">🐔 Broiler</option>
+                            <option value="Layer">🥚 Layer</option>
+                            <option value="Breeder">🐓 Breeder</option>
+                            <option value="Pullet">🐤 Pullet</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Quantity <span class="required">*</span></label>
+                        <input type="number" id="batchQuantity" required min="1" placeholder="Number of birds">
+                    </div>
+                    <div class="form-group">
+                        <label>Age (weeks)</label>
+                        <input type="number" id="batchAge" min="0" value="0">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="batchStatus">
+                            <option value="Growing">🟡 Growing</option>
+                            <option value="Active">🟢 Active</option>
+                            <option value="Completed">🔵 Completed</option>
+                            <option value="Sold">⚫ Sold</option>
+                            <option value="Culled">🔴 Culled</option>
+                        </select>
+                        <div class="status-hint">📌 <strong>Next statuses:</strong> Growing → Active → Completed → Sold</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Start Date</label>
+                        <input type="date" id="batchStartDate">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Cost (R)</label>
+                        <input type="number" id="batchCost" min="0" step="0.01" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Revenue (R)</label>
+                        <input type="number" id="batchRevenue" min="0" step="0.01" placeholder="0.00">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Feed Used (kg)</label>
+                        <input type="number" id="batchFeedUsed" min="0" step="0.01" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Health Status</label>
+                        <select id="batchHealth">
+                            <option value="Good">✅ Good</option>
+                            <option value="Fair">🟡 Fair</option>
+                            <option value="Poor">🔴 Poor</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Mortality</label>
+                        <input type="number" id="batchMortality" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Avg Weight (kg)</label>
+                        <input type="number" id="batchAvgWeight" min="0" step="0.01" placeholder="0.00">
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label for="batchType">Type *</label>
-                    <select id="batchType" required>
-                        <option value="Layer">Layer</option>
-                        <option value="Broiler">Broiler</option>
-                        <option value="Breeder">Breeder</option>
-                        <option value="Pullet">Pullet</option>
-                    </select>
+                    <label>Notes</label>
+                    <input type="text" id="batchNotes" placeholder="Optional notes about this batch">
                 </div>
-                <div class="form-group">
-                    <label for="batchQuantity">Quantity *</label>
-                    <input type="number" id="batchQuantity" required min="1">
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">💾 Save Batch</button>
                 </div>
-                <div class="form-group">
-                    <label for="batchAge">Age (weeks)</label>
-                    <input type="number" id="batchAge" min="0" value="0">
-                </div>
-                <div class="form-group">
-                    <label for="batchStatus">Status</label>
-                    <select id="batchStatus">
-                        <option value="Active">🟢 Active</option>
-                        <option value="Growing">🟡 Growing</option>
-                        <option value="Completed">🔵 Completed</option>
-                        <option value="Sold">⚫ Sold</option>
-                        <option value="Culled">🔴 Culled</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="batchStartDate">Start Date</label>
-                    <input type="date" id="batchStartDate">
-                </div>
-                <div class="form-group">
-                    <label for="batchNotes">Notes</label>
-                    <input type="text" id="batchNotes" placeholder="Optional notes">
-                </div>
-                <button type="submit" class="primary-btn full-width">Save Batch</button>
             </form>
         </div>
     </div>
 
-    <!-- History Modal -->
+    <!-- ===== HISTORY MODAL ===== -->
     <div id="historyModal" class="modal">
         <div class="modal-content history-modal-content">
-            <span class="close" onclick="document.getElementById('historyModal').style.display='none'">&times;</span>
+            <span class="modal-close" onclick="document.getElementById('historyModal').style.display='none'">&times;</span>
             <h2 id="historyModalTitle">Batch History</h2>
-            <div id="historyBatchInfo" style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;"></div>
+            <div id="historyBatchInfo" style="font-size:13px;color:#475569;margin-bottom:12px;"></div>
             <div class="history-timeline" id="historyTimeline">
                 <div class="history-empty">Loading history...</div>
             </div>
         </div>
     </div>
 
-    <script src="js/app.js"></script>
-    <script src="js/nav.js"></script>
     <script>
-        var API_URL = 'http://localhost:5500';
-        var token = localStorage.getItem('token');
-        if (!token) { window.location.href = 'login.html'; }
+        const API_URL = 'http://localhost:5500';
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = 'login.html';
 
         var allBatches = [];
         var filteredBatches = [];
-        var viewBatchId = null;
+        var historyData = [];
+        var historyPage = 1;
+        var historyPerPage = 5;
+        var historyTotalPages = 0;
 
         document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', {
             weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
         });
 
-        async function loadUser() {
-            try {
-                var res = await fetch(API_URL + '/api/auth/me', {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
-                if (res.ok) {
-                    var user = await res.json();
-                    document.getElementById('userAvatar').textContent = (user.name || 'U')[0].toUpperCase();
-                } else {
-                    localStorage.removeItem('token');
-                    window.location.href = 'login.html';
+        // ===== TOAST =====
+        function showToast(message, type) {
+            var container = document.getElementById('toastContainer');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toastContainer';
+                container.className = 'toast-container';
+                document.body.appendChild(container);
+            }
+            var toast = document.createElement('div');
+            toast.className = 'toast ' + (type || 'info');
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(function() {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(function() { toast.remove(); }, 300);
+            }, 3000);
+        }
+
+        // ===== BATCH NUMBER GENERATION =====
+        function generateBatchNumber(type) {
+            var prefixMap = { 'Broiler': 'B', 'Layer': 'L', 'Breeder': 'BR', 'Pullet': 'P' };
+            var prefix = prefixMap[type] || 'B';
+            var year = new Date().getFullYear();
+            var typeCount = 0;
+            for (var i = 0; i < allBatches.length; i++) {
+                if ((allBatches[i].type || '') === type) {
+                    typeCount++;
                 }
-            } catch (e) {
-                localStorage.removeItem('token');
-                window.location.href = 'login.html';
+            }
+            var nextNum = typeCount + 1;
+            var padded = String(nextNum).padStart(3, '0');
+            return prefix + '-' + year + '-' + padded;
+        }
+
+        function updateBatchNumber() {
+            var type = document.getElementById('batchType').value;
+            var field = document.getElementById('batchNumber');
+            if (type && field) {
+                field.value = generateBatchNumber(type);
             }
         }
 
-        async function loadBatches() {
-            try {
-                var res = await fetch(API_URL + '/api/batches', {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
-                if (res.ok) {
-                    allBatches = await res.json();
-                    updateStats(allBatches);
-                    applyFilters();
-                } else {
-                    document.getElementById('batchCardsContainer').innerHTML = '<div class="no-results"><span class="icon">❌</span><p>Failed to load batches</p></div>';
-                }
-            } catch (e) {
-                document.getElementById('batchCardsContainer').innerHTML = '<div class="no-results"><span class="icon">❌</span><p>Error loading data</p></div>';
-            }
+        function loadUser() {
+            fetch(API_URL + '/api/auth/me', { headers: { 'Authorization': 'Bearer ' + token } })
+            .then(res => res.json())
+            .then(user => {
+                document.getElementById('userAvatar').textContent = (user.name || 'U')[0].toUpperCase();
+            })
+            .catch(() => {});
+        }
+
+        // ===== STATUS RULES =====
+        function getStatusActions(status) {
+            var s = (status || 'Growing').toLowerCase();
+            return {
+                canEdit: s === 'growing' || s === 'active',
+                canRecordEggs: s === 'active',
+                canRecordWeight: s === 'growing' || s === 'active',
+                canRecordMortality: s === 'growing' || s === 'active',
+                canUpdateHealth: s === 'growing' || s === 'active',
+                canSell: s === 'active' || s === 'completed',
+                canComplete: s === 'active',
+                canCull: s === 'growing' || s === 'active',
+                canDelete: s === 'growing' || s === 'active' || s === 'completed',
+                canView: true
+            };
+        }
+
+        function getStatusDisplay(status) {
+            var map = { 'growing': '🟡 Growing', 'active': '🟢 Active', 'completed': '🔵 Completed', 'sold': '⚫ Sold', 'culled': '🔴 Culled' };
+            return map[(status || 'growing').toLowerCase()] || status;
+        }
+
+        // ===== LOAD BATCHES =====
+        function loadBatches() {
+            fetch(API_URL + '/api/batches', { headers: { 'Authorization': 'Bearer ' + token } })
+            .then(res => res.json())
+            .then(data => {
+                allBatches = data || [];
+                updateStats(allBatches);
+                applyFilters();
+            })
+            .catch(() => {
+                document.getElementById('batchCardsContainer').innerHTML = '<div class="no-results"><span class="icon">❌</span><p>Failed to load batches</p></div>';
+            });
         }
 
         function updateStats(batches) {
             var total = batches.length;
             var active = 0, growing = 0, completed = 0, sold = 0, culled = 0;
-
-            for (var i = 0; i < batches.length; i++) {
-                var status = (batches[i].status || 'Active').toLowerCase();
+            var totalProfit = 0;
+            batches.forEach(function(b) {
+                var status = (b.status || 'Active').toLowerCase();
                 if (status === 'active') active++;
                 else if (status === 'growing') growing++;
                 else if (status === 'completed') completed++;
                 else if (status === 'sold') sold++;
                 else if (status === 'culled') culled++;
-            }
-
+                totalProfit += (b.revenue || 0) - (b.cost || 0);
+            });
             document.getElementById('totalBatches').textContent = total;
             document.getElementById('activeBatches').textContent = active;
             document.getElementById('growingBatches').textContent = growing;
             document.getElementById('completedBatches').textContent = completed;
             document.getElementById('soldBatches').textContent = sold;
             document.getElementById('culledBatches').textContent = culled;
+            document.getElementById('profitBatches').textContent = 'R' + totalProfit.toFixed(2);
         }
 
         function applyFilters() {
@@ -616,7 +496,6 @@
             var type = document.getElementById('filterType').value;
             var dateFrom = document.getElementById('filterDateFrom').value;
             var dateTo = document.getElementById('filterDateTo').value;
-
             filteredBatches = allBatches.filter(function(b) {
                 if (status && (b.status || 'Active') !== status) return false;
                 if (type && (b.type || 'Layer') !== type) return false;
@@ -624,10 +503,8 @@
                 if (dateTo && b.start_date && b.start_date > dateTo) return false;
                 return true;
             });
-
             renderBatches(filteredBatches);
-            document.getElementById('filterCount').innerHTML = 'Showing <strong>' + filteredBatches.length +
-                '</strong> batches';
+            document.getElementById('filterCount').innerHTML = 'Showing <strong>' + filteredBatches.length + '</strong> batches';
         }
 
         function resetFilters() {
@@ -641,222 +518,85 @@
         function renderBatches(batches) {
             var container = document.getElementById('batchCardsContainer');
             if (!batches || batches.length === 0) {
-                container.innerHTML = '<div class="no-results"><span class="icon">📋</span><p>No batches found matching your filters</p></div>';
+                container.innerHTML = '<div class="no-results"><span class="icon">📋</span><p>No batches found</p></div>';
                 return;
             }
-
             var html = '<div class="batch-cards-grid">';
-            for (var i = 0; i < batches.length; i++) {
-                var b = batches[i];
-                var statusClass = (b.status || 'Active').toLowerCase();
-                var statusDisplay = b.status || 'Active';
-                var type = b.type || 'Layer';
-                var age = b.age || '0';
-                var quantity = b.quantity || '0';
-                var startDate = b.start_date || 'N/A';
-
+            batches.forEach(function(b) {
+                var status = b.status || 'Active';
+                var statusClass = status.toLowerCase();
+                var statusDisplay = getStatusDisplay(status);
+                var actions = getStatusActions(status);
+                var profit = (b.revenue || 0) - (b.cost || 0);
+                var profitClass = profit > 0 ? 'profit-positive' : (profit < 0 ? 'profit-negative' : '');
+                var profitLabel = profit > 0 ? '💰 Profit' : (profit < 0 ? '📉 Loss' : '⚖️ Break Even');
+                var healthClass = 'health-' + (b.health_status || 'Good').toLowerCase();
                 html += '<div class="batch-card-item">';
                 html += '<div class="batch-card-header">';
                 html += '<div><div class="batch-number">' + (b.batch_number || 'B-2026-0001') + '</div>';
-                html += '<div class="batch-type">' + type + '</div></div>';
+                html += '<div class="batch-type">' + (b.type || 'Layer') + '</div></div>';
                 html += '<span class="batch-card-status ' + statusClass + '">' + statusDisplay + '</span>';
                 html += '</div>';
                 html += '<div class="batch-card-details">';
-                html += '<div class="detail-item"><span class="label">Age</span><span class="value">' + age +
-                    ' weeks</span></div>';
-                html += '<div class="detail-item"><span class="label">Birds</span><span class="value">' + quantity +
-                    '</span></div>';
-                html += '<div class="detail-item"><span class="label">Start Date</span><span class="value">' + startDate +
-                    '</span></div>';
-                html += '<div class="detail-item"><span class="label">Type</span><span class="value">' + type +
-                    '</span></div>';
+                html += '<div class="detail-item"><span class="label">📅 Age</span><span class="value">' + (b.age || 0) + ' weeks</span></div>';
+                html += '<div class="detail-item"><span class="label">🐔 Birds</span><span class="value">' + (b.quantity || 0) + '</span></div>';
+                html += '<div class="detail-item"><span class="label">📆 Start</span><span class="value">' + (b.start_date ? b.start_date.split('T')[0] : 'N/A') + '</span></div>';
+                html += '<div class="detail-item"><span class="label">💰 Cost</span><span class="value">R' + (b.cost || 0).toFixed(2) + '</span></div>';
+                html += '<div class="detail-item"><span class="label">💰 Revenue</span><span class="value">R' + (b.revenue || 0).toFixed(2) + '</span></div>';
+                html += '<div class="detail-item"><span class="label">' + profitLabel + '</span><span class="value ' + profitClass + '">R' + profit.toFixed(2) + '</span></div>';
+                html += '<div class="detail-item"><span class="label">🌾 Feed</span><span class="value">' + (b.feed_used || 0) + ' kg</span></div>';
+                html += '<div class="detail-item"><span class="label">⚖️ Weight</span><span class="value">' + (b.avg_weight || 0) + ' kg</span></div>';
+                html += '<div class="detail-item"><span class="label">💀 Mortality</span><span class="value">' + (b.mortality || 0) + '</span></div>';
+                html += '<div class="detail-item" style="grid-column: span 3;"><span class="label">❤️ Health</span><span class="value ' + healthClass + '">' + (b.health_status || 'Good') + '</span></div>';
                 if (b.notes) {
-                    html += '<div class="detail-item" style="grid-column:span 2;"><span class="label">Notes</span><span class="value" style="font-weight:400;color:var(--text-muted);">' +
-                        b.notes + '</span></div>';
+                    html += '<div class="detail-item" style="grid-column: span 3; overflow-wrap: break-word; word-break: break-word;"><span class="label">📝 Notes</span><span class="value" style="font-weight:400;color:#94a3b8;font-size:11px;overflow-wrap:break-word;word-break:break-word;white-space:normal;">' + b.notes + '</span></div>';
                 }
                 html += '</div>';
                 html += '<div class="batch-card-actions">';
-                html += '<button class="action-btn-sm edit" onclick="editBatch(\'' + (b.id || b.batch_number) +
-                    '\')">✏️ Edit</button>';
-                html += '<button class="action-btn-sm record" onclick="recordProduction(\'' + (b.id || b.batch_number) +
-                    '\')">🥚 Record Eggs</button>';
-                html += '<button class="action-btn-sm view" onclick="viewHistory(\'' + (b.id || b.batch_number) +
-                    '\')">📋 History</button>';
-                html += '<button class="action-btn-sm delete" onclick="deleteBatch(\'' + (b.id || b.batch_number) +
-                    '\')">🗑️ Delete</button>';
-                html += '</div>';
-                html += '</div>';
-            }
+                html += '<button class="action-btn-sm edit" onclick="editBatch(\'' + (b.id || b.batch_number) + '\')" ' + (actions.canEdit ? '' : 'disabled') + '>✏️ Edit</button>';
+                if (actions.canRecordEggs) {
+                    html += '<button class="action-btn-sm record" onclick="recordProduction(\'' + (b.id || b.batch_number) + '\')">🥚 Record</button>';
+                }
+                if (actions.canRecordWeight) {
+                    html += '<button class="action-btn-sm weight" onclick="recordWeight(\'' + (b.id || b.batch_number) + '\')">⚖️ Weight</button>';
+                }
+                if (actions.canRecordMortality) {
+                    html += '<button class="action-btn-sm mortality" onclick="recordMortality(\'' + (b.id || b.batch_number) + '\')">💀 Mortality</button>';
+                }
+                if (actions.canUpdateHealth) {
+                    html += '<button class="action-btn-sm health" onclick="updateHealth(\'' + (b.id || b.batch_number) + '\')">❤️ Health</button>';
+                }
+                html += '<button class="action-btn-sm view" onclick="viewHistory(\'' + (b.id || b.batch_number) + '\')">📋 History</button>';
+                if (actions.canDelete) {
+                    html += '<button class="action-btn-sm delete" onclick="deleteBatch(\'' + (b.id || b.batch_number) + '\')">🗑️ Delete</button>';
+                }
+                html += '</div></div>';
+            });
             html += '</div>';
             container.innerHTML = html;
         }
 
-        // ===== RECORD PRODUCTION - Link to Egg Production =====
-        function recordProduction(id) {
-            // Find the batch to get its ID
-            var batch = allBatches.find(function(b) {
-                return b.id == id || b.batch_number == id;
-            });
-            if (batch) {
-                // Store the selected batch ID in localStorage for egg production page
-                localStorage.setItem('selectedBatchId', batch.id || batch.batch_number);
-                window.location.href = 'eggs.html';
-            } else {
-                alert('Batch not found');
-            }
+        // ===== MODAL FUNCTIONS =====
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = 'Add Batch';
+            document.getElementById('editBatchId').value = '';
+            document.getElementById('batchForm').reset();
+            document.getElementById('batchStatus').value = 'Growing';
+            document.getElementById('batchStartDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('batchType').value = 'Broiler';
+            updateBatchNumber();
+            document.getElementById('batchModal').style.display = 'flex';
         }
 
-        // ===== VIEW HISTORY =====
-        async function viewHistory(id) {
-            viewBatchId = id;
-            var batch = allBatches.find(function(b) {
-                return b.id == id || b.batch_number == id;
-            });
-            if (!batch) { alert('Batch not found'); return; }
-
-            document.getElementById('historyModalTitle').textContent = 'History: ' + (batch.batch_number || batch.id);
-            document.getElementById('historyBatchInfo').textContent = batch.type + ' · ' + (batch.quantity || 0) + ' birds · ' +
-                (batch.status || 'Active');
-
-            document.getElementById('historyTimeline').innerHTML = '<div class="history-empty">Loading history...</div>';
-            document.getElementById('historyModal').style.display = 'block';
-
-            try {
-                var res = await fetch(API_URL + '/api/batches/' + id + '/history', {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
-                if (res.ok) {
-                    var history = await res.json();
-                    renderHistory(history);
-                } else {
-                    // Try to get history from the batch's own data (fallback)
-                    var fallbackHistory = [
-                        { update_type: 'creation', notes: 'Batch created', created_at: batch.created_at || batch.start_date ||
-                                'N/A' }
-                    ];
-                    if (batch.status) {
-                        fallbackHistory.push({
-                            update_type: 'status_change',
-                            field_name: 'status',
-                            old_value: 'Unknown',
-                            new_value: batch.status,
-                            created_at: batch.updated_at || batch.start_date || 'N/A'
-                        });
-                    }
-                    renderHistory(fallbackHistory);
-                }
-            } catch (e) {
-                console.error('Error loading history:', e);
-                document.getElementById('historyTimeline').innerHTML = '<div class="history-empty">Could not load history</div>';
-            }
+        function closeModal() {
+            document.getElementById('batchModal').style.display = 'none';
         }
 
-        function renderHistory(history) {
-            var container = document.getElementById('historyTimeline');
-            if (!history || history.length === 0) {
-                container.innerHTML = '<div class="history-empty">No history recorded for this batch</div>';
-                return;
-            }
-
-            var html = '';
-            var seenCreation = false;
-
-            for (var i = 0; i < history.length; i++) {
-                var h = history[i];
-                var updateType = h.update_type || 'unknown';
-                var dotClass = 'status-change';
-
-                if (updateType === 'creation') {
-                    dotClass = 'creation';
-                    seenCreation = true;
-                } else if (updateType === 'quantity_change' || updateType === 'quantity') {
-                    dotClass = 'quantity-change';
-                } else if (updateType === 'notes_update' || updateType === 'notes') {
-                    dotClass = 'notes-update';
-                }
-
-                var time = h.created_at ? h.created_at.split('T')[0] : 'N/A';
-                var title = getHistoryTitle(updateType);
-                var details = getHistoryDetails(h);
-
-                html += '<div class="history-item">';
-                html += '<div class="history-time">' + time + '</div>';
-                html += '<div class="history-dot ' + dotClass + '"></div>';
-                html += '<div class="history-content">';
-                html += '<div class="history-title">' + title + '</div>';
-                if (details) {
-                    html += '<div class="history-details">' + details + '</div>';
-                }
-                if (h.notes && updateType !== 'creation') {
-                    html += '<div class="history-details" style="color:var(--text-muted);font-size:10px;">' + h.notes +
-                        '</div>';
-                }
-                html += '</div>';
-                html += '</div>';
-            }
-
-            // If no creation record exists, add one
-            if (!seenCreation && history.length > 0) {
-                var firstDate = history[0].created_at ? history[0].created_at.split('T')[0] : 'N/A';
-                var creationHtml = '<div class="history-item">';
-                creationHtml += '<div class="history-time">' + firstDate + '</div>';
-                creationHtml += '<div class="history-dot creation"></div>';
-                creationHtml += '<div class="history-content">';
-                creationHtml += '<div class="history-title">📦 Batch Created</div>';
-                creationHtml += '</div>';
-                creationHtml += '</div>';
-                html = creationHtml + html;
-            }
-
-            container.innerHTML = html;
-        }
-
-        function getHistoryTitle(type) {
-            var titles = {
-                'creation': '📦 Batch Created',
-                'status_change': '🔄 Status Changed',
-                'quantity_change': '📊 Quantity Updated',
-                'notes_update': '📝 Notes Updated',
-                'status': '🔄 Status Changed',
-                'quantity': '📊 Quantity Updated',
-                'notes': '📝 Notes Updated'
-            };
-            return titles[type] || '📋 Update';
-        }
-
-        function getHistoryDetails(h) {
-            var details = '';
-
-            if (h.field_name === 'status' || h.update_type === 'status_change' || h.update_type === 'status') {
-                var oldVal = h.old_value || 'Unknown';
-                var newVal = h.new_value || 'Unknown';
-                details = 'Changed from <span class="old-val">' + oldVal + '</span> to <span class="new-val">' + newVal +
-                    '</span>';
-            } else if (h.field_name === 'quantity' || h.update_type === 'quantity_change' || h.update_type === 'quantity') {
-                var oldQ = h.old_value || '0';
-                var newQ = h.new_value || '0';
-                details = 'Changed from <span class="old-val">' + oldQ + '</span> to <span class="new-val">' + newQ +
-                    '</span> birds';
-            } else if (h.field_name === 'notes' || h.update_type === 'notes_update' || h.update_type === 'notes') {
-                var oldN = h.old_value || 'Empty';
-                var newN = h.new_value || 'Empty';
-                if (oldN !== 'Empty' || newN !== 'Empty') {
-                    details = 'Notes updated';
-                    if (oldN !== 'Empty' && oldN) details += ' from "' + oldN + '"';
-                    if (newN !== 'Empty' && newN) details += ' to "' + newN + '"';
-                }
-            }
-
-            return details || '';
-        }
-
-        // ===== EDIT BATCH =====
         function editBatch(id) {
-            var batch = allBatches.find(function(b) {
-                return b.id == id || b.batch_number == id;
-            });
+            var batch = allBatches.find(function(b) { return b.id == id || b.batch_number == id; });
             if (!batch) { alert('Batch not found'); return; }
-
+            var actions = getStatusActions(batch.status);
+            if (!actions.canEdit) { alert('Cannot edit ' + batch.status + ' batches.'); return; }
             document.getElementById('modalTitle').textContent = 'Edit Batch';
             document.getElementById('editBatchId').value = batch.id || batch.batch_number;
             document.getElementById('batchNumber').value = batch.batch_number || '';
@@ -865,115 +605,307 @@
             document.getElementById('batchAge').value = batch.age || '0';
             document.getElementById('batchStatus').value = batch.status || 'Active';
             document.getElementById('batchStartDate').value = batch.start_date || '';
+            document.getElementById('batchCost').value = batch.cost || 0;
+            document.getElementById('batchRevenue').value = batch.revenue || 0;
+            document.getElementById('batchFeedUsed').value = batch.feed_used || 0;
+            document.getElementById('batchMortality').value = batch.mortality || 0;
+            document.getElementById('batchAvgWeight').value = batch.avg_weight || 0;
+            document.getElementById('batchHealth').value = batch.health_status || 'Good';
             document.getElementById('batchNotes').value = batch.notes || '';
-            document.getElementById('batchModal').style.display = 'block';
+            document.getElementById('batchModal').style.display = 'flex';
         }
 
-        // ===== DELETE BATCH =====
-        function deleteBatch(id) {
-            if (!confirm('Are you sure you want to delete this batch? This will also delete all related records.'))
-            return;
-            // Find the batch to get its ID
-            var batch = allBatches.find(function(b) {
-                return b.id == id || b.batch_number == id;
-            });
-            if (!batch) { alert('Batch not found'); return; }
-            var batchId = batch.id || batch.batch_number;
+        document.getElementById('batchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var id = document.getElementById('editBatchId').value;
+            var data = {
+                batch_number: document.getElementById('batchNumber').value.trim(),
+                type: document.getElementById('batchType').value,
+                quantity: parseInt(document.getElementById('batchQuantity').value),
+                age: parseInt(document.getElementById('batchAge').value) || 0,
+                status: document.getElementById('batchStatus').value,
+                start_date: document.getElementById('batchStartDate').value,
+                cost: parseFloat(document.getElementById('batchCost').value) || 0,
+                revenue: parseFloat(document.getElementById('batchRevenue').value) || 0,
+                feed_used: parseFloat(document.getElementById('batchFeedUsed').value) || 0,
+                mortality: parseInt(document.getElementById('batchMortality').value) || 0,
+                avg_weight: parseFloat(document.getElementById('batchAvgWeight').value) || 0,
+                health_status: document.getElementById('batchHealth').value,
+                notes: document.getElementById('batchNotes').value.trim()
+            };
+            if (!data.batch_number || !data.type || !data.quantity) {
+                alert('Batch Number, Type, and Quantity are required');
+                return;
+            }
+            var url = API_URL + '/api/batches';
+            var method = 'POST';
+            if (id) { url = API_URL + '/api/batches/' + id; method = 'PUT'; }
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(result => {
+                if (result.success) {
+                    alert(id ? 'Batch updated!' : 'Batch added!');
+                    closeModal();
+                    loadBatches();
+                } else {
+                    alert(result.error || 'Failed to save');
+                }
+            })
+            .catch(() => alert('Network error'));
+        });
 
-            fetch(API_URL + '/api/batches/' + batchId, {
+        // ===== WEIGHT =====
+        function recordWeight(id) {
+            var batch = allBatches.find(function(b) { return b.id == id || b.batch_number == id; });
+            if (!batch) { showToast('Batch not found', 'error'); return; }
+            var currentWeight = batch.avg_weight || 0;
+            var batchName = batch.batch_number || batch.id;
+            var html = '<div id="weightModal" class="modal" style="display:flex;"><div class="modal-content" style="max-width:440px;"><div class="modal-header"><h2>⚖️ Record Weight</h2><button class="modal-close" onclick="document.getElementById(\'weightModal\').remove()">&times;</button></div>';
+            html += '<div style="background:#f8fafc;padding:12px 16px;border-radius:8px;margin-bottom:16px;border:1px solid #E8E4E0;"><strong>' + batchName + '</strong> · Current: ' + currentWeight.toFixed(2) + ' kg</div>';
+            html += '<div class="form-group"><label>Average Weight (kg) <span class="required">*</span></label><input type="number" id="weightInput" step="0.01" min="0.1" max="10" value="' + currentWeight.toFixed(2) + '" placeholder="e.g. 2.5" style="font-size:16px;padding:10px 14px;"></div>';
+            html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">';
+            html += '<button onclick="document.getElementById(\'weightInput\').value=1.5" style="padding:4px 12px;border:1px solid #E8E4E0;border-radius:4px;background:#f8fafc;cursor:pointer;font-size:11px;">1.5 kg</button>';
+            html += '<button onclick="document.getElementById(\'weightInput\').value=2.0" style="padding:4px 12px;border:1px solid #E8E4E0;border-radius:4px;background:#f8fafc;cursor:pointer;font-size:11px;">2.0 kg</button>';
+            html += '<button onclick="document.getElementById(\'weightInput\').value=2.5" style="padding:4px 12px;border:1px solid #E8E4E0;border-radius:4px;background:#f8fafc;cursor:pointer;font-size:11px;">2.5 kg</button>';
+            html += '<button onclick="document.getElementById(\'weightInput\').value=3.0" style="padding:4px 12px;border:1px solid #E8E4E0;border-radius:4px;background:#f8fafc;cursor:pointer;font-size:11px;">3.0 kg</button>';
+            html += '</div>';
+            html += '<div class="form-group"><label>Notes</label><input type="text" id="weightNotes" placeholder="Optional notes" style="padding:10px 14px;"></div>';
+            html += '<div class="form-actions"><button class="btn-secondary" onclick="document.getElementById(\'weightModal\').remove()">Cancel</button><button class="btn-primary" onclick="submitWeight(\'' + (batch.id || batch.batch_number) + '\')">💾 Record</button></div>';
+            html += '</div></div>';
+            var div = document.createElement('div');
+            div.innerHTML = html;
+            document.body.appendChild(div.firstElementChild);
+            document.getElementById('weightInput').focus();
+        }
+
+        function submitWeight(id) {
+            var input = document.getElementById('weightInput');
+            if (!input || !input.value || parseFloat(input.value) <= 0) { showToast('Please enter a valid weight', 'error'); return; }
+            var weight = parseFloat(input.value);
+            var notes = document.getElementById('weightNotes');
+            fetch(API_URL + '/api/batches/' + id + '/weight', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ weight: weight, notes: notes ? notes.value : 'Weight recorded' })
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data.success) { showToast('✅ Weight recorded: ' + weight.toFixed(2) + ' kg', 'success'); var modal = document.getElementById('weightModal'); if (modal) modal.remove(); loadBatches(); }
+                else { showToast('❌ ' + (data.error || 'Failed'), 'error'); }
+            })
+            .catch(function() { showToast('Network error', 'error'); });
+        }
+
+        // ===== MORTALITY =====
+        function recordMortality(id) {
+            var batch = allBatches.find(function(b) { return b.id == id || b.batch_number == id; });
+            if (!batch) { showToast('Batch not found', 'error'); return; }
+            var batchName = batch.batch_number || batch.id;
+            var currentCount = batch.quantity || 0;
+            var maxMortality = Math.min(currentCount, 50);
+            var html = '<div id="mortalityModal" class="modal" style="display:flex;"><div class="modal-content" style="max-width:440px;"><div class="modal-header"><h2>💀 Record Mortality</h2><button class="modal-close" onclick="document.getElementById(\'mortalityModal\').remove()">&times;</button></div>';
+            html += '<div style="background:#f8fafc;padding:12px 16px;border-radius:8px;margin-bottom:16px;border:1px solid #E8E4E0;"><strong>' + batchName + '</strong> · Current birds: ' + currentCount + '</div>';
+            html += '<div class="form-group"><label>Number of Birds Lost <span class="required">*</span></label><input type="number" id="mortalityCount" min="1" max="' + maxMortality + '" value="1" placeholder="Count" style="font-size:16px;padding:10px 14px;"><span class="helper-text">Max: ' + maxMortality + ' birds</span></div>';
+            html += '<div class="form-group"><label>Reason</label><select id="mortalityReason" style="padding:10px 14px;"><option value="Natural Causes">Natural Causes</option><option value="Disease">Disease</option><option value="Injury">Injury</option><option value="Predator">Predator</option><option value="Culling">Culling</option><option value="Other">Other</option></select></div>';
+            html += '<div class="form-group"><label>Notes</label><input type="text" id="mortalityNotes" placeholder="Additional details" style="padding:10px 14px;"></div>';
+            html += '<div class="form-actions"><button class="btn-secondary" onclick="document.getElementById(\'mortalityModal\').remove()">Cancel</button><button class="btn-primary" onclick="submitMortality(\'' + (batch.id || batch.batch_number) + '\')">💾 Record</button></div>';
+            html += '</div></div>';
+            var div = document.createElement('div');
+            div.innerHTML = html;
+            document.body.appendChild(div.firstElementChild);
+        }
+
+        function submitMortality(id) {
+            var count = document.getElementById('mortalityCount');
+            var reason = document.getElementById('mortalityReason');
+            var notes = document.getElementById('mortalityNotes');
+            if (!count || !count.value || parseInt(count.value) <= 0) { showToast('Please enter the number of birds lost', 'error'); return; }
+            var countVal = parseInt(count.value);
+            var reasonText = reason ? reason.value : 'Mortality recorded';
+            if (notes && notes.value) { reasonText += ' - ' + notes.value; }
+            fetch(API_URL + '/api/batches/' + id + '/mortality', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ count: countVal, reason: reasonText })
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data.success) { showToast('✅ Mortality recorded: ' + countVal + ' birds', 'success'); var modal = document.getElementById('mortalityModal'); if (modal) modal.remove(); loadBatches(); }
+                else { showToast('❌ ' + (data.error || 'Failed'), 'error'); }
+            })
+            .catch(function() { showToast('Network error', 'error'); });
+        }
+
+        // ===== HEALTH =====
+        function updateHealth(id) {
+            var batch = allBatches.find(function(b) { return b.id == id || b.batch_number == id; });
+            if (!batch) { showToast('Batch not found', 'error'); return; }
+            var batchName = batch.batch_number || batch.id;
+            var currentHealth = batch.health_status || 'Good';
+            var html = '<div id="healthModal" class="modal" style="display:flex;"><div class="modal-content" style="max-width:440px;"><div class="modal-header"><h2>❤️ Update Health Status</h2><button class="modal-close" onclick="document.getElementById(\'healthModal\').remove()">&times;</button></div>';
+            html += '<div style="background:#f8fafc;padding:12px 16px;border-radius:8px;margin-bottom:16px;border:1px solid #E8E4E0;"><strong>' + batchName + '</strong> · Current: ' + currentHealth + '</div>';
+            html += '<div class="form-group"><label>Health Status <span class="required">*</span></label><select id="healthStatus" style="padding:10px 14px;font-size:14px;">';
+            html += '<option value="Good" ' + (currentHealth === 'Good' ? 'selected' : '') + '>✅ Good</option>';
+            html += '<option value="Fair" ' + (currentHealth === 'Fair' ? 'selected' : '') + '>🟡 Fair</option>';
+            html += '<option value="Poor" ' + (currentHealth === 'Poor' ? 'selected' : '') + '>🔴 Poor</option>';
+            html += '</select></div>';
+            html += '<div class="form-group"><label>Notes</label><input type="text" id="healthNotes" placeholder="Additional details" style="padding:10px 14px;"></div>';
+            html += '<div class="form-actions"><button class="btn-secondary" onclick="document.getElementById(\'healthModal\').remove()">Cancel</button><button class="btn-primary" onclick="submitHealth(\'' + (batch.id || batch.batch_number) + '\')">💾 Update</button></div>';
+            html += '</div></div>';
+            var div = document.createElement('div');
+            div.innerHTML = html;
+            document.body.appendChild(div.firstElementChild);
+        }
+
+        function submitHealth(id) {
+            var status = document.getElementById('healthStatus');
+            var notes = document.getElementById('healthNotes');
+            if (!status || !status.value) { showToast('Please select a health status', 'error'); return; }
+            fetch(API_URL + '/api/batches/' + id + '/health', {
+                method: 'PUT',
+                headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: status.value, notes: notes ? notes.value : 'Health check' })
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data.success) { showToast('✅ Health updated: ' + status.value, 'success'); var modal = document.getElementById('healthModal'); if (modal) modal.remove(); loadBatches(); }
+                else { showToast('❌ ' + (data.error || 'Failed'), 'error'); }
+            })
+            .catch(function() { showToast('Network error', 'error'); });
+        }
+
+        // ===== OTHER =====
+        function recordProduction(id) {
+            var batch = allBatches.find(function(b) { return b.id == id || b.batch_number == id; });
+            if (batch) {
+                localStorage.setItem('selectedBatchId', batch.id || batch.batch_number);
+                window.location.href = 'eggs.html';
+            }
+        }
+
+        function deleteBatch(id) {
+            if (!confirm('Delete this batch?')) return;
+            var batch = allBatches.find(function(b) { return b.id == id || b.batch_number == id; });
+            if (!batch) { alert('Batch not found'); return; }
+            fetch(API_URL + '/api/batches/' + (batch.id || batch.batch_number), {
                 method: 'DELETE',
                 headers: { 'Authorization': 'Bearer ' + token }
             })
-            .then(function(res) {
-                if (res.ok) {
-                    alert('Batch deleted successfully!');
-                    loadBatches();
-                } else {
-                    return res.json().then(function(data) {
-                        alert(data.error || 'Failed to delete batch');
-                    });
-                }
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) { alert('Batch deleted'); loadBatches(); }
+                else { alert(data.error || 'Failed to delete'); }
             })
-            .catch(function(e) {
-                alert('Network error. Please try again.');
+            .catch(() => alert('Network error'));
+        }
+
+        // ===== HISTORY =====
+        function viewHistory(id) {
+            var batch = allBatches.find(function(b) { return b.id == id || b.batch_number == id; });
+            if (!batch) { alert('Batch not found'); return; }
+            document.getElementById('historyModalTitle').textContent = 'History: ' + (batch.batch_number || batch.id);
+            document.getElementById('historyBatchInfo').textContent = batch.type + ' · ' + (batch.quantity || 0) + ' birds · ' + (batch.status || 'Active');
+            document.getElementById('historyTimeline').innerHTML = '<div class="history-empty">Loading...</div>';
+            document.getElementById('historyModal').style.display = 'block';
+            fetch(API_URL + '/api/batches/' + (batch.id || batch.batch_number) + '/history', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(res => res.json())
+            .then(data => {
+                historyData = data || [];
+                historyPage = 1;
+                renderHistoryPage();
+            })
+            .catch(() => {
+                document.getElementById('historyTimeline').innerHTML = '<div class="history-empty">No history found</div>';
             });
         }
 
-        // ===== MODAL CONTROLS =====
-        document.getElementById('closeModalBtn').addEventListener('click', function() {
-            document.getElementById('batchModal').style.display = 'none';
-        });
-
-        window.addEventListener('click', function(e) {
-            if (e.target === document.getElementById('batchModal')) {
-                document.getElementById('batchModal').style.display = 'none';
+        function renderHistoryPage() {
+            var container = document.getElementById('historyTimeline');
+            if (!historyData || historyData.length === 0) {
+                container.innerHTML = '<div class="history-empty">No history recorded</div>';
+                return;
             }
+            historyTotalPages = Math.ceil(historyData.length / historyPerPage);
+            if (historyPage < 1) historyPage = 1;
+            if (historyPage > historyTotalPages) historyPage = historyTotalPages;
+            var start = (historyPage - 1) * historyPerPage;
+            var end = Math.min(start + historyPerPage, historyData.length);
+            var pageItems = historyData.slice(start, end);
+            var html = '';
+            pageItems.forEach(function(h) {
+                var dotClass = 'creation';
+                var title = '📦 Batch Created';
+                var details = '';
+                var time = h.created_at ? h.created_at.split('T')[0] : 'N/A';
+                if (h.update_type === 'status_change') {
+                    dotClass = 'status-change';
+                    title = '🔄 Status Changed';
+                    details = 'From <span class="old-val">' + (h.old_value || 'Unknown') + '</span> to <span class="new-val">' + (h.new_value || 'Unknown') + '</span>';
+                } else if (h.update_type === 'quantity_change') {
+                    dotClass = 'quantity-change';
+                    title = '📊 Quantity Updated';
+                    details = 'From <span class="old-val">' + (h.old_value || '0') + '</span> to <span class="new-val">' + (h.new_value || '0') + '</span>';
+                } else if (h.update_type === 'cost_update') {
+                    dotClass = 'status-change';
+                    title = '💰 Cost Updated';
+                    details = 'From <span class="old-val">R' + parseFloat(h.old_value || 0).toFixed(2) + '</span> to <span class="new-val">R' + parseFloat(h.new_value || 0).toFixed(2) + '</span>';
+                } else if (h.update_type === 'revenue_update') {
+                    dotClass = 'status-change';
+                    title = '💰 Revenue Updated';
+                    details = 'From <span class="old-val">R' + parseFloat(h.old_value || 0).toFixed(2) + '</span> to <span class="new-val">R' + parseFloat(h.new_value || 0).toFixed(2) + '</span>';
+                } else if (h.update_type === 'health_update') {
+                    dotClass = 'notes-update';
+                    title = '❤️ Health Updated';
+                    details = 'From <span class="old-val">' + (h.old_value || 'Good') + '</span> to <span class="new-val">' + (h.new_value || 'Good') + '</span>';
+                } else if (h.update_type === 'weight_update') {
+                    dotClass = 'quantity-change';
+                    title = '⚖️ Weight Updated';
+                    details = 'From <span class="old-val">' + (h.old_value || '0') + ' kg</span> to <span class="new-val">' + (h.new_value || '0') + ' kg</span>';
+                }
+                html += '<div class="history-item">';
+                html += '<div class="history-time">' + time + '</div>';
+                html += '<div class="history-dot ' + dotClass + '"></div>';
+                html += '<div class="history-content">';
+                html += '<div class="history-title">' + title + '</div>';
+                if (details) { html += '<div class="history-details">' + details + '</div>'; }
+                if (h.notes && h.update_type !== 'creation') {
+                    html += '<div class="history-details" style="color:#94a3b8;font-size:10px;">' + h.notes + '</div>';
+                }
+                html += '</div>';
+                html += '</div>';
+            });
+            html += '<div class="history-pagination">';
+            html += '<div class="page-info">Showing <strong>' + (start + 1) + '-' + end + '</strong> of <strong>' + historyData.length + '</strong></div>';
+            html += '<div class="page-btns">';
+            html += '<button onclick="historyGoToPage(' + (historyPage - 1) + ')" ' + (historyPage <= 1 ? 'disabled' : '') + '>‹ Prev</button>';
+            html += '<button onclick="historyGoToPage(' + (historyPage + 1) + ')" ' + (historyPage >= historyTotalPages ? 'disabled' : '') + '>Next ›</button>';
+            html += '</div></div>';
+            container.innerHTML = html;
+        }
+
+        function historyGoToPage(page) {
+            if (page < 1 || page > historyTotalPages) return;
+            historyPage = page;
+            renderHistoryPage();
+        }
+
+        // ===== CLOSE MODALS =====
+        document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+        window.addEventListener('click', function(e) {
+            if (e.target === document.getElementById('batchModal')) closeModal();
             if (e.target === document.getElementById('historyModal')) {
                 document.getElementById('historyModal').style.display = 'none';
             }
         });
-
-        // ===== SAVE BATCH =====
-        document.getElementById('batchForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            var id = document.getElementById('editBatchId').value;
-            var batch_number = document.getElementById('batchNumber').value.trim();
-            var type = document.getElementById('batchType').value;
-            var quantity = parseInt(document.getElementById('batchQuantity').value);
-            var age = parseInt(document.getElementById('batchAge').value) || 0;
-            var status = document.getElementById('batchStatus').value;
-            var start_date = document.getElementById('batchStartDate').value;
-            var notes = document.getElementById('batchNotes').value.trim();
-
-            if (!batch_number || !type || !quantity) {
-                alert('Batch Number, Type, and Quantity are required');
-                return;
-            }
-
-            var data = {
-                batch_number: batch_number,
-                type: type,
-                quantity: quantity,
-                age: age,
-                status: status,
-                start_date: start_date,
-                notes: notes
-            };
-
-            var url = API_URL + '/api/batches';
-            var method = 'POST';
-            if (id) { url = API_URL + '/api/batches/' + id;
-                method = 'PUT'; }
-
-            try {
-                var res = await fetch(url, {
-                    method: method,
-                    headers: {
-                        'Authorization': 'Bearer ' + token,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                });
-                var result = await res.json();
-                if (res.ok) {
-                    alert(id ? 'Batch updated successfully!' : 'Batch added successfully!');
-                    document.getElementById('batchModal').style.display = 'none';
-                    loadBatches();
-                } else {
-                    alert(result.error || 'Failed to save batch');
-                }
-            } catch (e) {
-                alert('Network error. Please try again.');
-            }
-        });
-
-        // ===== ADD BATCH BUTTON =====
-        document.querySelector('.filters-section').insertAdjacentHTML('afterend',
-            '<div style="margin-bottom:16px;"><button class="primary-btn" onclick="document.getElementById(\'modalTitle\').textContent=\'Add Batch\';document.getElementById(\'editBatchId\').value=\'\';document.getElementById(\'batchNumber\').value=\'\';document.getElementById(\'batchType\').value=\'Layer\';document.getElementById(\'batchQuantity\').value=\'\';document.getElementById(\'batchAge\').value=\'0\';document.getElementById(\'batchStatus\').value=\'Active\';document.getElementById(\'batchStartDate\').value=\'' +
-            new Date().toISOString().split('T')[0] +
-            '\';document.getElementById(\'batchNotes\').value=\'\';document.getElementById(\'batchModal\').style.display=\'block\';">+ Add Batch</button></div>'
-        );
 
         // ===== LOGOUT =====
         document.getElementById('logoutBtn').addEventListener('click', function(e) {
@@ -986,7 +918,7 @@
         // ===== INIT =====
         loadUser();
         loadBatches();
+        setInterval(loadBatches, 30000);
     </script>
 </body>
-
 </html>

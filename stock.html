@@ -2,144 +2,87 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Whitestone - Stock Management</title>
-    <link rel="stylesheet" href="css/style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Management - Whitestone</title>
+    <link rel="stylesheet" href="css/style.css">
     <style>
-        /* Quick fix for missing sidebar styles */
-        .dashboard-container {
-            display: flex;
-            min-height: 100vh;
+        /* KEEP YOUR EXISTING STYLES - THEY ARE FINE */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
         }
 
-        .sidebar {
-            width: 220px;
-            background: #0A1628;
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-            z-index: 100;
-        }
-
-        .sidebar-header {
-            padding: 24px 20px 20px;
-            text-align: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .sidebar-header h2 {
-            font-size: 18px;
-            font-weight: 900;
-            letter-spacing: 3px;
-            color: #fff;
-        }
-
-        .sidebar-header span {
-            display: block;
-            font-size: 9px;
-            color: #888;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            opacity: 0.6;
-        }
-
-        .sidebar-divider {
-            width: 25px;
-            height: 1px;
-            background: rgba(255, 255, 255, 0.1);
-            margin: 8px auto;
-        }
-
-        .sidebar-header p {
-            font-size: 10px;
-            color: #888;
-            opacity: 0.4;
-        }
-
-        .nav-menu {
-            list-style: none;
-            padding: 10px 8px;
-        }
-
-        .nav-menu li {
-            margin: 1px 0;
-        }
-
-        .nav-menu a {
+        .stat-card {
+            background: #fff;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid #E8E4E0;
             display: flex;
             align-items: center;
-            padding: 10px 14px;
-            color: rgba(255, 255, 255, 0.5);
-            text-decoration: none;
-            font-size: 13px;
-            border-radius: 6px;
-            font-weight: 500;
-            transition: all 0.2s;
+            gap: 10px;
         }
 
-        .nav-menu a:hover {
-            background: rgba(255, 255, 255, 0.05);
-            color: #fff;
+        .stat-icon {
+            font-size: 20px;
         }
 
-        .nav-menu a.active {
-            background: rgba(255, 255, 255, 0.08);
-            color: #fff;
+        .stat-info h3 {
+            font-size: 9px;
+            color: #888;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin: 0;
         }
 
-        .nav-menu .icon {
-            margin-right: 12px;
-            font-size: 16px;
-            width: 22px;
-            text-align: center;
+        .stat-info p {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0A1628;
+            margin: 0;
         }
 
-        .main-content {
-            margin-left: 220px;
-            flex: 1;
-            padding: 24px 32px;
-            min-height: 100vh;
-            background: #f0f2f5;
+        .stat-info .sub {
+            font-size: 9px;
+            color: #94a3b8;
         }
 
         .top-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 18px;
+            padding-bottom: 14px;
             border-bottom: 1px solid #E8E4E0;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-            gap: 10px;
+            margin-bottom: 16px;
         }
 
         .top-bar-left h1 {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 700;
             color: #0A1628;
         }
 
         .welcome-text {
             color: #888;
-            font-size: 13px;
-            margin-top: 2px;
+            font-size: 12px;
         }
 
         .top-bar-right {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
         }
 
         .date-display {
             color: #888;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         .user-avatar {
-            width: 34px;
-            height: 34px;
+            width: 30px;
+            height: 30px;
             background: #0A1628;
             border-radius: 50%;
             display: flex;
@@ -147,14 +90,13 @@
             justify-content: center;
             font-weight: 600;
             color: #fff;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         .content-section {
             background: #fff;
-            padding: 22px 26px;
+            padding: 18px 22px;
             border-radius: 10px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
             border: 1px solid #E8E4E0;
         }
 
@@ -162,44 +104,43 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 18px;
-            flex-wrap: wrap;
-            gap: 10px;
+            margin-bottom: 14px;
         }
 
         .section-header h2 {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             color: #0A1628;
         }
 
+        .section-controls {
+            display: flex;
+            gap: 8px;
+        }
+
         .primary-btn {
-            padding: 8px 20px;
+            padding: 6px 16px;
             background: #0A1628;
             color: #fff;
             border: none;
             border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 13px;
-            transition: all 0.2s;
+            font-size: 12px;
         }
 
         .primary-btn:hover {
             background: #1A2A4A;
-            transform: translateY(-1px);
         }
 
         .secondary-btn {
-            padding: 8px 20px;
+            padding: 6px 16px;
             background: #f0f2f5;
             color: #0A1628;
             border: 1px solid #E8E4E0;
             border-radius: 6px;
             cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-            transition: all 0.2s;
+            font-size: 12px;
         }
 
         .secondary-btn:hover {
@@ -213,8 +154,8 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 13px;
-            min-width: 600px;
+            font-size: 12px;
+            min-width: 700px;
         }
 
         thead {
@@ -223,17 +164,16 @@
 
         thead th {
             color: #fff;
-            padding: 10px 14px;
+            padding: 8px 12px;
             text-align: left;
             font-weight: 600;
-            font-size: 11px;
+            font-size: 10px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
         tbody td {
-            padding: 10px 14px;
-            border-bottom: 1px solid #E8E4E0;
+            padding: 8px 12px;
+            border-bottom: 1px solid #f1f5f9;
             color: #4A4A4A;
         }
 
@@ -241,183 +181,525 @@
             background: #f5f2ed;
         }
 
+        .status-badge {
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-badge.in-stock {
+            background: #D4EDDA;
+            color: #155724;
+        }
+
+        .status-badge.low-stock {
+            background: #FEF3C7;
+            color: #856404;
+        }
+
+        .status-badge.out-of-stock {
+            background: #F8D7DA;
+            color: #721C24;
+        }
+
+        .action-btn {
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: none;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .action-btn.edit {
+            background: #DBEAFE;
+            color: #2563EB;
+        }
+
+        .action-btn.delete {
+            background: #FEE2E2;
+            color: #EF4444;
+        }
+
+        .action-btn.movement {
+            background: #E0E7FF;
+            color: #4F46E5;
+        }
+
         .empty-state {
             text-align: center;
-            padding: 40px 20px;
+            padding: 30px 20px;
             color: #888;
         }
 
-        .empty-state .icon {
-            font-size: 48px;
-            display: block;
-            margin-bottom: 12px;
-            opacity: 0.5;
-        }
-
-        .stats-grid {
+        .category-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 14px;
-            margin-bottom: 24px;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
         }
 
-        .stat-card {
+        .category-item {
             background: #fff;
-            padding: 16px 18px;
-            border-radius: 10px;
+            padding: 8px 12px;
+            border-radius: 6px;
             border: 1px solid #E8E4E0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .stat-card .label {
-            font-size: 11px;
-            color: #888;
+        .category-item .name {
             font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
+            font-size: 11px;
+            color: #4A4A4A;
         }
 
-        .stat-card .value {
-            font-size: 22px;
+        .category-item .count {
             font-weight: 700;
+            font-size: 15px;
             color: #0A1628;
-            margin-top: 4px;
         }
 
-        .stat-card .sub {
+        .fcr-display {
+            background: #fff;
+            padding: 16px 20px;
+            border-radius: 8px;
+            border: 1px solid #E8E4E0;
+            margin-bottom: 16px;
+        }
+
+        .fcr-display .fcr-label {
+            font-weight: 600;
+            font-size: 13px;
+            color: #0A1628;
+        }
+
+        .fcr-display .fcr-value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .fcr-bar-container {
+            margin-top: 8px;
+            width: 100%;
+            height: 24px;
+            background: #f1f5f9;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .fcr-bar {
+            height: 100%;
+            border-radius: 12px;
+            background: linear-gradient(90deg, #EF4444 0%, #F59E0B 50%, #22C55E 100%);
+            width: 0%;
+        }
+
+        .tab-bar {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #E8E4E0;
+        }
+
+        .tab-btn {
+            padding: 8px 16px;
+            background: none;
+            border: none;
             font-size: 12px;
-            color: #94a3b8;
-            margin-top: 2px;
+            font-weight: 600;
+            color: #888;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
         }
 
-        .header-actions {
+        .tab-btn.active {
+            color: #0A1628;
+            border-bottom-color: #0A1628;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toast {
+            padding: 10px 20px;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .toast.success {
+            background: #22C55E;
+        }
+
+        .toast.error {
+            background: #EF4444;
+        }
+
+        .toast.info {
+            background: #0A1628;
+        }
+
+        .search-filter-bar {
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 12px;
         }
 
-        @media (max-width: 992px) {
-            .sidebar {
-                width: 60px;
-            }
-
-            .sidebar-header h2,
-            .sidebar-header p,
-            .sidebar-divider,
-            .nav-menu a span:last-child {
-                display: none;
-            }
-
-            .nav-menu a {
-                justify-content: center;
-                padding: 12px;
-            }
-
-            .nav-menu .icon {
-                margin-right: 0;
-            }
-
-            .main-content {
-                margin-left: 60px;
-                padding: 18px;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
+        .search-filter-bar input[type="text"] {
+            padding: 5px 10px;
+            border: 1px solid #E8E4E0;
+            border-radius: 6px;
+            font-size: 12px;
+            width: 180px;
         }
 
-        @media (max-width: 768px) {
-            .top-bar {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .top-bar-right {
-                width: 100%;
-                justify-content: space-between;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 8px;
-            }
-
-            .content-section {
-                padding: 16px 18px;
-            }
-
-            .header-actions {
-                width: 100%;
-            }
-
-            .header-actions .primary-btn,
-            .header-actions .secondary-btn {
-                flex: 1;
-                text-align: center;
-            }
+        .search-filter-bar select {
+            padding: 5px 10px;
+            border: 1px solid #E8E4E0;
+            border-radius: 6px;
+            font-size: 12px;
+            background: #fff;
+            cursor: pointer;
         }
 
-        @media (max-width: 480px) {
-            .sidebar {
-                width: 48px;
-            }
+        .movement-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 12px;
+        }
 
-            .main-content {
-                margin-left: 48px;
-                padding: 10px;
-            }
+        .movement-item .qty-in {
+            color: #28A745;
+            font-weight: 600;
+        }
 
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
+        .movement-item .qty-out {
+            color: #DC3545;
+            font-weight: 600;
+        }
 
-            table {
-                min-width: 400px;
-                font-size: 11px;
-            }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
 
-            thead th,
-            tbody td {
-                padding: 6px 8px;
-            }
+        .modal-content {
+            background: #fff;
+            padding: 24px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            border-bottom: 2px solid #E8E4E0;
+            padding-bottom: 12px;
+        }
+
+        .modal-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #0A1628;
+        }
+
+        .modal-close {
+            font-size: 24px;
+            cursor: pointer;
+            color: #888;
+            background: none;
+            border: none;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        .form-group label {
+            font-size: 11px;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 3px;
+            color: #4A4A4A;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid #E8E4E0;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+            justify-content: flex-end;
+            border-top: 1px solid #E8E4E0;
+            padding-top: 14px;
+        }
+
+        .sidebar {
+            width: 220px;
+            background: #0A1628;
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .sidebar-header span {
+            font-size: 10px;
+            opacity: 0.6;
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 10px 0;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-menu li a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .nav-menu li a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .nav-menu li a.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .nav-menu li a .icon {
+            font-size: 16px;
+        }
+
+        .dashboard-container {
+            display: flex;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: #f8fafc;
+            min-height: 100vh;
+        }
+
+        .required {
+            color: #EF4444;
+        }
+
+        .supplier-card {
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid #E8E4E0;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+        }
+
+        .supplier-card .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .supplier-card .name {
+            font-weight: 600;
+            color: #0A1628;
+        }
+
+        .supplier-card .contact {
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        .supplier-card .body .row {
+            display: flex;
+            gap: 6px;
+            font-size: 12px;
+            color: #475569;
+            padding: 2px 0;
+        }
+
+        .status-badge-supplier {
+            font-size: 9px;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .status-badge-supplier.active {
+            background: #D4EDDA;
+            color: #155724;
+        }
+
+        .status-badge-supplier.on-hold {
+            background: #FFF3CD;
+            color: #856404;
+        }
+
+        .status-badge-supplier.inactive {
+            background: #F8D7DA;
+            color: #721C24;
+        }
+
+        .status-badge-supplier.blacklisted {
+            background: #E5E7EB;
+            color: #1F2937;
+        }
+
+        .status-badge-supplier.pending {
+            background: #EDE9FE;
+            color: #4C1D95;
+        }
+
+        .supplier-stats {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .supplier-stat {
+            background: #f8fafc;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #E8E4E0;
+            text-align: center;
+        }
+
+        .supplier-stat .num {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0A1628;
+        }
+
+        .supplier-stat .label {
+            font-size: 9px;
+            color: #94a3b8;
+            text-transform: uppercase;
+        }
+
+        .supplier-stat.active {
+            background: #D4EDDA;
+            border-color: #22C55E40;
+        }
+
+        .supplier-stat.on-hold {
+            background: #FFF3CD;
+            border-color: #F59E0B40;
+        }
+
+        .supplier-stat.inactive {
+            background: #FEE2E2;
+            border-color: #EF444440;
+        }
+
+        .supplier-stat.pending {
+            background: #EDE9FE;
+            border-color: #8B5CF640;
         }
     </style>
 </head>
 
 <body>
     <div class="dashboard-container">
-        <!-- ===== SIDEBAR ===== -->
         <nav class="sidebar">
             <div class="sidebar-header">
                 <h2>WHITESTONE</h2>
-                <span>Dynamic</span>
+                <span>DYNAMIC</span>
                 <div class="sidebar-divider"></div>
                 <p>Poultry Management</p>
             </div>
             <ul class="nav-menu">
-                <li><a href="dashboard.html"><span class="icon">📊</span><span>Dashboard</span></a></li>
-                <li><a href="employees.html"><span class="icon">👥</span><span>Employees</span></a></li>
-                <li><a href="stock.html" class="active"><span class="icon">📦</span><span>Stock</span></a></li>
-                <li><a href="feed.html"><span class="icon">🌾</span><span>Feed Management</span></a></li>
-                <li><a href="coops.html"><span class="icon">🏠</span><span>Coops</span></a></li>
-                <li><a href="eggs.html"><span class="icon">🥚</span><span>Egg Production</span></a></li>
-                <li><a href="sales.html"><span class="icon">💰</span><span>Sales</span></a></li>
-                <li><a href="chickens.html"><span class="icon">🐔</span><span>Chickens</span></a></li>
-                <li><a href="customers.html"><span class="icon">🤝</span><span>Customers</span></a></li>
-                <li><a href="batches.html"><span class="icon">📋</span><span>Batches</span></a></li>
-                <li><a href="pricing.html"><span class="icon">💲</span><span>Pricing</span></a></li>
-                <li><a href="security.html"><span class="icon">🔒</span><span>Security</span></a></li>
-                <li><a href="equipment.html"><span class="icon">🔧</span><span>Equipment</span></a></li>
-                <li><a href="#" onclick="logout()"><span class="icon">🚪</span><span>Logout</span></a></li>
+                <li><a href="dashboard.html"><span class="icon">📊</span> Dashboard</a></li>
+                <li><a href="employees.html"><span class="icon">👥</span> Employees</a></li>
+                <li><a href="stock.html" class="active"><span class="icon">📦</span> Stock</a></li>
+                <li><a href="feed.html"><span class="icon">🌾</span> Feed Management</a></li>
+                <li><a href="coops.html"><span class="icon">🏠</span> Coops</a></li>
+                <li><a href="eggs.html"><span class="icon">🥚</span> Eggs</a></li>
+                <li><a href="sales.html"><span class="icon">💰</span> Sales</a></li>
+                <li><a href="chickens.html"><span class="icon">🐔</span> Chickens</a></li>
+                <li><a href="customers.html"><span class="icon">👤</span> Customers</a></li>
+                <li><a href="batches.html"><span class="icon">📋</span> Batches</a></li>
+                <li><a href="pricing.html"><span class="icon">🏷️</span> Pricing</a></li>
+                <li><a href="security.html"><span class="icon">🔒</span> Security</a></li>
+                <li><a href="equipment.html"><span class="icon">🔧</span> Equipment</a></li>
+                <li><a href="#" id="logoutBtn"><span class="icon">🚪</span> Logout</a></li>
             </ul>
         </nav>
 
-        <!-- ===== MAIN CONTENT ===== -->
         <div class="main-content">
             <div class="top-bar">
                 <div class="top-bar-left">
                     <h1>📦 Stock Management</h1>
-                    <p class="welcome-text">Monitor poultry and egg inventory in <span>real-time</span></p>
+                    <p class="welcome-text">Complete inventory management for your poultry farm</p>
                 </div>
                 <div class="top-bar-right">
                     <span class="date-display" id="dateDisplay"></span>
@@ -428,57 +710,296 @@
             <!-- Stats -->
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="label">🐔 TOTAL BROILERS</div>
-                    <div class="value" id="totalBroilers">0</div>
-                    <div class="sub">Ready for sale</div>
+                    <div class="stat-icon">📦</div>
+                    <div class="stat-info">
+                        <h3>Total Items</h3>
+                        <p id="totalItems">0</p><span class="sub">In stock</span>
+                    </div>
                 </div>
                 <div class="stat-card">
-                    <div class="label">🐔 TOTAL LAYERS</div>
-                    <div class="value" id="totalLayers">0</div>
-                    <div class="sub">Active layers</div>
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-info">
+                        <h3>Stock Value</h3>
+                        <p id="totalValue">R 0.00</p><span class="sub">Total inventory</span>
+                    </div>
                 </div>
                 <div class="stat-card">
-                    <div class="label">🥚 TOTAL EGGS</div>
-                    <div class="value" id="totalEggs">0</div>
-                    <div class="sub">In stock</div>
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-info">
+                        <h3>Categories</h3>
+                        <p id="categoryCount">0</p><span class="sub">Types</span>
+                    </div>
                 </div>
                 <div class="stat-card">
-                    <div class="label">💰 TOTAL VALUE</div>
-                    <div class="value" id="totalValue">R 0.00</div>
-                    <div class="sub">Estimated</div>
+                    <div class="stat-icon">🌾</div>
+                    <div class="stat-info">
+                        <h3>Feed Stock</h3>
+                        <p id="feedStock">0 kg</p><span class="sub">Total feed</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⚠️</div>
+                    <div class="stat-info">
+                        <h3>Low Stock</h3>
+                        <p id="lowStockCount">0</p><span class="sub">Items below threshold</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⏳</div>
+                    <div class="stat-info">
+                        <h3>Feed Days</h3>
+                        <p id="feedDays">0</p><span class="sub">Days remaining</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Content Section -->
-            <div class="content-section">
-                <div class="section-header">
-                    <h2>Stock Inventory</h2>
-                    <div class="header-actions">
-                        <button class="primary-btn" onclick="showAddModal()">➕ Add Product</button>
-                        <button class="secondary-btn" onclick="refreshData()">🔄 Refresh</button>
+            <!-- Categories -->
+            <div class="category-grid">
+                <div class="category-item"><span class="name">🐔 Birds</span><span class="count" id="catBirds">0</span>
+                </div>
+                <div class="category-item"><span class="name">🥚 Eggs</span><span class="count" id="catEggs">0</span>
+                </div>
+                <div class="category-item"><span class="name">🌾 Feed</span><span class="count" id="catFeed">0 kg</span>
+                </div>
+                <div class="category-item"><span class="name">💊 Meds</span><span class="count" id="catMeds">0</span>
+                </div>
+                <div class="category-item"><span class="name">🔧 Equipment</span><span class="count"
+                        id="catEquipment">0</span></div>
+                <div class="category-item"><span class="name">📦 Packaging</span><span class="count"
+                        id="catPackaging">0</span></div>
+            </div>
+
+            <!-- FCR -->
+            <div class="fcr-display">
+                <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+                    <div>
+                        <span class="fcr-label">📈 Feed Conversion Ratio</span>
+                        <div style="display:flex;align-items:center;gap:12px;margin-top:4px;">
+                            <span class="fcr-value" id="fcrDisplayValue">0.00</span>
+                            <span class="fcr-status good" id="fcrDisplayStatus">Good</span>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:20px;flex-wrap:wrap;">
+                        <div><span style="font-size:11px;color:#94a3b8;">Feed Consumed</span><br><strong
+                                id="fcrFeed">0</strong> kg</div>
+                        <div><span style="font-size:11px;color:#94a3b8;">Weight Gained</span><br><strong
+                                id="fcrGained">0</strong> kg</div>
                     </div>
                 </div>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Item</th>
-                                <th>Quantity</th>
-                                <th>Unit</th>
-                                <th>Price (R)</th>
-                                <th>Total Value</th>
-                                <th>Last Updated</th>
-                            </tr>
-                        </thead>
-                        <tbody id="stockTableBody">
-                            <tr>
-                                <td colspan="6" class="empty-state"><span class="icon">📭</span>Loading stock data...
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="fcr-bar-container">
+                    <div class="fcr-bar" id="fcrBar" style="width:0%;"></div>
+                </div>
+                <div class="fcr-thresholds"
+                    style="display:flex;justify-content:space-between;font-size:10px;color:#94a3b8;margin-top:4px;">
+                    <span>⚠️ Poor > 2.2</span>
+                    <span>📊 Average 1.8 - 2.2</span>
+                    <span>✅ Good ≤ 1.8</span>
                 </div>
             </div>
+
+            <!-- Tabs -->
+            <div class="tab-bar">
+                <button class="tab-btn active" data-tab="tab-inventory" onclick="switchTab('tab-inventory')">📦
+                    Inventory</button>
+                <button class="tab-btn" data-tab="tab-movements" onclick="switchTab('tab-movements')">🔄
+                    Movements</button>
+                <button class="tab-btn" data-tab="tab-suppliers" onclick="switchTab('tab-suppliers')">🏢
+                    Suppliers</button>
+                <button class="tab-btn" data-tab="tab-reports" onclick="switchTab('tab-reports')">📊 Reports</button>
+            </div>
+
+            <!-- TAB 1: INVENTORY -->
+            <div id="tab-inventory" class="tab-content active">
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2>Stock Inventory</h2>
+                        <div class="section-controls">
+                            <button class="primary-btn" onclick="openAddModal()">➕ Add Product</button>
+                            <button class="secondary-btn" onclick="refreshData()">🔄 Refresh</button>
+                        </div>
+                    </div>
+                    <div class="search-filter-bar">
+                        <input type="text" id="searchInput" placeholder="🔍 Search products..." oninput="filterStock()">
+                        <select id="categoryFilter" onchange="filterStock()">
+                            <option value="all">All Categories</option>
+                            <option value="Feed">🌾 Feed</option>
+                            <option value="Eggs">🥚 Eggs</option>
+                            <option value="Birds">🐔 Birds</option>
+                            <option value="Meds">💊 Medications</option>
+                            <option value="Equipment">🔧 Equipment</option>
+                            <option value="Packaging">📦 Packaging</option>
+                            <option value="Vaccines">💉 Vaccines</option>
+                        </select>
+                        <select id="statusFilter" onchange="filterStock()">
+                            <option value="all">All Status</option>
+                            <option value="in-stock">✅ In Stock</option>
+                            <option value="low-stock">⚠️ Low Stock</option>
+                            <option value="out-of-stock">❌ Out of Stock</option>
+                        </select>
+                        <span style="font-size:11px;color:#94a3b8;margin-left:auto;" id="itemCount">0 items</span>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Category</th>
+                                    <th>Qty</th>
+                                    <th>Unit</th>
+                                    <th>Value</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stockTableBody">
+                                <tr>
+                                    <td colspan="7" class="empty-state"><span class="icon">⏳</span>Loading products...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: MOVEMENTS -->
+            <div id="tab-movements" class="tab-content">
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2>🔄 Stock Movements</h2>
+                        <span style="font-size:11px;color:#94a3b8;">Purchase, Usage, Waste, Return, Transfer,
+                            Adjustment</span>
+                    </div>
+                    <div id="movementsContainer">
+                        <div style="text-align:center;padding:20px;color:#94a3b8;font-size:12px;">No movements recorded
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: SUPPLIERS -->
+            <div id="tab-suppliers" class="tab-content">
+                <div class="content-section">
+                    <div class="section-header">
+                        <div>
+                            <h2>🏢 Suppliers</h2>
+                            <span style="font-size:11px;color:#94a3b8;">Manage your suppliers and their products</span>
+                        </div>
+                        <button class="primary-btn" onclick="openSupplierModal()">➕ Add Supplier</button>
+                    </div>
+                    <div id="suppliersContainer">
+                        <div style="text-align:center;padding:20px;color:#94a3b8;font-size:12px;">Loading suppliers...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: REPORTS -->
+            <div id="tab-reports" class="tab-content">
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2>📊 Reports & Insights</h2>
+                        <button class="secondary-btn" onclick="refreshData()">🔄 Refresh</button>
+                    </div>
+                    <div class="report-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                        <div class="report-card"
+                            style="background:#fff;padding:14px 18px;border-radius:8px;border:1px solid #E8E4E0;">
+                            <div class="report-label"
+                                style="font-size:10px;text-transform:uppercase;color:#94a3b8;font-weight:600;">📦 Total
+                                Stock Value</div>
+                            <div class="report-value" id="reportTotalValue"
+                                style="font-size:20px;font-weight:700;color:#0A1628;">R 0.00</div>
+                        </div>
+                        <div class="report-card"
+                            style="background:#fff;padding:14px 18px;border-radius:8px;border:1px solid #E8E4E0;">
+                            <div class="report-label"
+                                style="font-size:10px;text-transform:uppercase;color:#94a3b8;font-weight:600;">⚠️ Low
+                                Stock Items</div>
+                            <div class="report-value" id="reportLowStock"
+                                style="font-size:20px;font-weight:700;color:#0A1628;">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Movements -->
+            <div style="margin-top:16px;background:#fff;padding:16px 20px;border-radius:10px;border:1px solid #E8E4E0;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                    <div>
+                        <h3 style="font-size:14px;font-weight:600;color:#0A1628;margin:0;">🔄 Recent Stock Movements
+                        </h3>
+                        <p style="font-size:11px;color:#94a3b8;margin:2px 0 0 0;">Track all stock activity</p>
+                    </div>
+                    <button onclick="refreshMovements()"
+                        style="padding:4px 14px;border:1px solid #E8E4E0;border-radius:6px;background:#fff;cursor:pointer;font-size:11px;">🔄
+                        Refresh</button>
+                </div>
+                <div id="movementsContainerBottom">
+                    <div style="text-align:center;padding:20px;color:#94a3b8;font-size:12px;">Loading movements...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Product Modal -->
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>➕ Add Product</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="addProductForm">
+                <div class="form-group">
+                    <label>Product Name <span class="required">*</span></label>
+                    <input type="text" id="productName" required placeholder="Enter product name">
+                </div>
+                <div class="form-group">
+                    <label>Category <span class="required">*</span></label>
+                    <select id="productCategory" required>
+                        <option value="">Select Category</option>
+                        <option value="Feed">🌾 Feed</option>
+                        <option value="Eggs">🥚 Eggs</option>
+                        <option value="Birds">🐔 Birds</option>
+                        <option value="Meds">💊 Medications</option>
+                        <option value="Equipment">🔧 Equipment</option>
+                        <option value="Packaging">📦 Packaging</option>
+                        <option value="Vaccines">💉 Vaccines</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Quantity <span class="required">*</span></label>
+                        <input type="number" id="productQuantity" required min="0" step="0.01" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Unit</label>
+                        <select id="productUnit">
+                            <option value="kg">kg</option>
+                            <option value="pieces">pieces</option>
+                            <option value="units">units</option>
+                            <option value="bags">bags</option>
+                            <option value="cartons">cartons</option>
+                            <option value="trays">trays</option>
+                            <option value="vials">vials</option>
+                            <option value="bottles">bottles</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Value (R)</label>
+                        <input type="number" id="productValue" step="0.01" min="0" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Min Threshold</label>
+                        <input type="number" id="productThreshold" min="0" placeholder="0">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="secondary-btn" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="primary-btn" id="saveBtn">💾 Save Product</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -487,117 +1008,301 @@
         const token = localStorage.getItem('token');
         if (!token) window.location.href = 'login.html';
 
-        let stockData = [];
-        let statsData = {};
+        var allProducts = [];
+        var allMovements = [];
+        var allSuppliers = [];
 
-        document.getElementById('dateDisplay').textContent = new Date().toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+        document.getElementById('dateDisplay').textContent = new Date().toLocaleDateString('en-US', {
+            weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
+        });
+
+        function showToast(message, type) {
+            var container = document.getElementById('toastContainer');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toastContainer';
+                container.className = 'toast-container';
+                document.body.appendChild(container);
+            }
+            var toast = document.createElement('div');
+            toast.className = 'toast ' + (type || 'info');
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(function () {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(function () { toast.remove(); }, 300);
+            }, 3000);
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(function (el) { el.classList.remove('active'); });
+            document.querySelectorAll('.tab-btn').forEach(function (el) { el.classList.remove('active'); });
+            document.getElementById(tabId).classList.add('active');
+            document.querySelector('[data-tab="' + tabId + '"]').classList.add('active');
+        }
 
         async function loadUser() {
             try {
-                const res = await fetch(API_URL + '/api/auth/me', { headers: { 'Authorization': 'Bearer ' + token } });
-                if (res.ok) {
-                    const user = await res.json();
-                    document.getElementById('userAvatar').textContent = (user.name || 'U')[0].toUpperCase();
-                } else {
-                    localStorage.removeItem('token');
-                    window.location.href = 'login.html';
-                }
-            } catch (e) {
-                localStorage.removeItem('token');
-                window.location.href = 'login.html';
-            }
-        }
-
-        function logout() {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            window.location.href = 'login.html';
-        }
-
-        function showAddModal() {
-            alert('➕ Add Product - Feature coming soon!');
-        }
-
-        function refreshData() {
-            document.getElementById('stockTableBody').innerHTML = '<tr><td colspan="6" class="empty-state"><span class="icon">🔄</span>Refreshing...</td></tr>';
-            loadData();
-        }
-
-        async function loadData() {
-            try {
-                const res = await fetch(API_URL + '/api/stock', {
+                var res = await fetch(API_URL + '/api/auth/me', {
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
-                if (!res.ok) throw new Error('API error');
-                const data = await res.json();
+                if (res.ok) {
+                    var user = await res.json();
+                    document.getElementById('userAvatar').textContent = (user.name || 'U')[0].toUpperCase();
+                }
+            } catch (e) { console.warn('User load error'); }
+        }
 
-                stockData = data.products || [];
-                statsData = data.stats || {};
-                updateUI();
+        // ============================================
+        // MAIN LOAD FUNCTION - FIXED
+        // ============================================
+        async function loadStock() {
+            console.log('loadStock() called - fetching from /api/stock');
+            try {
+                var res = await fetch(API_URL + '/api/stock', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (!res.ok) throw new Error('API error: ' + res.status);
+                var data = await res.json();
+                console.log('API Response:', data);
+                console.log('Products in response:', data.products.length);
+
+                // FIX: Assign products to allProducts
+                allProducts = data.products || [];
+                allMovements = data.movements || [];
+
+                console.log('allProducts now has:', allProducts.length, 'items');
+                console.log('First product:', allProducts[0]);
+
+                renderProducts(allProducts);
+                renderMovements(allMovements);
+                updateStats(data.stats || {});
+                updateCategories(data.categories || {});
+                updateFCR(data.stats || {});
+                document.getElementById('itemCount').textContent = allProducts.length + ' items';
+                loadSuppliers();
             } catch (error) {
-                console.warn('API unavailable, using sample data:', error);
-                loadSampleData();
+                console.error('Error loading stock:', error);
+                document.getElementById('stockTableBody').innerHTML = '<tr><td colspan="7" class="empty-state"><span class="icon">❌</span>Error loading data: ' + error.message + '</td></tr>';
+                showToast('❌ Error loading stock data', 'error');
             }
         }
 
-        function loadSampleData() {
-            stockData = [
-                { id: 1, name: 'Broiler Feed', quantity: 450, unit: 'kg', price: 4.50, value: 2025.00, updated: '2026-06-27' },
-                { id: 2, name: 'Layer Feed', quantity: 320, unit: 'kg', price: 5.20, value: 1664.00, updated: '2026-06-27' },
-                { id: 3, name: 'Fresh Eggs', quantity: 540, unit: 'eggs', price: 2.50, value: 1350.00, updated: '2026-06-27' },
-                { id: 4, name: 'Broiler Chicks', quantity: 320, unit: 'chicks', price: 45.00, value: 14400.00, updated: '2026-06-26' },
-                { id: 5, name: 'Layer Pullets', quantity: 240, unit: 'pullets', price: 85.00, value: 20400.00, updated: '2026-06-26' },
-                { id: 6, name: 'Vaccines', quantity: 25, unit: 'vials', price: 120.00, value: 3000.00, updated: '2026-06-25' },
-                { id: 7, name: 'Egg Cartons', quantity: 200, unit: 'cartons', price: 8.00, value: 1600.00, updated: '2026-06-25' }
-            ];
-            statsData = {
-                totalBroilers: 320,
-                totalLayers: 240,
-                totalEggs: 540,
-                totalValue: 92000.00
-            };
-            updateUI();
+        function loadSuppliers() {
+            fetch(API_URL + '/api/stock/suppliers', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    allSuppliers = data || [];
+                    renderSuppliers(allSuppliers);
+                })
+                .catch(function () {
+                    document.getElementById('suppliersContainer').innerHTML = '<div style="text-align:center;padding:20px;color:#EF4444;font-size:12px;">❌ Failed to load suppliers</div>';
+                });
         }
 
-        function updateUI() {
-            // Update stats
-            document.getElementById('totalBroilers').textContent = statsData.totalBroilers || 0;
-            document.getElementById('totalLayers').textContent = statsData.totalLayers || 0;
-            document.getElementById('totalEggs').textContent = statsData.totalEggs || 0;
-            document.getElementById('totalValue').textContent = 'R ' + (statsData.totalValue || 0).toFixed(2);
+        function renderSuppliers(suppliers) {
+            var container = document.getElementById('suppliersContainer');
+            if (!suppliers || suppliers.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:40px 20px;color:#94a3b8;">No suppliers added yet</div>';
+                return;
+            }
+            var html = '';
+            for (var i = 0; i < suppliers.length; i++) {
+                var s = suppliers[i];
+                var status = (s.status || 'active').toLowerCase();
+                var statusLabels = { 'active': '🟢 Active', 'on-hold': '🟡 On Hold', 'inactive': '🔴 Inactive', 'blacklisted': '⚫ Blacklisted', 'pending': '🟣 Pending' };
+                html += '<div class="supplier-card">';
+                html += '<div class="header"><div><div class="name">' + (s.name || 'Unknown') + '</div>' + (s.contact_person ? '<div class="contact">👤 ' + s.contact_person + '</div>' : '') + '</div><span class="status-badge-supplier ' + status + '">' + (statusLabels[status] || '🟢 Active') + '</span></div>';
+                html += '<div class="body">';
+                if (s.phone) { html += '<div class="row"><span>📞</span> ' + s.phone + '</div>'; }
+                if (s.email) { html += '<div class="row"><span>✉️</span> ' + s.email + '</div>'; }
+                html += '</div></div>';
+            }
+            container.innerHTML = html;
+        }
 
-            // Update table
-            const tbody = document.getElementById('stockTableBody');
-            if (!stockData || stockData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><span class="icon">📭</span>No stock items found. Add your first product!</td></tr>';
+        function renderProducts(products) {
+            console.log('renderProducts() called with', products.length, 'products');
+
+            var tbody = document.getElementById('stockTableBody');
+            if (!tbody) {
+                console.error('stockTableBody element not found!');
                 return;
             }
 
-            tbody.innerHTML = stockData.map(item => {
-                const name = item.name || item.item || 'Unknown';
-                const qty = item.quantity || 0;
-                const unit = item.unit || 'units';
-                const price = (item.price || 0).toFixed(2);
-                const value = (item.value || item.total || 0).toFixed(2);
-                const updated = item.updated || item.lastUpdated || '2026-06-27';
+            if (!products || products.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><span class="icon">📭</span>No products found</td></tr>';
+                return;
+            }
 
-                return `
-                <tr>
-                    <td><strong>${name}</strong></td>
-                    <td>${qty}</td>
-                    <td>${unit}</td>
-                    <td>R ${price}</td>
-                    <td>R ${value}</td>
-                    <td>${updated}</td>
-                </tr>
-                `;
-            }).join('');
+            var html = '';
+            for (var i = 0; i < products.length; i++) {
+                var p = products[i];
+                console.log('Rendering:', p.item_type, p.quantity);
+
+                var itemName = p.item_type || 'Unknown';
+                var qty = p.quantity || 0;
+                var unit = p.unit || 'units';
+                var price = p.price || 0;
+                var totalValue = (qty * price).toFixed(2);
+                var category = p.category || 'Other';
+
+                var status = 'in-stock';
+                var statusText = '✅ In Stock';
+                if (qty <= 0) {
+                    status = 'out-of-stock';
+                    statusText = '❌ Out of Stock';
+                } else if (qty < 50) {
+                    status = 'low-stock';
+                    statusText = '⚠️ Low Stock';
+                }
+
+                html += '<tr>';
+                html += '<td><strong>' + itemName + '</strong></td>';
+                html += '<td>' + category + '</td>';
+                html += '<td>' + qty + '</td>';
+                html += '<td>' + unit + '</td>';
+                html += '<td>R ' + totalValue + '</td>';
+                html += '<td><span class="status-badge ' + status + '">' + statusText + '</span></td>';
+                html += '<td>';
+                html += '<button class="action-btn edit" onclick="alert(\'Edit: ' + itemName + '\')">✏️</button>';
+                html += '<button class="action-btn movement" onclick="alert(\'Movement for: ' + itemName + '\')">📊</button>';
+                html += '<button class="action-btn delete" onclick="if(confirm(\'Delete ' + itemName + '?\')) { alert(\'Deleted\'); }">🗑️</button>';
+                html += '</td>';
+                html += '</tr>';
+            }
+            tbody.innerHTML = html;
+            console.log('✅ Rendered', products.length, 'products');
         }
 
-        // Load on start
+        function renderMovements(movements) {
+            var container = document.getElementById('movementsContainerBottom');
+            if (!movements || movements.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:20px;color:#94a3b8;font-size:12px;">No movements recorded</div>';
+                return;
+            }
+            var html = '';
+            var recent = movements.slice(0, 10);
+            for (var i = 0; i < recent.length; i++) {
+                var m = recent[i];
+                var sign = (m.type === 'in' || m.type === 'purchase') ? '+' : '-';
+                var qtyClass = (m.type === 'in' || m.type === 'purchase') ? 'qty-in' : 'qty-out';
+                var displayQty = m.amount || m.qty || 0;
+                var reasonDisplay = m.reason || m.notes || '';
+                var productName = m.productName || m.product || 'Unknown';
+                var dateDisplay = m.date || '';
+                html += '<div class="movement-item">';
+                html += '<span><strong>' + productName + '</strong> <span style="color:#94a3b8;font-size:11px;">' + reasonDisplay + '</span></span>';
+                html += '<span class="' + qtyClass + '">' + sign + displayQty + '</span>';
+                html += '<span style="color:#94a3b8;font-size:11px;">' + dateDisplay + '</span>';
+                html += '</div>';
+            }
+            container.innerHTML = html;
+        }
+
+        function updateStats(stats) {
+            document.getElementById('totalItems').textContent = stats.itemCount || 0;
+            document.getElementById('totalValue').textContent = 'R ' + (stats.totalValue || 0).toFixed(2);
+            document.getElementById('categoryCount').textContent = stats.categories || 0;
+            document.getElementById('feedStock').textContent = (stats.totalFeed || 0) + ' kg';
+            document.getElementById('lowStockCount').textContent = stats.lowStockItems || 0;
+            document.getElementById('feedDays').textContent = stats.feedDays || 0;
+            document.getElementById('reportTotalValue').textContent = 'R ' + (stats.totalValue || 0).toFixed(2);
+            document.getElementById('reportLowStock').textContent = stats.lowStockItems || 0;
+        }
+
+        function updateCategories(cats) {
+            document.getElementById('catBirds').textContent = cats.birds || 0;
+            document.getElementById('catEggs').textContent = cats.eggs || 0;
+            document.getElementById('catFeed').textContent = (cats.feed || 0) + ' kg';
+            document.getElementById('catMeds').textContent = cats.meds || 0;
+            document.getElementById('catEquipment').textContent = cats.equipment || 0;
+            document.getElementById('catPackaging').textContent = cats.packaging || 0;
+        }
+
+        function updateFCR(stats) {
+            var feed = stats.feedConsumed || 0;
+            var gained = stats.weightGained || 0;
+            var fcr = gained > 0 ? (feed / gained) : 0;
+            document.getElementById('fcrDisplayValue').textContent = fcr.toFixed(2);
+            document.getElementById('fcrFeed').textContent = feed;
+            document.getElementById('fcrGained').textContent = gained;
+            var barWidth = Math.min((fcr / 2.5) * 100, 100);
+            document.getElementById('fcrBar').style.width = barWidth + '%';
+            var statusEl = document.getElementById('fcrDisplayStatus');
+            if (fcr <= 1.8) { statusEl.textContent = '✅ Good'; statusEl.className = 'fcr-status good'; }
+            else if (fcr <= 2.2) { statusEl.textContent = '📊 Average'; statusEl.className = 'fcr-status average'; }
+            else { statusEl.textContent = '⚠️ Poor'; statusEl.className = 'fcr-status poor'; }
+        }
+
+        function filterStock() {
+            var search = document.getElementById('searchInput').value.toLowerCase();
+            var category = document.getElementById('categoryFilter').value;
+            var status = document.getElementById('statusFilter').value;
+            var filtered = allProducts.filter(function (p) {
+                var matchSearch = (p.item_type || '').toLowerCase().includes(search) || (p.category || '').toLowerCase().includes(search);
+                var matchCategory = category === 'all' || p.category === category;
+                var pStatus = 'in-stock';
+                if (p.quantity <= 0) pStatus = 'out-of-stock';
+                else if (p.quantity < 50) pStatus = 'low-stock';
+                var matchStatus = status === 'all' || pStatus === status;
+                return matchSearch && matchCategory && matchStatus;
+            });
+            renderProducts(filtered);
+            document.getElementById('itemCount').textContent = filtered.length + ' items';
+        }
+
+        function refreshData() {
+            document.getElementById('stockTableBody').innerHTML = '<tr><td colspan="7" class="empty-state"><span class="icon">🔄</span>Refreshing...</td></tr>';
+            loadStock();
+            showToast('🔄 Stock data refreshed', 'info');
+        }
+
+        function refreshMovements() {
+            loadStock();
+            showToast('🔄 Movements refreshed', 'info');
+        }
+
+        function openAddModal() {
+            document.getElementById('addModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('addModal').style.display = 'none';
+        }
+
+        function openSupplierModal() {
+            alert('Add supplier modal - implement as needed');
+        }
+
+        function closeSupplierModal() {
+            // Close supplier modal
+        }
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', function (e) {
+            e.preventDefault();
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        });
+
+        // ============================================
+        // PAGE INIT - THIS RUNS WHEN PAGE LOADS
+        // ============================================
+        console.log('Page loading - calling loadStock()');
         loadUser();
-        loadData();
-        setInterval(loadData, 30000);
+        loadStock();
+        setInterval(loadStock, 30000);
+
+        // Modal close on background click
+        document.getElementById('addModal').addEventListener('click', function (e) {
+            if (e.target === this) closeModal();
+        });
     </script>
 </body>
 
